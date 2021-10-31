@@ -97,7 +97,7 @@
 	\newpage
 	\chapter*{Abstract}
 	Bayesian experimental design (BED) is a powerful mathematical framework with diverse applications that include asking the most pertinent question in an online survey, designing a laboratory experiment, choosing sensor locations, obtaining labels in active learning, searching for the maximum of an unknown function, and exploring an unknown environment.
-	Automated design of optimal experiments allows scientists to undertake experiments more efficiently, reach statistically valid conclusions more quickly, and unlock kinds of experiments that have been hitherto considered impractical.
+	Automated design of optimal experiments will allow scientists to undertake experiments more efficiently, reach statistically valid conclusions more quickly, and unlock kinds of experiments that have been hitherto considered impractical.
 	Unfortunately, widespread utilisation of BED for designing optimal experiments is not yet a reality.
 	Adoption of BED is hampered by computational challenges that are inherent in finding experimental designs that maximise the expected information that will be gained about the underlying process by running the experiment.
 	Broadly, the computational challenges can be broken down into three parts of increasing complexity: 1) estimating the expected information gain, 2) optimising the expected information gain over the space of possible designs, and 3) choosing a sequence of optimal designs whilst incorporating feedback from the experiment.
@@ -114,7 +114,7 @@
 	\newpage
 	\chapter*{Acknowledgements}
 	I would like to begin by thanking my supervisors Yee Whye Teh and Tom Rainforth for their kindness, patience and guidance throughout my DPhil.
-	To Yee Whye, I particularly owe gratitude for his thoughtfulness and calmness, the confidence he has in me and his unwavering commitment to allow me to work on whichever project I find most interesting.
+	To Yee Whye, I particularly owe gratitude for his thoughtfulness and calmness, his ability to always give some insight on the mathematical problem that I happened to be considering and for his unwavering commitment to allow me to work on whichever project I find most interesting.
 	To Tom, I would like to express my thanks for the enthusiasm and interest he has for our shared work---I would have given up many years ago without his input and his drive to continually improve our understanding---and for teaching me many of the skills that I needed to succeed in my DPhil, including writing in something other than the `Russian mathematician' style.
 	
 	In the Department of Statistics at Oxford, I would like to thank Emile Mathieu for his friendship and support during our four year DPhil adventure, as well as Benjamin Bloem-Reddy, Chris Maddison, Dominic Richards, Jean-François Ton, Adam Kosiorek, Emilien Dupont, Anthony Caterini, Adam Goliński, Bobby He, Hyunjik Kim, Qinyi Zhang, Yuan Zhou, Michael Hutchinson and Desi Ivanova for their friendship and for making the department a good place to be.
@@ -135,59 +135,82 @@
 	
 	\tableofcontents
 	
-	\section*{Page counts}
-	\begin{center}
-		\begin{tabular}{lr}
-			Main content pages & 100 \\
-			Reference pages & 50 \\
-			Appendices & 25 \\
-			Other & \\
-			\hline
-			Total & 100
-		\end{tabular}
-	\end{center}
+%	\section*{Page counts}
+%	\begin{center}
+%		\begin{tabular}{lr}
+%			Main content pages & 100 \\
+%			Reference pages & 50 \\
+%			Appendices & 25 \\
+%			Other & \\
+%			\hline
+%			Total & 100
+%		\end{tabular}
+%	\end{center}
 	
 \newpage
 	
 	
 	\chapter{Introduction and Literature Review}
 	\label{chap:intro}
+	In this chapter, we present a self-contained literature review of the field of Bayesian Experimental Design.
+	In Chapter~\ref{chap:vboed}, we present work on the variational estimation of the expected information gain.
+	Chapter~\ref{chap:sgboed} discusses stochastic-gradient optimisation of Bayesian experimental designs.
+	In Chapter~\ref{chap:mlmc}, we extend this by deriving an unbiased gradient estimator of the expected information gain.
+	In Chapter~\ref{chap:dad}, we consider the problem of sequential experimental design, and present a policy-based algorithm for real-time adaptive experimental design.
+	Chapter~\ref{chap:idad} is an extension of Chapter~\ref{chap:dad} to implicit models.
+	We conclude with the discussion, in Chapter~\ref{chap:discussion}. 
 	\includepdf[pagecommand={}, pages=-, trim=0mm 17.5mm 0mm 17.5mm, clip]{litreview.pdf}
 	
 	\chapter{Variational Bayesian Optimal Experimental Design}
 	\label{chap:vboed}
+	This paper was published as the following
+	\begin{quote}
+		Adam Foster, Martin Jankowiak, Elias Bingham, Paul Horsfall, Yee Whye Teh, Thomas Rainforth, and Noah Goodman. Variational Bayesian Optimal Experimental Design.  In \emph{Advances in Neural Information Processing Systems 32}, pages 14036–14047. Curran Associates, Inc., 2019.
+	\end{quote}
+	
 	\includepdf[pagecommand={}, pages=-, trim=5mm 17.5mm 5mm 17.5mm, clip]{vboedmain.pdf}
 	\includepdf[pagecommand={}, pages=-, trim=5mm 17.5mm 5mm 17.5mm, clip]{vboedsupplement.pdf}
 	\includepdf[pagecommand={}, pages=-, trim=0mm 0mm 0mm 0mm, clip]{statementofauthorshipvboed.pdf}
 	
 	\chapter{A Unified Stochastic Gradient Approach to Designing Bayesian-Optimal Experiments}
 	\label{chap:sgboed}
+	This paper was published as the following
+	\begin{quote}
+		Adam Foster, Martin Jankowiak, Matthew O'Meara, Yee Whye Teh, and Thomas Rainforth. A Unified Stochastic Gradient Approach to Designing Bayesian-Optimal Experiments.  In \emph{Proceedings of the Twenty Third International Conference on Artificial Intelligence and Statistics}, pages 2959--2969. PMLR, 2020.
+	\end{quote}
 	\includepdf[pagecommand={}, pages=-, trim=0mm 16.5mm 0mm 16.5mm, clip]{sgboed.pdf}
 	\includepdf[pagecommand={}, pages=-, trim=0mm 0mm 0mm 0mm, clip]{statementofauthorshipsgboed.pdf}
 	
 	\chapter{Unbiased MLMC stochastic gradient-based optimization of Bayesian experimental designs}
 	\label{chap:mlmc}
+	This paper has been accepted for publication in the SIAM Journal on Scientific Computing.
 	\includepdf[pagecommand={}, pages=-, trim=0mm 33mm 32mm 30mm, clip]{mlmc.pdf}
 	\includepdf[pagecommand={}, pages=-, trim=0mm 0mm 0mm 0mm, clip]{statementofauthorshipmlmc.pdf}
 	
 	\chapter{Deep Adaptive Design: Amortizing Bayesian Experimental Design}
 	\label{chap:dad}
+	This paper was published as the following
+	\begin{quote}
+		Adam Foster, Desi R Ivanova, Ilyas Malik, and Thomas Rainforth. Deep Adaptive Design: Amortizing Sequential Bayesian Experimental Design. In \emph{Proceedings of the 38th International Conference on Machine Learning}, pages 3384--3395. PMLR, 2021.
+	\end{quote}
 	\includepdf[pagecommand={}, pages=-, trim=0mm 17mm 0mm 17mm, clip]{dad.pdf}
 	\includepdf[pagecommand={}, pages=-, trim=0mm 0mm 0mm 0mm, clip]{statementofauthorshipdad.pdf}
 	
 	\chapter{Implicit Deep Adaptive Design: Policy-Based Experimental Design without Likelihoods}
 	\label{chap:idad}
+	This paper has been accepted for publication at the Thirty-fifth Conference on Neural Information Processing Systems (NeurIPS 2021).
 	\includepdf[pagecommand={}, pages=-, trim=5mm 17.5mm 5mm 17.5mm, clip]{idad.pdf}
 	\includepdf[pagecommand={}, pages=-, trim=0mm 0mm 0mm 0mm, clip]{statementofauthorshipidad.pdf}
 	
 	\chapter{Discussion}
 	\label{chap:discussion}
+	This discussion is broken into a number of self-contained essays that delve into specific aspects of the concepts laid out in the earlier chapters.
+	In Section 1, we focus on elucidating the ideas of Chapters~\ref{chap:vboed} and~\ref{chap:sgboed} by focusing on the specific example use case of Bayesian \emph{model selection}. We examine how the variational estimators of Chapter~\ref{chap:vboed} look in this example, highlighting connections to other work, we also note how the approach of Chapter~\ref{chap:sgboed} translates to this specific case.
+	In Section 2, we focus on comparing our work, particularly the estimators of Chapter~\ref{chap:sgboed} to work in the field of Bayesian active learning, drawing out the deep connections between experimental design and active learning.
+	In Section 3, we draw another connection, this time between the sequential experiment methods in Chapters~\ref{chap:dad} and~\ref{chap:idad} and the field of Bayesian reinforcement learning. We show that reinforcement learning provides a natural language to express the sequential experimental design problem.
+	In Section 4, we investigate some of the statistical properties of various estimators discussed in this thesis. We focus on the NMC estimator, the PCE estimator introduced in Chapter~\ref{chap:sgboed}. We connect these more basic estimators with MLMC estimators, creating a stronger connection between earlier chapters and Chapter~\ref{chap:mlmc}.
+	In Section 5, we present new results on mutual information bounds. This can be seen a generalising theory for some of the bounds derived in Chapters~\ref{chap:vboed}, \ref{chap:sgboed}, \ref{chap:dad} and \ref{chap:idad}.
 	\includepdf[pagecommand={}, pages=-, trim=0mm 17.5mm 0mm 17.5mm, clip]{discussion.pdf}
-	
-	\chapter{Additional material}
-	\label{chap:additional}
-	\includepdf[pages=-]{bounds.pdf}
-	\includepdf[pages=-]{estimator.pdf}
 	
 	
 	
