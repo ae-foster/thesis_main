@@ -35,7 +35,7 @@
 
 % theorem
 \theoremstyle{plain}
-\newtheorem{theorem}{Theorem}
+\newtheorem{theorem}{Theorem}[chapter]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{remark}[theorem]{Remark}
@@ -1950,7 +1950,7 @@
 	%Plus all our other references that we already studied, trying to understand and summarise what those papers actually said. 
 	
 	
-	\bibliographystyle{plainnat}
+	% \bibliographystyle{plainnat}
 	\bibliography{refs}
 	
 	\chapter{Variational Bayesian Optimal Experimental Design}
@@ -1997,12 +1997,1398 @@
 	\chapter{Discussion}
 	\label{chap:discussion}
 	This discussion is broken into a number of self-contained essays that delve into specific aspects of the concepts laid out in the earlier chapters.
-	In Section 1, we focus on elucidating the ideas of Chapters~\ref{chap:vboed} and~\ref{chap:sgboed} by focusing on the specific example use case of Bayesian \emph{model selection}. We examine how the variational estimators of Chapter~\ref{chap:vboed} look in this example, highlighting connections to other work, we also note how the approach of Chapter~\ref{chap:sgboed} translates to this specific case.
-	In Section 2, we focus on comparing our work, particularly the estimators of Chapter~\ref{chap:sgboed} to work in the field of Bayesian active learning, drawing out the deep connections between experimental design and active learning.
-	In Section 3, we draw another connection, this time between the sequential experiment methods in Chapters~\ref{chap:dad} and~\ref{chap:idad} and the field of Bayesian reinforcement learning. We show that reinforcement learning provides a natural language to express the sequential experimental design problem.
-	In Section 4, we investigate some of the statistical properties of various estimators discussed in this thesis. We focus on the NMC estimator, the PCE estimator introduced in Chapter~\ref{chap:sgboed}. We connect these more basic estimators with MLMC estimators, creating a stronger connection between earlier chapters and Chapter~\ref{chap:mlmc}.
-	In Section 5, we present new results on mutual information bounds. This can be seen a generalising theory for some of the bounds derived in Chapters~\ref{chap:vboed}, \ref{chap:sgboed}, \ref{chap:dad} and \ref{chap:idad}.
-	\includepdf[pagecommand={}, pages=-, trim=0mm 17.5mm 0mm 17.5mm, clip]{discussion.pdf}
+	In Section~\ref{sec:modelselection}, we focus on elucidating the ideas of Chapters~\ref{chap:vboed} and~\ref{chap:sgboed} by focusing on the specific example use case of Bayesian \emph{model selection}. We examine how the variational estimators of Chapter~\ref{chap:vboed} look in this example, highlighting connections to other work, we also note how the approach of Chapter~\ref{chap:sgboed} translates to this specific case.
+	In Section~\ref{sec:balessay}, we focus on comparing our work, particularly the estimators of Chapter~\ref{chap:sgboed} to work in the field of Bayesian active learning, drawing out the deep connections between experimental design and active learning.
+	In Section~\ref{sec:brlessay}, we draw another connection, this time between the sequential experiment methods in Chapters~\ref{chap:dad} and~\ref{chap:idad} and the field of Bayesian reinforcement learning. We show that reinforcement learning provides a natural language to express the sequential experimental design problem.
+	In Section~\ref{sec:estimators}, we investigate some of the statistical properties of various estimators discussed in this thesis. We focus on the NMC estimator, the PCE estimator introduced in Chapter~\ref{chap:sgboed}. We connect these more basic estimators with MLMC estimators, creating a stronger connection between earlier chapters and Chapter~\ref{chap:mlmc}.
+	In Section~\ref{sec:bounds}, we present new results on mutual information bounds. This can be seen a generalising theory for some of the bounds derived in Chapters~\ref{chap:vboed}, \ref{chap:sgboed}, \ref{chap:dad} and \ref{chap:idad}.
+
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% ESSAY ONE MODEL SELECTION
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	\section{Bayesian experimental design for model selection: variational and classification approaches}
+	\label{sec:modelselection}
+	
+	\subsection{Introduction}
+	Bayesian experimental design for model selection is a important and well-studied problem \citep{cavagnaro2010adaptive,vanlier2014optimal,hainy2018optimal}.
+	In this essay, we tackle two questions that are relevant to this problem. First, how do recently proposed variational methods for experimental design \citep{foster2019variational,foster2020unified} translate into the model selection context? 
+	% This is therefore something of a case study for these methods. 
+	Second, how do these methods intersect with recently proposed classification-driven approaches to experimental design for model selection \citep{hainy2018optimal}?
+	
+	We begin by elucidating the key features of the model selection problem---it turns out that we can characterise the set-up as a semi-implicit model with a discrete latent variable of interest.
+	The posterior or Barber--Agakov approach of \citet{foster2019variational} involves training an amortised inference network from data simulated from the model. We find that, for model selection, this network is exactly a (neural) classifier that predicts the true model that synthesised an observation from that synthetic experimental observation.
+	The marginal + likelihood method of \citet{foster2019variational} also translates into the model selection case. 
+	This method involves variational density estimation of experimental outcomes for each possible model.
+	In other words, it involves approximating the model evidence of the data for each possible model.
+	Finally, we examine how the stochastic gradient design approach of \citet{foster2020unified} applies here.
+	This approach can build off the back of the Barber--Agakov bound, so it also utilises a classifier.
+	The key difference here is that we differentiate the classifier output with respect to its input to learn the design at the same time as the classifier network parameters. This bears some similarities with adversarial approaches to neural network robustness \citep{carlini2019evaluating}.
+	Finally, we compare and contrast the variational approach with other classification driven approaches in the literature.
+	
+	\subsection{Characterising the problem}
+	We denote experimental designs by $\xi$ and experimental observations as $y$.
+	Suppose there are $K$ competing models $\{m_1,\dots,m_k\}$ and we have a prior distribution $p(m)$ on which model we think is likely to  be correct.
+	Given the choice of model, there are other model parameters $\psi \sim p(\psi|m)$.
+	Conditional on the model, and on its parameters, we have a likelihood for the experiment $p(y|m,\psi,\xi)$ which we assume is known in closed form.
+	
+	One important feature of the model selection problem is that we do \emph{not} have a likelihood that directly relates the design $\xi$, observation $y$ and the latent variable of interest $m$. Instead, we have to account for the auxiliary latent variable $\psi$. 
+	Indeed, we actually have $p(y|m,\xi) = \int_\Psi p(y|m,\psi,\xi) p(\psi|m) d\psi$.
+	This case, where we have a closed form likelihood but for a larger set of variable, is referred to as a \emph{semi-implicit} model.
+	
+	In this essay, we focus on experimental design with the expected information gain (EIG) criterion, also called mutual information utility, that aims to reduce Shannon entropy in our beliefs about $m$. The EIG-optimal design is specifically,
+	\begin{equation}
+	\xi^* = \argmax_{\xi} \E_{p(m)p(\psi|m)p(y|m,\psi,\xi)}\left[ \log \frac{p(m|y,\xi)}{p(m)} \right].
+	\end{equation}
+	Finding $\xi^*$ amounts to estimating the EIG objective function and optimising over the space of possible designs.
+	
+	If we have already observed some data $\mathcal{D}=\{(\xi_1,y_1),\dots,(\xi_T,y_T)\}$, then we fit model-specific posteriors for the auxiliary variable $\psi$ for each model $p(\psi|m,\mathcal{D})$, and we compute the posterior over models $p(m|\mathcal{D}) \propto p(m)p(\mathcal{D}|m)$.
+	Thus, we update our priors $p(m)$ and $p(\psi|m)$ on the basis of past data.
+	
+	\subsection{The variational approach}
+	\subsubsection{Posterior lower bound}
+	\citet{foster2019variational} considered variational estimation of the EIG. Their general strategy was to optimise variational upper or lower bounds on the EIG.
+	Their simplest bound was the posterior lower bound  (also called the Barber--Agakov bound after \citet{ba}).
+	With the variables we have in this model, the bound would be expressed as
+	\begin{equation}
+	\E_{p(m)p(\psi|m)p(y|m,\psi,\xi)}\left[ \log \frac{p(m|y,\xi)}{p(m)} \right] \ge \E_{p(m)p(\psi|m)p(y|m,\psi,\xi)}\left[ \log \frac{q_\phi(m|y)}{p(m)} \right].
+	\end{equation}
+	The new term $q_\phi(m|y,\xi)$ was generically referred to as the \emph{amortised approximate posterior} with variational parameters $\phi$. It is an approximate posterior distribution on the latent variable $m$ of interest. The amortisation here refers to the fact that we learn a function from $y$ to a distribution over $m$ (for different $\xi$, we would train separate functions).
+	For the model selection approach, then, $q_\phi$ is a function from $y$ to a distribution over the discrete model indicator $m$.
+	First, since $m$ is discrete, the choice of variational family is moot, because every distribution over $m$ can be finitely represented.
+	Second, $q_\phi$ has a very simple interpretation. It is a classifier that attempts to predict, on the basis of input $y$, which model of $m_1,\dots,m_k$ generated that data, specifically trying to estimate the posterior probability $p(m|y,\xi)$ over the $k$ different possibilities for $m$.
+	Importantly though, rather than just attempting to predict the correct model that was responsible for generating the data $y$, it is essential that we have a \emph{probabilistic} classifier that assigns probabilities to each possible model. 
+	For this probabilistic classifier, the issue of calibration becomes central, as we hope that our classifier probabilities will approach $p(m|y,\xi)$ during training.
+	
+	We have established that $q_\phi$ is simply a probabilistic classifier for the model selection case.
+	How should this classifier be trained? 
+	In general, \citet{foster2019variational} proposed training $q_\phi$ by stochastic gradient methods \citep{robbins1951stochastic,kingma2014adam} to maximise the lower bound with respect to $\phi$
+	\begin{equation}
+	\phi^* = \argmax_\phi \E_{p(m)p(\psi|m)p(y|m,\psi,\xi)}\left[ \log \frac{q_\phi(m|y)}{p(m)} \right]
+	\end{equation}
+	In model selection, training $\phi$ simply means training the parameters of the classifier. 
+	Maximising the posterior lower bound is equivalent to simply maximising the expected log likelihood under $q$, i.e. 
+	\begin{equation}
+	\phi^* = \argmax_\phi \E_{p(m)p(\psi|m)p(y|m,\psi,\xi)}\left[ \log q_\phi(m|y) \right].
+	\end{equation}
+	This is true because $p(m)$ has no dependence on $\phi$.
+	So, we see that training $q_\phi$ to maximise the variational posterior lower bound amounts to maximum likelihood training of a neural classifier when we are in the setting of model selection.
+	(Care may be needed to ensure the classifier produces good \emph{probabilistic uncertainty}, as well as getting good predictions, as these probabilities are central to our method.)
+	
+	In fact, we have an enhanced setting in which we can draw an infinite amount of training data by simulating from $p(m)p(\psi|m)p(y|m,\psi,\xi)$.
+	To do this, we sample a random model $m$ from its prior, then a random set of parameters $\psi \sim p(\psi|m)$ for the chosen model, and then simulate an experimental outcome under design $\xi$.
+	Importantly, we do not need to draw a fixed training or test set, and we never need to show the classifier the same examples twice, we instead draw new batches on the fly.
+	One particularly important consequence of this is that the spectre of \emph{over-fitting} is much reduced in our case, as there is no fixed training set to overfit to.
+	
+	We now see another important point---the negative log-likelihood loss of the classifier is essentially an estimate of the EIG, up to a constant.
+	Suppose we have completed training and reached parameters $\hat{\phi}$.
+	Then the EIG estimate is
+	\begin{equation}
+	\text{EIG}(\xi) \approx \E_{p(m)p(\psi|m)p(y|m,\psi,\xi)}\left[ \log \frac{q_{\hat{\phi}}(m|y)}{p(m)} \right] = \E_{p(m)p(\psi|m)p(y|m,\psi,\xi)}\left[ \log q_{\hat{\phi}}(m|y) \right] + H[p(m)]
+	\end{equation}
+	and we can estimate the expectation with new, independent batches simulated from the model.
+	
+	In summary, the posterior lower bound method for model selection amounts to training a classifier on (infinite) simulated data to predict $m$ from $y$. The optimal design $\xi^*$ will be approximated by the classifier which has the best (lowest) validation loss, which is a good approximation of having the highest EIG.
+	
+	
+	\subsubsection{Marginal + likelihood estimator}
+	The posterior lower bound is not the only way to estimate the EIG proposed by \citet{foster2019variational}.
+	Both the marginal and the VNMC methods require an explicit likelihood, so they are not suitable for the semi-implicit model selection scenario.
+	The marginal + likelihood estimator is
+	\begin{equation}
+	\text{EIG}(\xi) \approx \E_{p(m)p(\psi|m)p(y|m,\psi,\xi)}\left[ \log \frac{q_\ell(y|m,\xi)}{q_p(y|\xi)} \right].
+	\end{equation}
+	This estimator translates, with some simplification, into the model selection setting. 
+	The `approximate likelihood' $q_\ell(y|m,\xi)$ in the model selection setting is an approximation of the model evidence $q_\ell(y|m,\xi) \approx p(y|m,\xi)$.
+	For model selection when $m$ is discrete, we do not need to separately estimate $q_p$ and $q_\ell$, we can instead sum over $m$ to obtain
+	\begin{equation}
+	q_p(y|\xi) = \sum_m p(m) q_\ell(y|m,\xi).
+	\end{equation}
+	As shown in Appendix A.4 of \citet{foster2019variational}, the estimator actually becomes a lower bound 
+	\begin{equation}
+	\label{eq:model_selection_bound}
+	\text{EIG}(\xi) \ge \E_{p(m)p(\psi|m)p(y|m,\psi,\xi)}\left[ \log \frac{q_\ell(y|m,\xi)}{\sum_{m'} p(m') q_\ell(y|m'	,\xi)} \right]
+	\end{equation}
+	on the EIG in this case, which is not generally the case for the marginal + likelihood method.
+	(In fact, this lower bound is itself a special case of the likelihood-free ACE lower bound introduced in \citet{foster2020unified}. Indeed, if we take the prior as the variational posterior and let $L\to\infty$ in the LF-ACE bound, we recover this lower bound.)
+	
+	This lower bound also has a nice interpretation in the model selection scenario. The best design will be the one where the lower bound is largest, which happens, loosely speaking, when $q_\ell(y|m,\xi)$ is much larger than $\sum_m p(m) q_\ell(y|m,\xi)$. That means the approximate model evidence for the observation $y$ under the correct model $m$ is much larger than its evidence under other models. Thus, using the experiment with design $\xi$ and observing $y$ will allow us to easily discriminate between models.
+	
+	To explicitly use this method, we need to choose trainable density estimators for $q_\ell(y|m,\xi; \phi)$ with parameters $\phi$.
+	The simplest method would be to have a distinct set of variational parameters for each value of $m$ and $\xi$.
+	Whilst it is possible to use a Gaussian density model, we could use more sophisticated methods such as normalising flows \citep{rezende2015variational}. The training approach is similar to that for the posterior method.
+	We use infinite simulated data, and maximise the variational lower bound using stochastic gradient optimisers.
+	
+	
+	The last two sections highlight a general feature of the variational methods of \citet{foster2019variational}---we can either make variational approximations to densities over $m$ or over $y$. Both lead to valid bounds.
+	
+	\subsection{Stochastic gradient optimisation of the design}
+	So far, we have focused on variational estimation of the EIG.
+	As shown in \citet{foster2020unified}, it is only a short jump from variational estimation of the EIG to stochastic gradient optimisation of the design using a variational lower bound on EIG.
+	The benefit here, of course, is that we do not have conduct a grid search, co-ordinate exchange or similar algorithm over the design space.
+	What we require instead is a continuous design space and the ability to differentiate observations with respect to designs.
+	
+	Whilst \citet{foster2020unified} focused on explicit likelihood models, both the posterior (Barber--Agakov) lower bound and the LF-ACE bound are applicable to the semi-implicit model selection setting. There is just one thing to check, which is that we can compute a derivative $\partial y/\partial \xi$.
+	In the semi-implicit case, this is often fine. For example, if $p(y|m,\psi,\xi)$ takes the form $y = g(m,\psi,\xi,\epsilon)$ for a differentiable $g$ and an independent noise random variable $\epsilon$.
+	
+	Assuming this is the case, we can train $\xi$ by stochastic gradient using either the posterior bound or the simplified LF-ACE bound that was derived in \eqref{eq:model_selection_bound}.
+	We focus on the posterior lower bound for simplicity.
+	Recall that, for the posterior bound, we are training a classifier to predict $m$ from $y$.
+	We have
+	\begin{equation}
+	\text{EIG}(\xi) \ge \E_{p(m)p(\psi|m)p(y|m,\psi,\xi)}\left[ \log q_\phi(m|y) \right] + H[p(m)]
+	\end{equation}
+	where $q_\phi$ is the classifier.
+	One thing that we skimmed over slightly in the previous section was that $\phi$ implicitly depends on $\xi$ via the training data, and different $\xi$ will have different classifiers with different optimal values of the classifier parameters $\phi$.
+	
+	In \citet{foster2020unified}, rather than training separate classifiers with different designs $\xi$, we update $\xi$ and $\phi$ togther in one stochastic gradient optimisation over the combined set of variables $(\xi,\phi)$.
+	To explicitly write down the $\xi$ gradient here, let's assume that we do have $y = g(m,\psi,\xi,\epsilon)$, so we can write
+	\begin{equation}
+	\mathcal{L}(\xi,\phi) = \E_{p(m)p(\psi|m)p(\epsilon)}\left[ \log q_\phi(m|g(m,\psi,\xi,\epsilon)) \right] + H[p(m)].
+	\end{equation}
+	In this form, the $\xi$ gradient can be simply calculated as
+	\begin{equation}
+	\label{eq:grad}
+	\frac{\partial \mathcal{L}}{\partial \xi} = \E_{p(m)p(\psi|m)p(\epsilon)}\left[ \left.\frac{\partial \log q_\phi}{\partial y}\right\vert_{m,g(m,\psi,\xi,\epsilon)}\left.\frac{\partial g}{\partial \xi}\right\vert_{m,\psi,\xi,\epsilon} \right].
+	\end{equation}
+	The beauty of modern auto-diff frameworks, of course, means that we do not even need to calculate this explicitly ourselves.
+	
+	For model selection, \eqref{eq:grad} has a natural interpretation. 
+	We want to increase the lower bound $\mathcal{L}$ by moving to regions in which the classifier can confidently predict the correct model label $m$. This corresponds to moving $y$ into regions in which $\log q_\phi(m|y)$ is larger \emph{for the model that actually generated $y$}.
+	In other words, we want the input to the classifier $y$ to be pushed to regions where the classifier already finds it easy to classify correctly.
+	That is, regions where deciding which model is correct is easier.
+	We then exploit the differentiable relationship between $\xi$ and $y$, and use this signal to `improve' the input to the classifier by adjusting the design $\xi$ to that such datasets $y$ are more likely to be synthesised.
+	
+	At the same time, we are constantly making gradient updates on the classifier parameters $\phi$. This means that, as the distribution of $(m,y)$ changes, the classifier can adjust accordingly.
+	
+	If this sounds dubious, it is worth taking a step back. We are quite simply optimising the lower bound $\mathcal{L}(\xi,\phi)$ jointly with respect to $\xi$ and $\phi$, in the hopes that this global maximum may closely correspond to the EIG maximiser $\xi^*$.
+	We actually have a guarantee that the value of $\mathcal{L}$ at our final trained variables $\hat{\xi},\hat{\phi}$ is a lower bound on $\text{EIG}(\hat{\xi})$, i.e.~the true value of $\hat{\xi}$ cannot be worse than the value we estimate for it.
+	
+	Whilst the method is approximate, because we cannot quantify the discrepancy between $\mathcal{L}$ and the true EIG, it is highly scalable to very large design spaces. Other bounds presented in \citet{foster2020unified} have the added benefit that they become equal to the EIG in a limit, providing some assurances that the global maximum of $\mathcal{L}$ is a good design.
+	\citet{foster2020unified} also introduced the evaluation method of establishing \emph{lower and upper} bounds on chosen designs. This numerically bounds the discrepancy between the training objective $\mathcal{L}$ and the true EIG objective. Sadly, the upper bounds are only valid for explicit likelihood models; they don't work in the semi-implicit model selection case.
+	
+	Finally, all of the above discussion carries over if we were to use the lower bound of \eqref{eq:model_selection_bound} instead of the posterior bound.
+	
+	\subsection{Comparing with other classification approaches}
+	We have established that the variational posterior approach of \citet{foster2019variational} instructs us to learn a classifier to predict $m$ from $y$ and use the log probabilities $q_\phi(m|y)$ to estimate EIG.
+	Other authors have considered supervised classification as a means to perform Bayesian experimental design for model selection.
+	
+	Here, we focus on \citet{hainy2018optimal}, which is ``the first approach using supervised learning methods for optimal Bayesian design.''
+	This method trains a classifier that predicts $m$ using $y$, with separate classifiers for different $\xi$.
+	They focus on training decision trees and random forest classifiers \citep{breiman2001random}.
+	Since random forests are not generally trained by stochastic gradient methods, this means that they fall back on simulating fixed training and test datasets of samples $(m_j, y_j)_{j=1}^J$ from $p(m)p(\psi|m)p(y|m,\psi,\xi)$.
+	The training dataset is used to train the classifier model, whilst the test dataset gives unbiased estimates of the posterior loss.
+	There is a danger that the classifier may overfit to the training set in this case.
+	Compare this with the training of stochastic gradient classifiers in our previous sections---here we can draw fresh training batches on the fly, and avoid overfitting to a training set.
+	
+	Decision trees and random forests do provide estimates of the class probabilities $q(m|y)$, but they are relatively noisy.
+	For this reason, \citet{hainy2018optimal} focus on the 0--1 loss to evaluate designs.
+	In the language of classification, therefore, they choose the design which gives the best \emph{test accuracy}.
+	Again, this is different to the variational approach which fits a neural classifier that automatically provides smooth probability estimates $q_\phi(m|y)$.
+	The latter case was applied to estimate the information gain, which we showed is equivalent to choosing the design which gives the best \emph{test loss}, assuming a negative log-likelihood loss function.
+	
+	The trade-offs between these methods are clear when we consider optimising over a large design space.
+	For the variational method, we have to train a number of neural networks to convergence. For the classification approach of \citet{hainy2018optimal}, we train a number of random forest classifiers---this may be significantly more computationally efficient.
+	\citet{hainy2018optimal} propose embedding their 0--1 loss estimation within a co-ordinate exchange algorithm \citep{meyer1995coordinate} to optimise over designs.
+	The variational method, on the other hand, can naturally be embedded in a unified stochastic gradient optimisation to find the optimal design through stochastic gradient optimisation.
+	The former may be more effective when the design space is not continuous, the latter can work well in a high-dimensional design space that is difficult to search using discrete methods.
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% ESSAY TWO BAYESIAN ACTIVE LEARNING
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	\clearpage
+	\section{Bayesian active learning by disagreement and Bayesian experimental design}
+	\label{sec:balessay}
+	
+	\subsection{Introduction}
+	The purpose of this essay is to highlight the connection between the Bayesian Active Learning by Disagreement (BALD) score as estimated by \citet{gal2017deep} and the Prior Contrastive Estimation (PCE) bound of \citet{foster2020unified}.
+	There is a deep connection between Bayesian experimental design and Bayesian active learning. 
+	A significant touchpoint is the use of the mutual information score \citep{lindley1956}
+	\begin{equation}
+	\label{eq:info}
+	I(\xi) = \E_{p(\theta)p(y|\theta,\xi)}\left[H[p(\theta)] - H[p(\theta|y,\xi)]\right].
+	\end{equation}
+	to acquire new information in a Bayesian model with parameters $\theta$ where, $y$ is the as yet unobserved outcome, and $\xi$ is the design to be chosen.
+	
+	%\section{Acquiring data using the mutual information score}
+	%Choosing how and where to acquire new information is an age old problem in statistics and machine learning.
+	%The seminal paper \citet{lindley1956} introduced the principle of information-based acquisition.
+	%In a Bayesian model with parameters $\theta$, observation $y$ and designs $\xi$ through which to acquire new observations, the best design to choose is the one which most reduces the expected Shannon entropy of the posterior distribution over $\theta$. This is equivalent to choosing the design $\xi$ with the largest mutual information score
+	%\begin{equation}
+	%	\label{eq:info}
+	%	I(\xi) = \E_{p(\theta)p(y|\theta,\xi)}\left[H[p(\theta)] - H[p(\theta|y,\xi)]\right].
+	%\end{equation}
+	%Whilst the mutual information score has a number of attractive theoretical properties, its use has been limited by the difficult of calculating the score $I(\xi)$.
+	
+	\subsection{Bayesian Active Learning by Disagreement}
+	One of the computational challenges inherent in estimating \eqref{eq:info} directly is that it involves repeated estimation of posterior distributions $p(\theta|y,\xi)$ for different simulated observations $y$.
+	To remove this particular bottleneck, \citet{houlsby2011bayesian} introduced a rewriting of the mutual information score using Bayes rule
+	\begin{equation}
+	\label{eq:bald}
+	I(\xi) = H[p(y|\xi)] - \E_{p(\theta)}\left[ H[p(y|\theta,\xi)] \right].
+	\end{equation}
+	Whilst this is exactly equal to the original mutual information score, the new way of expressing $I$ removes the requirement to estimate posterior distributions over $\theta$.
+	They termed \eqref{eq:bald} the Bayesian Active Learning by Disagreement (BALD) score.
+	
+	Unfortunately, the story does not end with the BALD score because it still typically involves some intractable computations that must be estimated.
+	For example, \citet{houlsby2011bayesian} focused on approximations for Gaussian Process models \citep{williams2006gaussian}.
+	
+	The more recent work by \citet{gal2017deep} estimated the BALD score in the context of Bayesian deep learning classifiers.
+	In such a model, $\theta$ represents the parameters of a classification model, and $p(y|\theta,\xi)$ is a probability distribution over classes $y\in\{c_1,\dots,c_k\}$. 
+	Computing $p(y|\theta,\xi)$ involves a forward pass through the classifier with input $\xi$ and parameters $\theta$, the network generally ends in a softmax activation to produce a normalised distribution.
+	To sample different values of $\theta$, \citet{gal2017deep} employed Monte Carlo Dropout \citep{gal2016dropout}.
+	Given independent samples $\theta_1,\dots,\theta_M$ from $p(\theta)$, they proposed the following Deep BALD (DBALD) estimator of $I(\xi)$
+	\begin{equation}
+	I(\xi) \approx \hat{I}_\text{DBALD}(\xi) = H\left[ \frac{1}{M}\sum_{i=1}^M p(y|\theta_i,\xi) \right] - \frac{1}{M} \sum_{i=1}^M H[p(y|\theta_i,\xi)]
+	\end{equation}
+	where $H[P(y)] = -\sum_c P(y=c)\log P(y=c)$.
+	
+	\paragraph{Notation} For comparison with the original paper, we used $\theta$ in place of $\bm{\omega}$, $\xi$ in place of $\mathbf{x}$, $M$ in place of $T$ and $p(\theta)$ is used in place of $q^*_\theta(\bm{\omega})$.
+	
+	\subsection{Prior Contrastive Estimation}
+	In the context of stochastic gradient optimisation of Bayesian experimental designs, \citet{foster2020unified} also considered the mutual information score $I(\xi)$ and the rearrangement \eqref{eq:bald}.
+	They proved the following Prior Contrastive Estimation (PCE) lower bound on $I(\xi)$
+	\begin{equation}
+	I(\xi) \ge \E_{p(\theta_0)p(y|\theta_0,\xi)p(\theta_1)\dots p(\theta_L)}\left[ \log \frac{p(y|\theta_0,\xi)}{\frac{1}{L+1} \sum_{\ell=0}^L p(y|\theta_\ell,\xi)} \right]
+	\end{equation}
+	and used this bound to optimise $\xi$ by stochastic gradient.
+	One approach to estimate this bound using finite samples is the estimator
+	\begin{equation}
+	\hat{I}_\text{PCE-naive}(\xi) = \frac{1}{M} \sum_{m=1}^M \log \frac{p(y_m|\theta_{m0},\xi)}{\frac{1}{L+1}\sum_{\ell=0}^L p(y_m|\theta_{m\ell},\xi)  }.
+	\end{equation}
+	where $y_m,\theta_{m0}\sim p(y,\theta|\xi)$ and $\theta_{m\ell}\sim p(\theta)$ for $\ell \ge 1$.
+	However, we can also re-use samples more efficiently to give the estimator
+	\begin{equation}
+	\label{eq:pce}
+	\hat{I}_\text{PCE}(\xi) = \frac{1}{M} \sum_{m=1}^M \log \frac{p(y_m|\theta_{m},\xi)}{\frac{1}{M}\sum_{\ell=1}^M p(y_m|\theta_{\ell},\xi)  }.
+	\end{equation}
+	where $y_m,\theta_m \sim p(y,\theta|\xi)$. (To check the expectation of this version matches the PCE bound with $L=M-1$, we simply move the $\E$ sign inside of the summation.)
+	Finally, \citet{foster2020unified} discussed a speed-up that is possible when $y$ is a discrete random variable taking values in $\{ c_1,\dots,c_k \}$.
+	In this case, we can integrate out $y$ by summing over it, rather than by drawing random samples of $y$.
+	This method, called Rao-Blackwellisation, results in the estimator
+	\begin{equation}
+	\hat{I}_\text{PCE-RB}(\xi) = \frac{1}{M} \sum_{m=1}^M \sum_c p(y=c|\theta_m,\xi) \log \frac{p(y=c|\theta_{m},\xi)}{\frac{1}{M}\sum_{\ell=1}^M p(y=c|\theta_{\ell},\xi)  }.
+	\end{equation}
+	
+	\subsection{PCE and DBALD equivalence}
+	We have looked at two parallel ways of approximating $I(\xi)$.
+	The interesting result is that \emph{the Rao-Blackwellised PCE estimator and the DBALD estimator are the same}.
+	We can see this by direct calculation
+	\begin{align}
+	\hat{I}_\text{PCE-RB}(\xi) &= \frac{1}{M} \sum_{m=1}^M \sum_c p(y=c|\theta_m,\xi) \log \frac{p(y=c|\theta_{m},\xi)}{\frac{1}{M}\sum_{\ell=1}^M p(y=c|\theta_{\ell},\xi)  } \\
+	\begin{split}&= \frac{1}{M} \sum_{m=1}^M \sum_c p(y=c|\theta_m,\xi) \log p(y=c|\theta_{m},\xi) \\
+	& \qquad - \frac{1}{M} \sum_{m=1}^M \sum_c p(y=c|\theta_m,\xi) \log\left(\frac{1}{M}\sum_{\ell=1}^M p(y=c|\theta_{\ell},\xi)  \right) \end{split}\\
+	&= -\frac{1}{M} \sum_{m=1}^M H[p(y|\theta_m,\xi)]  - \frac{1}{M} \sum_{m=1}^M \sum_c p(y=c|\theta_m,\xi) \log\left(\frac{1}{M}\sum_{\ell=1}^M p(y=c|\theta_{\ell},\xi)  \right)\\
+	&= -\frac{1}{M} \sum_{m=1}^M H[p(y|\theta_m,\xi)]  - \sum_c \left(\frac{1}{M}  \sum_{m=1}^M  p(y=c|\theta_m,\xi) \right) \log\left(\frac{1}{M}\sum_{\ell=1}^M p(y=c|\theta_{\ell},\xi)  \right)\\
+	&= -\frac{1}{M} \sum_{m=1}^M H[p(y|\theta_m,\xi)]  + H\left[\frac{1}{M}  \sum_{m=1}^M  p(y|\theta_m,\xi) \right]\\
+	&= \hat{I}_\text{DBALD}(\xi).
+	\end{align}
+	A major consequence of this result is that \emph{the expectation of the DBALD score is a lower bound on the true mutual information score}.
+	We also note that this estimator has been used by \citet{vincent2017} in the context of Bayesian experimental design, although they did not show that it was a stochastic lower bound.
+	
+	\subsection{New diagnostic for the DBALD score}
+	One advantage of making this connection is that we can bring certain diagnostics that were applied by \citet{foster2020unified} over to the active learning setting.
+	In particular, \citet{foster2020unified} paired their PCE lower bound with a complementary \emph{upper bound} on $I(\xi)$.
+	This provides a very useful diagnostic tool to tune the number of samples $M$ used to compute the DBALD score.
+	If the lower bound and upper bound are very close, we know that the difference between the DBALD score and the true mutual information must also be small. On the other hand, if the upper and lower bounds are far apart, then the DBALD score might not yet be close to the true mutual information.
+	
+	One upper bound upper by \citet{foster2020unified} was the Nested Monte Carlo (NMC) \citep{vincent2017} estimator.
+	For the discrete $y$ case with Rao-Blackwellisation, the estimator is 
+	\begin{align}
+	\hat{I}_\text{NMC-RB}(\xi) &= -\frac{1}{M} \sum_{m=1}^M \sum_c p(y=c|\theta_m,\xi) \log\left(\frac{1}{M-1} \sum_{\ell \ne m} p(y=c|\theta_\ell,\xi)  \right)  -\frac{1}{M} \sum_{m=1}^M H[p(y|\theta_m,\xi)]\\
+	&= \frac{1}{M} \sum_{m=1}^M H\left[p(y|\theta_m,\xi), \frac{1}{M-1} \sum_{\ell \ne m} p(y|\theta_\ell,\xi)  \right]  -\frac{1}{M} \sum_{m=1}^M H[p(y|\theta_m,\xi)]
+	\end{align}
+	where $H[p,q]$ is the cross-entropy.
+	The expectation of this mutual information estimator is always an upper bound on $I(\xi)$.
+	So both the DBALD score and the NMC-RB estimator converge to $I(\xi)$ as $M\to\infty$, but from opposite directions.
+	We suggest NMC-RB as a diagnostic for the parameter $M$.
+	
+	
+	\subsection{BALD estimators for regression}
+	The connection to PCE may also be helpful when considering regression models.
+	The standard parametrisation of a Bayesian neural network for regression is for the output of the network with parameters $\theta$ and input $\xi$ to be the predictive mean ${\mu}$ and standard deviations ${\sigma}$ of a Gaussian $y|\theta,\xi \sim N({\mu}(\theta,\xi), {\sigma}(\theta,\xi)^2)$. (It is normal for $y$, $\mu$ and $\sigma$ to be vector-valued and for the Gaussian to have a diagonal covariance matrix.)
+	
+	For the DBALD estimator for a regression model, the entropy of a Gaussian is known in closed form, so $H[p(y|\theta_i,\xi)] = \tfrac{1}{2}\log\left(2\pi e \sigma(\theta_i,\xi)^2 \right)$.
+	However, the entropy of a mixture of Gaussians $H\left[ \frac{1}{M}\sum_{i=1}^M p(y|\theta_i,\xi) \right]$ cannot be computed analytically.
+	Instead, we could estimate this mixture of Gaussians entropy using Monte Carlo by sampling $i\in \{1,\dots,M\}$ uniformly, sampling $y$ from $p(y|\theta_i,\xi)$ and calculating the log-density at $y$.
+	
+	Despite the fact that we are using an analytic entropy for one term, and a Monte Carlo estimate for the other, it's easy to see that this new estimator is a \emph{partially Rao-Blackwellised} PCE estimator. (This can be proved starting from \eqref{eq:pce}.)
+	That means all the existing facts, such as the estimator being a stochastic lower bound on $I(\xi)$, carry over naturally to the regression case.
+	
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% ESSAY THREE BAYESIAN REINFORCEMENT LEARNING
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	\clearpage
+	\section{Deep Adaptive Design and Bayesian reinforcement learning}
+	\label{sec:brlessay}
+	
+	\subsection{Introduction}
+	The purpose of this essay is to discuss the connections between the recently proposed Deep Adaptive Design (DAD) \citep{foster2021dad} method and the field of Bayesian reinforcement learning \citep{ghavamzadeh2016bayesian}.
+	That such a connection exists is hinted at by a high-level appraisal of the DAD method---it solves a sequential decision making problem to optimise a certain objective function, decision optimality is dependent on a \emph{state} which is the experimental data already gathered, and the automated decision maker is a design \emph{policy} network.
+	We begin by showing how the sequential Bayesian experimental design problem solved by DAD can be viewed as a Bayes Adaptive Markov Decision Process (BAMDP) \citep{ross2007bayes,guez2012efficient}, making this connection formally precise.
+	We also isolate some of the key differences between the problem DAD is solving and a conventional Bayesian RL problem, noting that the reward in DAD is intractable. Much of the effort of DAD is in establishing a differentiable surrogate for the true objective.
+	The differentiability of the surrogate reward is also a key feature of the DAD problem, which facilitates the direct policy optimisation approach taken to train the policy that is rarely applicable in standard RL problems.
+	We also highlight other features of the DAD method, such as its avoidance of explicitly estimating any posterior distributions, i.e.~the avoidance of explicit belief state estimation.
+	
+	Having studied DAD in some detail, we consider possible extensions of the method that make use of the RL connection.
+	First, there are rather natural extensions of DAD to more general objective functions that incorporate design costs, terminal decisions and other functionals of the posterior distribution.
+	Second, more standard approaches to (Bayesian) RL, such as Q-learning \citep{watkins1992q,dearden1998bayesian} can be applicable to the sequential Bayesian experimental design problem. They may be particularly useful for long- or infinite-horizon problems.
+	
+	
+	\subsection{Background on Bayesian Reinforcement Learning}
+	\subsubsection{Markov Decision Processes}
+	The Markov Decision Process (MDP) \citep{bellman1957markovian,duff2002optimal} is a highly successful mathematical framework for sequential decision problems in a known environment.
+	Formally, a MDP consists of a state space $S$, an action space $A$, a transition model $\mathcal{P}$, a reward distribution $R$, a discount factor $0 \le \gamma \le 1$ and a time horizon $T$ which may be infinite.
+	An agent operates in the MDP by moving between different states in discrete time.
+	For example, if the agent is in state $s_t$ at time $t$ and chooses to play action $a_t$, then the next state $s_{t+1}$ will be sampled randomly according to the transition model $s_{t+1} \sim \mathcal{P}(s|s_t,a_t)$. Since the distribution over the next state depends only on $s_t$ and $a_t$, the transitions are Markovian.
+	Finally, by making the transition $s_t \overset{a_{t}}{\longrightarrow} s_{t+1}$, the agent receives a random reward $r_t \sim R(r|s_t,a_t,s_{t+1}) \in \R$.
+	The agent's objective is to maximise the discounted sum of rewards $\sum_{t=0}^T \gamma^t r_t$.
+	Given the Markovian nature of the problem, it is sufficient to choose actions according to some \emph{policy} $\pi$, where $a_t = \pi(s_t)$.
+	The optimality condition for a policy is
+	\begin{equation}
+	\pi^* = \argmax_{\pi} \mathcal{J}(\pi),
+	\end{equation}
+	where
+	\begin{equation}
+	\mathcal{J}(\pi) = \E_{ s_0\sim p(s_0) \prod_{t=0}^T a_t=\pi(s_t), s_{t+1}\sim \mathcal{P}(s|s_t,a_t), r_t \sim R(r|s_t,a_t,s_{t+1}) }\left[ \sum_{t=0}^T \gamma^t r_t \right].
+	\end{equation}
+	In a classical MDP, we assume that $\mathcal{P}$ and $R$ are known during the planning phase, when the agent devises their policy $\pi$.
+	Of particular utility in planning a policy is the value function, defined as
+	\begin{equation}
+	V^\pi(s) = \E_{s'\sim \mathcal{P}(\cdot|s,\pi(s)), r \sim R(r|s,\pi(s),s')}\left[ r + \gamma V^\pi(s') \right]
+	\end{equation}
+	and the $Q$-function
+	\begin{equation}
+	Q^\pi(s, a) = \E_{s'\sim \mathcal{P}(\cdot|s,a), r \sim R(r|s,a,s')}\left[ r + \gamma V^\pi(s') \right].
+	\end{equation}
+	These equations are valid when $T=\infty$, for finite time horizon we also have to take account of time $t$ in state evaluations.
+	
+	
+	\subsubsection{Bayes Adaptive Markov Decision Processes}
+	The BAMDP \citep{duff2002optimal,ross2007bayes,guez2012efficient,ghavamzadeh2016bayesian} is one approach to generalising the MDP to deal with unknown transition models. 
+	In the BAMDP, the agent retains an explicit posterior distribution over the transition model called a belief state. 
+	This allows a formally elegant approach to behaviour under uncertainty which can trade off exploration (learning the transition model) and exploitation (executing actions that receive a high reward). 
+	
+	To set this up formally using the notation of \citet{guez2012efficient}, we begin by considering an outer probabilistic model over the transition probabilities with prior $P(\mathcal{P})$.
+	Given a history of states, actions and rewards $h_t = s_0a_0\dots r_{t-1}a_{t-1}s_t$, we can compute a posterior distribution on $\mathcal{P}$ by
+	\begin{equation}
+	P(\mathcal{P}|h_t) \propto P(\mathcal{P})P(h_t|\mathcal{P}) = P(\mathcal{P}) \prod_{\tau=0}^t \mathcal{P}(s_{\tau+1}|s_\tau,a_\tau).
+	\end{equation}
+	To bring this back into the MDP formulation, we consider an augmented state space $S^+$ which consists of entire histories, and which encapsulates both the current state and our beliefs about the transition model.
+	Transitions in the augmented state space $S^+$ are given by integrating over the current beliefs on $\mathcal{P}$
+	\begin{equation}
+	\label{eq:augmentedtransition}
+	\mathcal{P}^+(h_{t+1}|h_t,a_t) = \int P(\mathcal{P}|h_t)\mathcal{P}(s_{t+1}|s_t,a_t) \, d\mathcal{P}.
+	\end{equation}
+	It is also possible for BAMDPs to incorporate unknown reward distributions (see e.g.~\citet{zintgraf2019varibad}), where an outer model over reward distributions is updated on the basis of $h_t$ in the same manner as for the transition probabilities. Specifically, if we have a prior $P(R)$ over reward distributions, then the reward function for playing action $a_t$ in augmented state $h_t$ is
+	\begin{equation}
+	R^+(r|h_t,a_t,h_{t+1}) = \int P(R|h_{t+1})R(r|s_t,a_t,s_{t+1}) \, dR.
+	\end{equation}
+	Combining these gives a new MDP with state space $S^+$ of histories, unchanged action space $A$, augmented transition model $\mathcal{P}^+$, augmented reward distribution $R^+$, discount factor $\gamma$ and time horizon $T$.
+	Optimal action in this new MDP gives the optimal trade-off between exploration and exploitation.
+	
+	\subsection{The Bayesian RL formulation of DAD}
+	In DAD \citep{foster2021dad}, we choose a sequence of designs $\xi_1,\dots,\xi_T$ with a view to maximising the expected information gained about a latent parameter of interest $\theta$.
+	To place DAD in a Bayesian RL setting, we begin by associating the design $\xi_t$ chosen before observing an outcome with the action $a_{t-1}$.
+	The difference in time labels is necessary because $\xi_t$ is chosen before $y_t$ is observed.
+	Since the observation distribution $p(y|\xi,\theta)$ depends on the unknown $\theta$, we are not in a MDP, but rather a BAMDP.
+	As in the previous section, it seems sensible to consider the state space for DAD as the space of histories $h_t = \xi_1y_1\dots\xi_ty_t$.
+	Uncertainty over the transition model in DAD is captured by uncertainty in $\theta$. Specifically, we have the following transition distribution for history states
+	\begin{equation}
+	p(h_{t+1}|h_t,\xi_{t+1}) = \int p(\theta|h_t)p(y_{t+1}|\xi_{t+1},\theta) \, d\theta
+	\end{equation}
+	which is the analogue of \eqref{eq:augmentedtransition}, but now expressed in the notation of experimental design.
+	Unlike the standard reinforcement learning setting, there are no external rewards in DAD.
+	Instead, rewards are defined in terms of information gathered about $\theta$.
+	Specifically, we can take the reward distribution on augmented states $R^+(r|h_t,a_t,h_{t+1})$ to be a deterministic function of $h_{t+1}$ that represents the information gained about $\theta$ by moving from $h_t$ to $h_{t+1}$. This is given by the reduction in entropy
+	\begin{equation}
+	R^+(h_t,a_t,h_{t+1}) = H[p(\theta|h_{t})] - H[p(\theta|h_{t+1})].
+	\end{equation}
+	To complete the BAMDP specification, we take $\gamma=1$ and we use a time horizon of $T$.
+	This gives the objective function for policies
+	\begin{equation}
+	\mathcal{J}(\pi) =  \E\left[\sum_{t=1}^T r_t \right] = \E_{p(\theta)p(h_T|\theta,\pi)}\left[\sum_{t=1}^T H[p(\theta|h_{t-1})] - H[p(\theta|h_t)] \right].
+	\end{equation}
+	To connect this with the objective that is used in DAD, we apply Theorem 1 of \citet{foster2021dad}, which tells us that 
+	\begin{equation}
+	\mathcal{J}(\pi) =\E_{p(\theta)p(h_T|\theta,\pi)}\left[\sum_{t=1}^T H[p(\theta|h_{t-1})] - H[p(\theta|h_t)] \right] \overset{\text{Theorem 1}}{=} \mathcal{I}_T(\pi)
+	\end{equation}
+	where 
+	\begin{equation}
+	\mathcal{I}_T(\pi) = \E_{p(\theta)p(h_T|\theta,\pi)}\left[ \log\frac{p(h_T|\theta,\pi)}{\E_{p(\theta')}[p(h_T|\theta',\pi)]} \right].
+	\end{equation}
+	In summary, we can cast the problem that DAD solves as a BAMDP. We identify designs with actions, experimental histories with augmented states, we use the probabilistic model to give a natural transition distribution on these states, we introduce non-random rewards that are one-step information gains, we set $\gamma=1$ and generally assume a finite number of experiment iterations $T$.
+	
+	%DAD is a method for sequential Bayesian experimental design.
+	%This begins with a Bayesian model for an experimental outcome $y$ given a design $\xi$ and a latent parameter of interest $\theta$ that consists of the prior $p(\theta)$ on the unobserved latent, and the likelihood $p(y|\theta,\xi)$.
+	%The sequential problem involves choosing a sequence of $T$ designs $\xi_1,\dots,\xi_T$. Each design $\xi_t$ is used to perform an experiment which results in the observation $y_t$. In \emph{adaptive} design, we choose $\xi_t$ on the basis of the existing history $h_{t-1} = \{(\xi_1,y_1),\dots,(\xi_{t-1},y_{t-1})\}$ of designs and observations that have already been gathered.
+	%We use the design policy $\pi$ to denote this relationship, so we have $\xi_t = \pi(h_{t-1})$ for $t=1,\dots,T$.
+	%The objective considered in DAD was the total expected information gained about $\theta$ from the entire sequence of experiments $h_T$
+	%\begin{equation}
+	%	\mathcal{I}_T(\pi) = \E_{p(\theta)p(h_T|\theta,\pi)}\left[ \log\frac{p(h_T|\theta,\pi)}{\E_{p(\theta')}[p(h_T|\theta',\pi)]} \right].
+	%\end{equation}
+	%
+	%To place this in a Bayesian RL setting, we begin by identifying the histories $(h_t)_{t=1}^T$ as the \emph{states} of a BAMDP. This actually matches precisely with the history states used in \citet{guez2012efficient}. The action taken when we are in state $h_t$ is simply the \emph{next} design $\xi_{t+1}$. The `transition model' in experimental design is actually simpler than the general Markovian set-up. If experiments are independent conditional on $\theta$, the distribution over the next state is simply given by the posterior predictive for $y_{t+1}$, that is
+	%\begin{equation}
+	%	p(h_{t+1}|h_t,\xi_{t+1}) = p(h_{t} \cup \{(\xi_{t+1},y_{t+1})\}|h_t,\xi_{t+1}) = \E_{p(\theta|h_t)}[p(y_{t+1}|\xi_{t+1},\theta)].
+	%\end{equation}
+	%Finally, there are several ways to think about the reward. Perhaps the most natural reward structure is the one-step information gain
+	%\begin{equation}
+	%	r_t = H[p(\theta|h_{t-1})] - H[p(\theta|h_t)].
+	%\end{equation}
+	%Then Theorem 1 of \citet{foster2021dad} tells us that the standard RL objective for $\pi$ is
+	%\begin{equation}
+	%	\mathcal{J}(\pi) = \E\left[\sum_{t=1}^T r_t \right] = \E_{p(\theta)p(h_T|\theta,\pi)}\left[\sum_{t=1}^T H[p(\theta|h_{t-1})] - H[p(\theta|h_t)] \right] \overset{\text{Theorem 1}}{=} \mathcal{I}_T(\pi).
+	%\end{equation}
+	%So the problem that is solved by DAD is indeed a Bayesian RL problem.
+	
+	\subsection{What makes the experimental design problem distinctive?}
+	Having established a theoretical connection between sequential Bayesian experimental design and Bayesian RL, one might naturally ask whether there is any reason to develop specialist algorithms for experimental design when general purpose Bayesian RL algorithms are applicable.
+	First, we focus on the reward structure of the Bayesian experimental design problem.
+	The rewards $r_t = H[p(\theta|h_{t-1})] - H[p(\theta|h_t)]$ are generally intractable, requiring Bayesian inference on $\theta$.
+	Rather than attempting to estimate this reward, DAD proposes the sPCE lower bound on the total expected informationn gain under policy $\pi$, namely
+	\begin{equation}
+	\mathcal{I}_T(\pi) \ge \mathcal{L}_T(\pi,L) = \E_{p(\theta_0)p(h_T|\theta_0,\pi)p(\theta_{1:L})}\left[ \log \frac{p(h_T|\theta_0,\pi)}{\frac{1}{L+1}\sum_{\ell=0}^L p(h_T|\theta_\ell,\pi) } \right].
+	\end{equation}
+	Interestingly, there is a way to interpret the sPCE objective within the RL framework.
+	First, we use \emph{root sampling} to sample $\theta_0$ and $h_T$ together.
+	We also fix the contrasts $\theta_{1:L}$.
+	Finally, we use the surrogate rewards
+	\begin{equation}
+	\tilde{r}_t = \log\frac{p(h_t|\theta_0,\pi)}{\frac{1}{L+1}\sum_{\ell=0}^L p(h_t|\theta_\ell,\pi)} - \log\frac{p(h_{t-1}|\theta_0,\pi)}{\frac{1}{L+1}\sum_{\ell=0}^L p(h_{t-1}|\theta_\ell,\pi)}.
+	\end{equation}
+	Since these rewards depend on $\theta_0$, we can treat them as randomised rewards if we are only conditioning on $h_t$.
+	
+	One important feature of these rewards is that, whilst intractable, the surrogate $\mathcal{L}_T(\pi,L)$ is differentiable with respect to the designs $(\xi_t)_{t=1}^T$ and observations $(y_t)_{t=1}^T$. In the simplest form of DAD, we further assume a differentiable relationship between $y_t$ and $\xi_t$ that is encapsulated by a reparametrisable way to sample $p(y|\theta,\xi)$. Concretetly, for example, we might have $y|\theta,\xi = \mu(\theta,\xi) + \sigma(\theta,\xi)\varepsilon$ where $\varepsilon \sim N(0,1)$ and $\mu$ and $\sigma$ are differentiable functions.
+	The result of these assumptions is that we can directly differentiate the surrogate objective $\mathcal{L}_T(\pi,L)$ with respect to the parameters $\phi$ of the policy network $\pi_\phi$ that generates the designs $(\xi_t)_{t=1}^T$ according to the formula $\xi_t = \pi_\phi(h_{t-1})$.
+	DAD optimises the policy $\pi_\phi$ directly by gradient descent on $\mathcal{L}_T(\pi,L)$.
+	
+	Thus, DAD can be characterised in RL language as a direct policy optimisation method. Whilst direct policy optimisation methods \citep{lorberbom2019direct,howell2021direct} are used in RL, they are far from the norm, with methodologies such as Q-learning \citep{watkins1992q} and actor--critic \citep{konda2000actor} being more dominant.
+	This may be because RL does not typically assume that the reward function is differentiable---for example, rewards from a real environment rarely come with gradient information. It may also be because discrete action problems are more the focus.
+	
+	DAD also contrasts with many approaches to \emph{Bayesian} RL in that it avoids the estimation of the posteriors $p(\theta|h_t,\pi)$.
+	In Bayesian RL, these posterior distributions are referred to as \emph{belief states}.
+	Many methods for tackling Bayesian RL problems utilise the estimation of belief states \citep{ghavamzadeh2016bayesian,igl2018deep,zintgraf2019varibad}.
+	DAD instead relies on an approach that is closer to the method of root sampling \citep{guez2012efficient}.
+	This is also one difference between DAD and the previous approach to non-greedy sequential Bayesian experimental design of \citet{huan2016sequential}.
+	
+	\subsection{New objective functions for DAD}
+	Seeing DAD in the framework of Bayesian RL naturally invites the question of whether the general DAD methodology can be applied to objective functions (rewards) that are not information gains.
+	The preceding discussion suggests that, using root sampling so a dependence on $\theta$ is possible, we could consider rewards of the form
+	\begin{equation}
+	r^\text{general}_t = R(\theta,h_t,\epsilon_t)
+	\end{equation}
+	where $R$ is a known differentiable function and $\epsilon_t$ is an independent noise random variable.
+	Clearly, the information gain reward $r_t$ fits this pattern, being a function of $h_t$ only.
+	Combining the differentiable reward function with the reparametrisation assumption would mean that the general reward
+	\begin{equation}
+	\mathcal{J}^\text{general}(\pi) = \E_{p(\theta)p(h_T)p(\epsilon_{1:T})}\left[\sum_{t=1}^T r^\text{general}_t \right]
+	\end{equation}
+	can be optimised with respect to $\pi$ by direct policy gradients.
+	In the experimental design context, this opens the door to two relatively simple extensions of DAD.
+	First, we can assign a (differentiable) cost to each design. Suppose we augment the original expected information gain objective with the negative sum of the costs of the designs. Using $\lambda$ to trade off cost and information, we arrive at 
+	\begin{equation}
+	\mathcal{J}^\text{costed}(\pi) = \mathcal{I}_T(\pi) - \lambda \E\left[\sum_{t=1}^T C(\xi_t) \right]
+	\end{equation}
+	which we can tackle using an approach that is essentially the same as DAD.
+	Second, we can consider different measures of the quality of the final posterior distribution.
+	For instance, with a one-dimensional $\theta$, we might be more interested in reducing posterior \emph{variance} than posterior entropy.
+	We could take the reward function
+	\begin{equation}
+	r^\text{variance}_t = \Var_{p(\theta|h_{t-1})}[\theta] - \Var_{p(\theta|h_{t})}[\theta].
+	\end{equation}
+	Whilst there are certain reasons why the entropy approach is considered more theoretically well-justified \citep{lindley1956}, using a different functional of the posterior distribution as a reward signal does fit relatively naturally into the DAD framework. 
+	The remaining piece of the puzzle would be whether that functional could be estimated efficiently as DAD estimates the information gain using sPCE.
+	For the variance, we have
+	\begin{equation}
+	\E_{p(\theta)p(h_T|\theta,\pi)}\left[ \sum_{t=1}^T r^\text{variance}_t \right] \ge \Var_{p(\theta)}[\theta] -  \E_{p(\theta)p(h_T|\theta,\pi)}\left[ (\theta - f_{\phi'}(h_T))^2 \right]
+	\end{equation}
+	where $f_{\phi'}$ is a learnable function. Note the similarity with the Barber--Agakov bound \citep{ba,foster2019variational,foster2020unified}.
+	
+	\subsection{RL algorithms for Bayesian experimental design}
+	To conclude, making the formal connection between sequential Bayesian experimental design opens up the possibility of using the vast literature on Bayesian RL and control theory to improve our ability to plan sequential experiments.
+	Whilst the direct policy optimisation approach of DAD works remarkably well, understanding the connection to RL should aid us when this training method begins to break down.
+	The application of existing Bayesian RL algorithms to experimental design is an exciting area for new research that is well within reach.
+	
+	A case of potential difficulty for DAD, where such insights may be useful, is in long-horizon experiments. 
+	In order to plan effectively for long experiments, DAD simulates thousands of possible experimental trajectories.
+	However, the efficiency of this simulation is likely to drop as $T$ increases.
+	DAD is extremely data hungry---it resimulates completely new trajectories at each gradient step.
+	This avoids any problems of the training data becoming out-of-date, but it increases the training cost.
+	
+	
+	It is also conceivable that, in some settings, it is impossible to plan for all future eventualities.
+	The RL analogy would be a strongly stochastic environment in which a game is selected at random from a long list at the start of play.
+	The agent, therefore, has to first discover which game it is playing, and then to play it successfully.
+	If all planning is conducted up-front, then the RL agent has to learn how to play every single game well before starting on the real environment.
+	The alternative is to introduce some real data and retrain the policy as we go.
+	In the RL setting, that would mean discovering which game is being played before knowing how to play the games, which could be achieved with a much simpler policy.
+	Once this discovery is made with good confidence, we can retrain to learn to play that specific game.
+	In the experimental design setting, we are often in the `unknown game' setting. 
+	This is because, until we have observed some data, it is almost impossible to know which later experiments will be optimal to run.
+	The DAD approach is to simulate different possibilities and learn to `play' well across the board.
+	The retraining alternative would be a hybrid approach between the standard greedy method and DAD in which some real data is used to retrain the policy as we progress.
+	
+	
+	
+	
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% ESSAY FOUR STATISTICAL ESTIMATION OF MUTUAL INFORMATION
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	\clearpage
+	\section{Statistical estimation of mutual information}
+	\label{sec:estimators}
+	
+	
+	\subsection{Introduction}
+	Mutual information is a central statistical quantity that measures the relationship between two random variables.
+	In machine learning, it has found use in blind source separation \citep{hyvarinen1999survey}, representation learning \citep{oord2018representation}, the information bottleneck \citep{tishby2000information} and feature selection \citep{kwak2002input}. It is also a key quantity in Bayesian experimental design \citep{lindley1956}.
+	The mutual information between jointly distributed random variables $\rvx,\rvy \sim p(\rvx,\rvy)$ is defined as
+	\begin{equation}
+	I(\rvx,\rvy) = \E_{p(\rvx,\rvy)}\left[ \log \frac{p(\rvx,\rvy)}{p(\rvx)p(\rvy)} \right].
+	\end{equation}
+	In this document, we focus on the estimation of mutual information in the \emph{explicit likelihood} setting in which one of the conditional densities, say $p(\rvy|\rvx)$ is known in closed form.
+	In this case, asymptotically consistent estimators exist for the mutual information, and we are concerned in studying their convergence rates.
+	In the \emph{implicit likelihood} setting, the standard approach is to introduce a positive, unnormalised function $\kappa(\rvx,\rvy)$ that is an estimate of the joint $p(\rvx,\rvy)$. However, estimators that use $\kappa$ as a surrogate for the true unknown density can only be guaranteed to produce lower bounds on the mutual information in the limit of infinite samples of $\rvx,\rvy$.
+	The convergence rates, though, behave similarly.
+	
+	\subsection{Nested Monte Carlo and leave-one-out estimators}
+	\label{sec:nmc}
+	The Nested Monte Carlo (NMC) estimator \citep{ryan2003estimating}, also called the double loop estimator, for mutual information estimation with an explicit likelihood is defined as 
+	\begin{equation}
+	A_{n,m} = \frac{1}{n}\sum_{i=1}^n \log \frac{p(\rvy_i|\rvx_i)}{\frac{1}{m}\sum_{j=1}^m p(\rvy_i|\rvx_{ij})}
+	\end{equation}
+	where $\rvx_i,\rvy_i \iid p(\rvx,\rvy)$ and $\rvx_{ij} \iid p(\rvx)$ are independent.
+	% Note the assumption that $p(\rvy|\rvx)$ is known in closed form.
+	It is also possible to include some correlation in the $\rvx$ samples, for example we can repeatedly use $\left(\rvx_{1j}\right)_{j=1}^m$
+	\begin{equation}
+	A'_{n,m} = \frac{1}{n}\sum_{i=1}^n \log \frac{p(\rvy_i|\rvx_i)}{\frac{1}{m}\sum_{j=1}^m p(\rvy_i|\rvx_{1j})},
+	\end{equation}
+	and we can use the original $n$ samples, giving the leave-one-out (LOO) estimator \citep{poole2018variational}
+	\begin{equation}
+	\tilde{A}_{n} = \frac{1}{n}\sum_{i=1}^n \log \frac{p(\rvy_i|\rvx_i)}{\frac{1}{n-1}\sum_{j\ne i} p(\rvy_i|\rvx_{j})}.
+	\end{equation}
+	Note that $\E[A_{n,m}] = \E[A'_{n,m}]$ and $\E[\tilde{A}_n] = \E[A_{n,n-1}]$, so the correlations only change the variance. 
+	Furthermore, estimators $A_{n,m}$ and $A'_{n,m}$ both cost $\mathcal{O}(mn)$ evaluations of the likelihood and $\tilde{A}_n$ costs $\mathcal{O}(n^2)$ evaluations of the likelihood. So, whilst $A'_{n,m}$ and $\tilde{A}_n$ appear more efficient in their use of samples, their theoretical computational complexity is not different to $A_{n,m}$.
+	
+	Here, we focus on analysing the estimator $A_{n,m}$.
+	Our results reaffirm previous analysis by \citet{rainforth2018nesting,zheng2018robust,beck2018fast}.
+	We focus on a rigorous approach to using Taylor's Theorem for the logarithm. Our techniques can then be used to analyse other estimators.
+	\begin{theorem}[Expectation of $A_{n,m}$]
+		\label{thm:exp:nmc}
+		Suppose there exist H\"{o}lder conjugate indices $p,q>0$ with $1/p + 1/q=1$ such that
+		\begin{equation}
+		\E_{p(\rvx)p(\rvy)}\left[\left(\frac{p(\rvy|\rvx)}{p(\rvy)}\right)^{3p} \right]<\infty \text{  and  } \E_{p(\rvx)p(\rvy)}\left[\left|  \log \frac{p(\rvy|\rvx)}{p(\rvy)} \right|^q\right]<\infty.
+		\end{equation}
+		Then we have
+		\begin{equation}
+		\E[A_{n,m}] = I(\rvx,\rvy) + \frac{1}{m}\E_{p(\rvy)}\left[\frac{\Var_{p(\rvx)}[p(\rvy|\rvx)]}{2p(\rvy)^2} \right] + \mathcal{O}\left( m^{-3/2} \right).
+		\end{equation}
+		\begin{proof}
+			By linearity, $\E[A_{n,m}] = \E[A_{1,m}]$.
+			To compute this expectation, we define
+			\begin{equation}
+			U_j = \frac{p(\rvy_1|\rvx_{1j})}{p(\rvy_1)}.
+			\end{equation}
+			with $E[U_j] = \E[\E[U_j|\rvy_1]]= 1$.
+			Then,
+			\begin{equation}
+			A_{1,m} = \log \frac{p(\rvy_1|\rvx_1)}{p(\rvy_1)} - \log\left( \frac{1}{m} \sum_{j=1}^m U_j \right),
+			\end{equation}
+			giving
+			\begin{equation}
+			\E[A_{n,m}] = I(\rvx,\rvy) - \E\left[ \log\left( \frac{1}{m} \sum_{j=1}^m U_j \right) \right].
+			\end{equation}
+			The standard approach to analysing the second term is to apply Taylor's Theorem to the logarithm function.
+			However, a naive application does not work for several reasons: a) the Taylor series for the logarithm about $1$ is convergent only on $(0,2)$ rather than $(0,\infty)$, b) the derivatives of the logarithm are not bounded at $0$, so the classical Delta Method (Lemma~\ref{lemma:delta}) does not apply.
+			To get around these problems, we define the partial Taylor series
+			\begin{equation}
+			L_k(x) = \sum_{j=1}^k \frac{(-1)^{j+1}}{j}(x-1)^j,
+			\end{equation}
+			in Lemma~\ref{lemma:log}, we prove that $|\log x - L_k(x)| \le |x-1|^{k+1}\max(1, -\log x)$ on $(0,\infty)$.
+			Taking $k=2$, we have
+			\begin{align}
+			\E\left[ \log\left( \frac{1}{m} \sum_{j=1}^m U_j \right) \right] &= -\frac{1}{2} \E\left[\left(\frac{1}{m}\sum_{j=1}^m (U_j -1) \right)^2 \right] + \E[\varepsilon]\\
+			\intertext{and}
+			\left|\E[\varepsilon]\right| \le \E[|\varepsilon|] &\le \E\left[ \left| \frac{1}{m}\sum_{j=1}^m (U_j -1) \right|^3 \max\left(1, -\log\left( \frac{1}{m} \sum_{j=1}^m U_j \right) \right)  \right]\\
+			\intertext{applying H\"{o}lder's Inequality} 
+			&\le \E\left[ \left| \frac{1}{m}\sum_{j=1}^m (U_j -1) \right|^{3p} \right]^{1/p}\E\left[ \max\left(1, -\log\left( \frac{1}{m} \sum_{j=1}^m U_j \right) \right)^q  \right]^{1/q}.
+			\end{align}
+			We tackle each term separately. 
+			Since the $U_j$ are i.i.d conditional on $\rvy_1$, we can apply Corollary~\ref{cor:moment} that uses the Marcinkiewicz--Zygmund Inequality, and the Tower Law to conclude that there is a finite constant $D_{3p}$ such that
+			\begin{equation}
+			\E\left[ \left| \frac{1}{m}\sum_{j=1}^m (U_j -1) \right|^{3p} \right]^{1/p} \le D_{3p}^{1/p}m^{-3/2}\E\left[ |U_1 - 1|^{3p} \right]^{1/p}
+			\end{equation}
+			and
+			\begin{equation}
+			\E\left[ |U_1 - 1|^{3p} \right] \le 1 + \E_{p(\rvx)p(\rvy)}\left[\left(\frac{p(\rvy|\rvx)}{p(\rvy)}\right)^{3p} \right] < \infty \text{ by assumption.}
+			\end{equation}
+			So this term is $\mathcal{O}(m^{-3/2})$.
+			For the latter term, we use the fact that $x \mapsto \max(1, -\log x)$ is a convex function. Thus
+			\begin{align}
+			\E\left[ \max\left(1, -\log\left( \frac{1}{m} \sum_{j=1}^m U_j \right) \right)^q  \right]^{1/q} &\le \E\left[\frac{1}{m} \sum_{j=1}^m \max\left(1, -\log\left(  U_j \right) \right)^q  \right]^{1/q} \\
+			&= \E\left[ \max\left(1, -\log\left(  U_1 \right) \right)^q  \right]^{1/q} \\
+			&\le \left(1 + \E[|\log U_1|^q] \right)^{1/q} \\
+			&= \left(1 + \E_{p(\rvx)p(\rvy)}\left[\left|\log \frac{p(\rvy|\rvx)}{p(\rvy)}\right|^q\right] \right)^{1/q}\\
+			&<\infty \text{ by assumption.}
+			\end{align}
+			Overall, we have $\E[\varepsilon] = \mathcal{O}(m^{-3/2})$.
+			Finally, 
+			\begin{equation}
+			\frac{1}{2}\E\left[\left(\frac{1}{m}\sum_{j=1}^m (U_j -1) \right)^2 \right] = \frac{1}{2m}\E_{p(\rvy)}\left[ \E_{p(\rvx)}\left[ \left( \frac{p(\rvy|\rvx)}{p(\rvy)} - 1 \right)^2 \right] \right] = \frac{1}{m}\E_{p(\rvy)}\left[\frac{\Var_{p(\rvx)}[p(\rvy|\rvx)]}{2p(\rvy)^2} \right].
+			\end{equation}
+			This completes the proof.
+		\end{proof}
+	\end{theorem}
+	A simple application of Jensen's Inequality further shows that $\E[A_{n,m}] \ge I(\rvx,\rvy)$ for every value of $n$ and $m$.
+	Put another way, the NMC estimator is always a stochastic upper bound on the mutual information with bias of order $1/m$.
+	\citet{zheng2018robust} showed that the coefficient of the $1/m$ term is
+	\begin{equation}
+	\E_{p(\rvy)}\left[\frac{\Var_{p(\rvx)}[p(\rvy|\rvx)]}{{2p(\rvy)^2}} \right] = \frac{1}{2}\E_{p(\rvx)p(\rvy)}\left[ \left( \frac{p(\rvx,\rvy)}{p(\rvx)p(\rvy)} - 1 \right)^2\right]
+	\end{equation}
+	which is the $\chi^2$-divergence from $p(\rvx,\rvy)$ to $p(\rvx)p(\rvy)$.
+	
+	\begin{theorem}[Variance of $A_{n,m}$]
+		\label{thm:var:nmc}
+		Assume that there exist H\"{o}lder conjugate indices  $p,q > 0$ such that
+		\begin{equation}
+		\E_{p(\rvx)p(\rvy)}\left[\left(\frac{p(\rvy|\rvx)}{p(\rvy)}\right)^{3p} \right]<\infty \text{  and  } \E_{p(\rvx)p(\rvy)}\left[\left|  \log \frac{p(\rvy|\rvx)}{p(\rvy)} \right|^{2q}\right]<\infty.
+		\end{equation}
+		Then,
+		\begin{equation}
+		\begin{split}
+		\Var[A_{n,m}] &= \frac{1}{n}\Var_{p(\rvx,\rvy)}\left[ \log \frac{p(\rvy|\rvx)}{p(\rvy)} \right]
+		\\ & + \frac{1}{nm} \left(\E_{p(\rvy)}\left[\frac{\Var_{p(\rvx)}[p(\rvy|\rvx)]}{p(\rvy)^2} \right] + \Cov_{p(\rvx,\rvy)}\left[\log \frac{p(\rvy|\rvx)}{p(\rvy)}, \frac{\Var_{p(\rvx')}[p(\rvy|\rvx')]}{p(\rvy)^2}  \right] \right) \\
+		& + \mathcal{O}\left(n^{-1}m^{-3/2}\right).
+		\end{split}
+		\end{equation}
+		\begin{proof}
+			We have
+			\begin{equation}
+			\Var[A_{n,m}] = \frac{1}{n}\Var[A_{1,m}].
+			\end{equation}
+			For the variance of $A_{1,m}$, we use the Tower Law for the Variance
+			\begin{equation}
+			\Var[A_{1,m}] = \E[\Var[A_{1,m}|\rvx_1,\rvy_1]] + \Var[\E[A_{1,m}|\rvx_1,\rvy_1]].
+			\end{equation}
+			For the conditional variance, we follow the proof of Theorem~\ref{thm:exp:nmc} to see that
+			\begin{equation}
+			\label{eq:temp:cond_var}
+			\E\left[\Var[A_{1,m}|\rvx_1,\rvy_1]\right] = \E\left[\Var\left[ \log\left( \frac{1}{m} \sum_{j=1}^m U_j \right) \Bigg{|}\, \rvy_1 \right]\right] \text{  where  } U_j = \frac{p(\rvy_1|\rvx_{1j})}{p(\rvy_1)}
+			\end{equation}
+			We will the form of the variance $\Var[A] = \E[A^2] - \E[A]^2$.
+			We now study the function $x \mapsto \log(x)^2$. Taylor's Theorem suggests that $\log x  = (x-1)^2 + ...$, but as before, we aim for a more rigorous approach. We have
+			\begin{equation}
+			|\log(x)^2 - (x-1)^2|=|(\log x - x + 1)(\log x + x -1)|\le |\log x - x + 1||\log x + x -1|.
+			\end{equation}
+			Using Lemma~\ref{lemma:log}, we can show $|\log x - x + 1|\le |x-1|^2\max(1,-\log x)$. 
+			It is also elementary to check that $|\log x + x -1|\le 3|x-1|\max(1,-\log x)$. Hence
+			\begin{equation}
+			|\log(x)^2 - (x-1)^2|\le 3|x-1|^3 \max(1,-\log x)^2.
+			\end{equation}
+			We can now return to computing the conditional expectation of \eqref{eq:temp:cond_var}. We have
+			\begin{align}
+			\E\left[\E\left[ \log\left( \frac{1}{m} \sum_{j=1}^m U_j \right)^2 \Bigg{|}\, \rvy_1 \right]\right] = \E\left[ \left( \frac{1}{m} \sum_{j=1}^m (U_j-1) \right)^2   \right] + \E[\eta]
+			\end{align}
+			where our recent result guarantees that
+			\begin{equation}
+			\left|\E[\eta]\right| \le \E[|\eta|] \le 3\E\left[ \left| \frac{1}{m}\sum_{j=1}^m (U_j -1) \right|^3 \max\left(1, -\log\left( \frac{1}{m} \sum_{j=1}^m U_j \right) \right)^2  \right].
+			\end{equation}
+			Without reproducing all the details, the approach of Theorem~\ref{thm:exp:nmc} shows us that this error term is $\mathcal{O}(m^{-3/2})$ provided that
+			\begin{equation}
+			\E_{p(\rvx)p(\rvy)}\left[\left(\frac{p(\rvy|\rvx)}{p(\rvy)}\right)^{3p} \right]<\infty \text{  and  } \E_{p(\rvx)p(\rvy)}\left[\left|  \log \frac{p(\rvy|\rvx)}{p(\rvy)} \right|^{2q}\right]<\infty
+			\end{equation}
+			where $p,q$ are H\"{o}lder conjugate indices.
+			Theorem~\ref{thm:exp:nmc} also shows that 
+			\begin{equation}
+			\E\left[\E\left[ \log\left( \frac{1}{m} \sum_{j=1}^m U_j \right) \Bigg{|}\, \rvy_1 \right]^2\right] = \mathcal{O}(m^{-2}).
+			\end{equation}
+			Putting these pieces together, we have
+			\begin{equation}
+			\E\left[\Var[A_{1,m}|\rvx_1,\rvy_1]\right] = \frac{1}{m}\E_{p(\rvy)}\left[\frac{\Var_{p(\rvx)}[p(\rvy|\rvx)]}{p(\rvy)^2} \right] + \mathcal{O}(m^{-3/2}).
+			\end{equation}
+			
+			
+			Turning to the variance of the conditional expectation, recall from Theorem~\ref{thm:exp:nmc} that
+			\begin{equation}
+			\E\left[ A_{1,m} | \rvx_1,\rvy_1 \right] = \log \frac{p(\rvy_1|\rvx_1)}{p(\rvy_1)} + \frac{1}{m}\frac{\Var_{p(\rvx)}[p(\rvy_1|\rvx)]}{2p(\rvy_1)^2} + \mathcal{O}\left( m^{-3/2} \right).
+			\end{equation}
+			Taking the variance gives
+			\begin{equation}
+			\Var\left[ \E\left[ A_{1,m} | \rvx_1,\rvy_1 \right]  \right] = \Var_{p(\rvx,\rvy)}\left[ \log \frac{p(\rvy|\rvx)}{p(\rvy)} \right] + \frac{1}{m} \Cov\left(\log \frac{p(\rvy|\rvx)}{p(\rvy)}, \frac{\Var_{p(\rvx')}[p(\rvy|\rvx')]}{p(\rvy)^2}  \right) + \mathcal{O}(m^{-3/2}).
+			\end{equation}
+			Thus,
+			\begin{equation}
+			\begin{split}
+			\Var[A_{1,m}] &= \Var_{p(\rvx,\rvy)}\left[ \log \frac{p(\rvy|\rvx)}{p(\rvy)} \right]
+			\\ & + \frac{1}{m} \left(\E_{p(\rvy)}\left[\frac{\Var_{p(\rvx)}[p(\rvy|\rvx)]}{p(\rvy)^2} \right] + \Cov_{p(\rvx,\rvy)}\left(\log \frac{p(\rvy|\rvx)}{p(\rvy)}, \frac{\Var_{p(\rvx')}[p(\rvy|\rvx')]}{p(\rvy)^2}  \right) \right) + \mathcal{O}(m^{-3/2})
+			\end{split}
+			\end{equation}
+			and the full result follows.
+		\end{proof}
+	\end{theorem}
+	Combining the last two theorems establishes that
+	\begin{equation}
+	\E\left[| A_{n,m} - I(\rvx,\rvy) |^2\right] = \mathcal{O}\left(\frac{1}{n} + \frac{1}{m^2} \right).
+	\end{equation}
+	The computational cost of $A_{n,m}$ is $\mathcal{O}(mn)$.  Thus it is optimal to set $m \propto \sqrt{n}$. Then the estimator converges to $I(\rvx,\rvy)$ at a rate $T^{-1/3}$ in root mean square, where $T$ is the total computational budget.
+	
+	Finally, in the case that $p(\rvy|\rvx)$ is not known, we can repeat this analysis using a positive function $\kappa(\rvx,\rvy)$ in its place.
+	In this case,
+	\begin{equation}
+	A^{(\kappa)}_{n,m} \to \E_{p(\rvx,\rvy)} \left[ \log\frac{\kappa(\rvx,\rvy)}{\kappa(\rvy)} \right] \text{ as } m,n\to\infty
+	\end{equation}
+	where $\kappa(\rvy) = \E_{p(\rvx)}[\kappa(\rvx,\rvy)]$. The same convergence rates apply.
+	
+	\subsection{Prior Contrastive Estimation and InfoNCE}
+	\label{sec:pce}
+	
+	We now consider the Prior Contrastive Estimation (PCE) estimator \citep{foster2020unified}
+	\begin{equation}
+	B_{n,m} = \frac{1}{n}\sum_{i=1}^n \log \frac{p(\rvy_i|\rvx_i)}{\frac{1}{m+1}\left(p(\rvy_i|\rvx_i) + \sum_{j=1}^m p(\rvy_i|\rvx_{ij})  \right)}.
+	\end{equation}
+	where $\rvx_i,\rvy_i \iid p(\rvx,\rvy)$ and $\rvx_{ij} \iid p(\rvx)$ are independent.
+	We can also re-use samples to make the variant
+	\begin{equation}
+	\tilde{B}_n = \frac{1}{n}\sum_{i=1}^n \log \frac{p(\rvy_i|\rvx_i)}{\frac{1}{n}\sum_{j=1}^n p(\rvy_i|\rvx_j)}.
+	\end{equation}
+	It is more common to utilise this estimator in the case that $p(\rvy|\rvx)$ is not known, leading to the InfoNCE estimator \citep{oord2018representation}
+	\begin{equation}
+	\tilde{B}_n^{(\kappa)} = \frac{1}{n}\sum_{i=1}^n \log \frac{\kappa(\rvx_i,\rvy_i)}{\frac{1}{n}\sum_{j=1}^n\kappa(\rvx_j,\rvy_i) }
+	\end{equation}
+	for some positive function $\kappa$.
+	Here, we focus on analysing the estimator $B_{n,m}$.
+	
+	Before computing the asymptotic expansion of $B_{n,m}$, we present a basic result on its expectation.
+	\begin{proposition}[Bounding the expectation of $B_{n,m}$]
+		Assume
+		\begin{equation}
+		\E_{p(\rvx,\rvy)}\left[ \frac{p(\rvy|\rvx)}{p(\rvy)} \right] < \infty.
+		\end{equation}
+		Then,
+		\begin{equation}
+		0 \le I(\rvx,\rvy) - \E[B_{n,m}] \le \frac{1}{m+1}\E_{p(\rvx,\rvy)}\left[ \frac{p(\rvy|\rvx)}{p(\rvy)} - 1 \right].
+		\end{equation}
+		This shows $B_{m,n}$ is negatively biased with bias of order $1/m$.
+		\begin{proof}
+			See Theorems 1 and 3 of \citet{foster2020unified}.
+		\end{proof}
+	\end{proposition}
+	
+	\begin{theorem}[Expectation of $B_{n,m}$]\label{thm:exp:pce}
+		Suppose there exist H\"{o}lder conjugate indices $p,q>0$ with $1/p + 1/q=1$ such that
+		\begin{equation}
+		\E_{p(\rvx)p(\rvy)}\left[\left(\frac{p(\rvy|\rvx)}{p(\rvy)}\right)^{3p} \right]<\infty \text{  and  } \E_{p(\rvx)p(\rvy)}\left[\left|  \log \frac{p(\rvy|\rvx)}{p(\rvy)} \right|^q\right]<\infty.
+		\end{equation}
+		Then we have
+		\begin{equation}
+		\begin{split}
+		\E[B_{n,m}] =& I(\rvx,\rvy) \\
+		& - \frac{1}{m}\E_{p(\rvx,\rvy)}\left[ \frac{p(\rvy|\rvx)}{p(\rvy)} - 1 \right] +  \frac{1}{m}\E_{p(\rvx,\rvy)}\left[ \frac{\Var_{p(\rvx')}[p(\rvy|\rvx')]}{2p(\rvy)^2} \right] \\
+		& + \mathcal{O}\left( m^{-3/2} \right).
+		\end{split}
+		\end{equation}
+		\begin{proof}
+			By linearity, $\E[B_{n,m}] = \E[B_{1,m}]$. To compute this we define $U_j$ as in Theorem~\ref{thm:exp:nmc}, and we define $U_0 = p(\rvx_1|\rvy_1)/p(\rvy_1)$.
+			We have
+			\begin{equation}
+			\E[B_{1,m}] = I(\rvx,\rvy) - \E\left[ \log \left(\frac{1}{m+1}\sum_{j=0}^m U_j \right) \right].
+			\end{equation}
+			To reduce this to a more manageable form, we have
+			\begin{align}
+			\E\left[ \log \left(\frac{1}{m+1}\sum_{j=0}^m U_j \right) \right] &= \log\left(\frac{m}{m+1}\right)+ \E\left[ \log \left(1 + \frac{U_0}{m}+\frac{1}{m}\sum_{j=1}^m (U_j-1) \right) \right] \\
+			&=  \log\left(\frac{m}{m+1}\right) + \E\left[\log\left(1 + \frac{U_0}{m} \right) \right] + \E\left[ \log \left(1 + \frac{1}{m}\sum_{j=1}^m \frac{U_j-1}{1 + U_0/m} \right) \right].
+			\end{align}
+			Here, the third term involves a sum of conditionally i.i.d.~random variables with mean zero.
+			We now expand this third term with Taylor's Theorem
+			\begin{equation}
+			\E\left[ \log \left(1 + \frac{1}{m}\sum_{j=1}^m \frac{U_j-1}{1 + U_0/m} \right) \right] = -\frac{1}{2}\E\left[ \left(\frac{1}{m}\sum_{j=1}^m \frac{U_j - 1}{1 + U_0 / m}\right)^2 \right] + \E[\zeta]
+			\end{equation}
+			We focus on controlling the $\zeta$ term.
+			By Lemma~\ref{lemma:log} with $k=2$ we have
+			\begin{equation}
+			|\zeta| \le \left| \frac{1}{m}\sum_{j=1}^m \frac{U_j - 1}{1 + U_0/m} \right|^3 \max\left(1, -\log\left(1 + \frac{1}{m} \sum_{j=1}^m \frac{U_j - 1}{1 + U_0/m} \right) \right).
+			\end{equation}
+			Since $U_0 >0$, we must have
+			\begin{equation}
+			\left| \frac{U_j - 1}{1 + U_0/m} \right| \le |U_j - 1|,
+			\end{equation}
+			thus we can bound $\E[|\zeta|]$ by the exact error term that was considered in Theorem~\ref{thm:exp:nmc}.
+			This shows that $\E[|\zeta|]=\mathcal{O}(m^{-3/2})$.
+			To calculate the expectation, we have 
+			\begin{align}
+			\E\left[ \left(\frac{1}{m}\sum_{j=1}^m \frac{U_j - 1}{1 + U_0 / m}\right)^2 \right] &= \E\left[\E\left[ \left(\frac{1}{m}\sum_{j=1}^m \frac{U_j - 1}{1 + U_0 / m}\right)^2 \Bigg{|} \rvx_1,\rvy_1 \right]\right] \\
+			&= \frac{1}{m}\E_{p(\rvx,\rvy)}\left[ \frac{1}{1 + U_0/m} \frac{\Var_{p(\rvx')}[p(\rvy|\rvx')]}{p(\rvy)^2} \right] \\
+			&= \frac{1}{m}\E_{p(\rvx,\rvy)}\left[ \frac{1}{1 + \frac{p(\rvy|\rvx)}{mp(\rvy)}} \frac{\Var_{p(\rvx')}[p(\rvy|\rvx')]}{p(\rvy)^2} \right],
+			\end{align}
+			this form offers easy comparison with Theorem~\ref{thm:exp:nmc}.
+			However, we have 
+			\begin{equation}
+			\frac{1}{1 + \frac{p(\rvy|\rvx)}{mp(\rvy)}} = 1 + \mathcal{O}(m^{-1})
+			\end{equation}
+			and so we can drop the extract factor, giving 
+			\begin{equation}
+			\E\left[ \left(\frac{1}{m}\sum_{j=1}^m \frac{U_j - 1}{1 + U_0 / m}\right)^2 \right] = \frac{1}{m}\E_{p(\rvx,\rvy)}\left[  \frac{\Var_{p(\rvx')}[p(\rvy|\rvx')]}{p(\rvy)^2} \right] + \mathcal{O}(m^{-2})
+			\end{equation}
+			We also need to expand
+			\begin{align}
+			\log \left( \frac{m}{m+1} \right) + \E\left[ \log\left(1 + \frac{U_0}{m} \right) \right] &= \E\left[ \log\left(1 + \frac{U_0-1}{m+1} \right) \right] \\
+			&= \E\left[ \frac{U_0 - 1}{m+1} \right] + \mathcal{O}(m^{-3/2}) \\
+			&= \frac{1}{m+1}\E_{p(\rvx,\rvy)}\left[ \frac{p(\rvy|\rvx)}{p(\rvy)} - 1 \right] + \mathcal{O}(m^{-3/2}) \\
+			&= \frac{1}{m}\E_{p(\rvx,\rvy)}\left[ \frac{p(\rvy|\rvx)}{p(\rvy)} - 1 \right] + \mathcal{O}(m^{-3/2}) \text{ as the difference is order $m^{-2}$.}
+			\end{align}
+			Combining these gives the result.
+		\end{proof}
+	\end{theorem}
+	
+	\begin{theorem}[Variance of $B_{m,n}$]\label{thm:var:pce}
+		Assume that there exist H\"{o}lder conjugate indices  $p,q > 0$ such that
+		\begin{equation}
+		\E_{p(\rvx)p(\rvy)}\left[\left(\frac{p(\rvy|\rvx)}{p(\rvy)}\right)^{3p} \right]<\infty \text{  and  } \E_{p(\rvx)p(\rvy)}\left[\left|  \log \frac{p(\rvy|\rvx)}{p(\rvy)} \right|^{2q}\right]<\infty.
+		\end{equation}
+		Then,
+		\begin{equation}
+		\begin{split}
+		\Var[B_{n,m}] &= \frac{1}{n}\Var_{p(\rvx,\rvy)}\left[ \log \frac{p(\rvy|\rvx)}{p(\rvy)} \right] \\
+		& + \frac{1}{nm}\E_{p(\rvx,\rvy)}\left[ \frac{\Var_{p(\rvx')}[p(\rvy|\rvx')]}{2p(\rvy)^2} \right] \\
+		& + \frac{1}{nm} \Cov_{p(\rvx,\rvy)}\left[ \log\frac{p(\rvy|\rvx)}{p(\rvy)} ,  - \frac{2p(\rvy|\rvx)}{p(\rvy)} +  \frac{\Var_{p(\rvx')}[p(\rvy|\rvx')]}{p(\rvy)^2}  \right] \\
+		& + \mathcal{O}\left(n^{-1}m^{-3/2}\right).
+		\end{split}
+		\end{equation}
+		\begin{proof}
+			We proceed using the same general strategy as Theorem~\ref{thm:var:nmc}.
+			We have
+			\begin{equation}
+			\Var[B_{n,m}]=\frac{1}{n}\Var[B_{1,m}].
+			\end{equation}
+			By Tower Law,
+			\begin{equation}
+			\Var[B_{1,m}] = \E[\Var[B_{1,m}|\rvx_1,\rvy_1]] + \Var[\E[B_{1,m}|\rvx_1,\rvy_1]].
+			\end{equation}
+			For the conditional variance, using the notation of Theorem~\ref{thm:exp:pce} we have
+			\begin{equation}
+			\begin{split}
+			\E[\Var[B_{1,m}|\rvx_1,\rvy_1]] =& \E\left[ \E\left[ \log\left(1 + \frac{1}{m}\sum_{j=1}^m \frac{U_j - 1}{1 + U_0/m} \right)^2 \Bigg{|} \rvx_1,\rvy_1 \right] \right]\\
+			&-\E\left[ \E\left[ \log\left(1 + \frac{1}{m}\sum_{j=1}^m \frac{U_j - 1}{1 + U_0/m} \right) \Bigg{|} \rvx_1,\rvy_1 \right]^2 \right].
+			\end{split}
+			\end{equation}
+			For the first term of this variance, we use the analysis of $x\mapsto \log(x)^2$ that was done in Theorem~\ref{thm:var:nmc} showing
+			\begin{equation}
+			|\log(x)^2 - (x-1)^2| \le |x-1|^3 \max(1,-\log x)^2.
+			\end{equation}
+			Thus,
+			\begin{equation}
+			\E\left[ \E\left[ \log\left(1 + \frac{1}{m}\sum_{j=1}^m \frac{U_j - 1}{1 + U_0/m} \right)^2 \Bigg{|} \rvx_1,\rvy_1 \right] \right] = \E\left[ \left(1 + \frac{1}{m}\sum_{j=1}^m \frac{U_j - 1}{1 + U_0/m} \right)^2 \right] + \E[\nu]
+			\end{equation}
+			where 
+			\begin{align}
+			\left|\E[\nu]\right| \le \E[|\nu|] &\le \E\left[ \left|\frac{1}{m} \sum_{j=1}^m \frac{U_j -1}{1 + U_0/m} \right|^3 \max\left(1, -\log \left( \frac{1}{m} \sum_{j=1}^m \frac{U_j -1}{1 + U_0/m} \right)\right)^2  \right] \\
+			&\overset{\text{H\"{o}lder}}{\le} \E\left[ \left|\frac{1}{m} \sum_{j=1}^m \frac{U_j -1}{1 + U_0/m} \right|^{3p} \right]^{1/p} \E\left[ \max\left(1, -\log \left( \frac{1}{m} \sum_{j=1}^m \frac{U_j -1}{1 + U_0/m} \right)\right)^{2q}  \right]^{1/q}\\
+			&\le \E\left[ \left|\frac{1}{m} \sum_{j=1}^m {U_j -1} \right|^{3p} \right]^{1/p} \E\left[ \max\left(1, -\log \left( \frac{1}{m} \sum_{j=1}^m {U_j -1} \right)\right)^{2q}  \right]^{1/q} \\
+			&\overset{\text{Corollary~\ref{cor:moment}}}{\le} D_{3p}^{1/p}m^{-3/2}\E\left[ \left|U_1 - 1\right|^{3p} \right]^{1/p} \E\left[ \max\left(1, -\log \left( \frac{1}{m} \sum_{j=1}^m {U_j -1} \right)\right)^{2q}  \right]^{1/q} \\
+			&\overset{\text{convexity}}{\le}D_{3p}^{1/p}m^{-3/2}\E\left[ \left|U_1 - 1\right|^{3p} \right]^{1/p}  \left( 1 + \E\left[|\log U_1|^{2q} \right]\right)^{1/q} \\
+			&\le D_{3p}^{1/p}m^{-3/2}\E_{p(\rvx)p(\rvy)}\left[ \left(\frac{p(\rvy|\rvx)}{p(\rvy)}\right)^{3p} \right]^{1/p}  \left( 1 + \E_{p(\rvx)p(\rvy)}\left[\left|\log \frac{p(\rvy|\rvx)}{p(\rvy)}\right|^{2q} \right]\right)^{1/q} .
+			\end{align}
+			We also have, as previously
+			\begin{equation}
+			\E\left[ \left(1 + \frac{1}{m}\sum_{j=1}^m \frac{U_j - 1}{1 + U_0/m} \right)^2 \right] = \frac{1}{m}\E_{p(\rvx,\rvy)}\left[  \frac{\Var_{p(\rvx')}[p(\rvy|\rvx')]}{2p(\rvy)^2} \right] + \mathcal{O}(m^{-2}).
+			\end{equation}
+			On the other hand, Theorem~\ref{thm:exp:pce} shows that
+			\begin{equation}
+			\E\left[ \E\left[ \log\left(1 + \frac{1}{m}\sum_{j=1}^m \frac{U_j - 1}{1 + U_0/m} \right) \Bigg{|} \rvx_1,\rvy_1 \right]^2 \right] = \mathcal{O}(m^{-2}).
+			\end{equation}
+			
+			We can now turn to the variance of the conditional expectation.
+			From Theorem~\ref{thm:exp:pce}, we know
+			\begin{equation}
+			\E[B_{1,m}|\rvx_1,\rvy_1] = \log \frac{p(\rvy_1|\rvx_1)}{p(\rvy_1)} + \frac{1}{m} \left( 1 - \frac{p(\rvy|\rvx)}{p(\rvy)} +  \frac{\Var_{p(\rvx')}[p(\rvy|\rvx')]}{2p(\rvy)^2} \right)  + \mathcal{O}\left( m^{-3/2} \right).
+			\end{equation}
+			Thus,
+			\begin{equation}
+			\begin{split}
+			\Var[\E[B_{1,m}|\rvx_1,\rvy_1]] &= \Var_{p(\rvx,\rvy)}\left[ \log\frac{p(\rvy|\rvx)}{p(\rvy)} \right] \\
+			&+\frac{1}{m}\Cov_{p(\rvx,\rvy)}\left[ \log\frac{p(\rvy|\rvx)}{p(\rvy)} ,  - \frac{2p(\rvy|\rvx)}{p(\rvy)} + \frac{\Var_{p(\rvx')}[p(\rvy|\rvx')]}{p(\rvy)^2}  \right] \\
+			&+ \mathcal{O}\left(m^{-3/2}\right).
+			\end{split}
+			\end{equation}
+			Putting the pieces together gives the final result.
+		\end{proof}
+	\end{theorem}
+	Finally, we note the key difference between the variance of the NMC and PCE estimators is the term
+	\begin{equation}
+	-\frac{1}{nm}\Cov_{p(\rvx,\rvy)}\left[ \log\frac{p(\rvy|\rvx)}{p(\rvy)} ,  \frac{2p(\rvy|\rvx)}{p(\rvy)}   \right].
+	\end{equation}
+	We would expect the covariance between a random variable and its logarithm to be positive, indicating that this term as a whole is negative.
+	This, in turn, suggests that the PCE estimator has a lower variance than its NMC counterpart.
+	However, focusing on the dominant terms, we still have the same overall NMC convergence rate of $T^{-1/3}$ in the total computational budget $T$.
+	
+	
+	\subsection{Multi-level Monte Carlo}
+	\label{sec:mlmc}
+	The following section covers material in \citet{goda2020multilevel}, with \citet{goda2020unbiased} covering the extension to gradient estimators.
+	
+	To begin, we define the random variables using the NMC estimator $A_{n,m}$ as our base
+	\begin{equation}
+	P_\ell = A_{1,M_\ell}
+	\end{equation}
+	where $M_\ell$ is an increasing sequence of positive integers. From previous remarks, we know that $\E [P_\ell] \to I(\rvx,\rvy)$ as $\ell\to\infty$. We now take $M_\ell=M_02^\ell$.
+	We define the random variables $Z_\ell$ as follows
+	\begin{equation}
+	\begin{split}
+	Z_\ell =& -\log \left(\frac{1}{M_{\ell}} \sum_{j=1}^{M_{\ell}} p(\rvy_1|\rvx_{1j})\right) \\&+ \frac{1}{2}\left[\log \left(\frac{1}{M_{\ell-1}} \sum_{j=1}^{M_{\ell-1}} p(\rvy_1|\rvx_{1j})\right) + \log \left(\frac{1}{M_{\ell-1}} \sum_{j=1+M_{\ell-1}}^{M_{\ell}} p(\rvy_1|\rvx_{1j})\right) \right].
+	\end{split}
+	\end{equation}
+	The key property of $Z_\ell$ is
+	\begin{equation}
+	\E[Z_\ell] = \E[P_\ell - P_{\ell-1}]
+	\end{equation}
+	and the cost of computing $Z_\ell$ is bounded by $c2^\ell$. The main technical challenge is to bound the expectation and variance of $Z_\ell$.
+	We have the following theorem.
+	\begin{theorem}[\citet{goda2020multilevel}]\label{thm:mlmc}
+		Suppose there exist constants $p,q>2$ such that $(p-2)(q-2) \ge 4$ such that
+		\begin{equation}
+		\E_{p(\rvx)p(\rvy)}\left[\left|\frac{p(\rvy|\rvx)}{p(\rvy)} \right|^p\right]<\infty \quad\text{and}\quad \E_{p(\rvx)p(\rvy)}\left[\left|\log \frac{p(\rvy|\rvx)}{p(\rvy)} \right|^q\right]<\infty.
+		\end{equation}
+		Then,
+		\begin{equation}
+		\E\left[\left|Z_\ell \right|\right] = O(2^{-a\ell}), \qquad \Var(Z_\ell) = O(2^{-r\ell})
+		\end{equation}
+		where $a = \min\left(\frac{p(q-1)}{2q}, 1 \right), r=\min\left(\frac{p(q-2)}{2q}, 2\right)$.
+		\begin{proof}
+			First, define
+			\begin{align}
+			\beta_\ell^{(a)} &= \frac{1}{M_{\ell}} \sum_{j=1}^{M_{\ell}} \frac{p(\rvy_1|\rvx_{1j})}{p(\rvy_1)} \\
+			\beta_\ell^{(b)} &= \frac{1}{M_{\ell}} \sum_{j=1+M_{\ell}}^{M_{\ell+1}} \frac{p(\rvy_1|\rvx_{1j})}{p(\rvy_1)}\\
+			\text{so}\quad Z_\ell &= -\log \beta_\ell^{(a)} + \frac{1}{2}\left(\log \beta_{\ell-1}^{(a)} + \log \beta_{\ell-1}^{(b)}\right) \\
+			\text{and}\quad \beta_\ell^{(a)}&= \frac{1}{2}\left(\beta_{\ell-1}^{(a)} + \beta_{\ell-1}^{(b)}\right).
+			\end{align}
+			We then have
+			\begin{align}
+			Z_\ell &= -\log \beta_\ell^{(a)} + \frac{1}{2}\left(\log \beta_{\ell-1}^{(a)} + \log \beta_{\ell-1}^{(b)}\right) \\
+			&= -\left(\log \beta_\ell^{(a)}-\beta_\ell^{(a)} + 1\right) + \frac{1}{2}\left(\log \beta_{\ell-1}^{(a)}-\beta_{\ell-1}^{(a)} + 1\right) +\frac{1}{2}\left( \log \beta_{\ell-1}^{(b)} - \beta_{\ell-1}^{(b)} + 1\right) \\
+			&= 2\left[ -\frac{1}{2}\left(\log \beta_\ell^{(a)}-\beta_\ell^{(a)} + 1\right) + \frac{1}{4}\left(\log \beta_{\ell-1}^{(a)}-\beta_{\ell-1}^{(a)} + 1\right) +\frac{1}{4}\left( \log \beta_{\ell-1}^{(b)} - \beta_{\ell-1}^{(b)} + 1\right)\right]
+			\end{align}
+			By convexity of $x\mapsto |x|^2$, we have
+			\begin{align}
+			\label{eq:threebeta}
+			|Z_\ell|^2 \le 2\left|\log \beta_\ell^{(a)}-\beta_\ell^{(a)} + 1\right|^2 + \left|\log \beta_{\ell-1}^{(a)}-\beta_{\ell-1}^{(a)} + 1\right|^2 +\left| \log \beta_{\ell-1}^{(b)} - \beta_{\ell-1}^{(b)} + 1\right|^2.
+			\end{align}
+			We use the following elementary inequality that holds for $1\le r \le 2$
+			\begin{equation}
+			|\log x - x + 1|\le |x-1|^r\max(-\log x, 1)
+			\end{equation}
+			which gives
+			\begin{equation}
+			\left|\log \beta_\ell^{(a)}-\beta_\ell^{(a)} + 1\right|^2 \le \left|\beta_\ell^{(a)}-1\right|^{2r}\left(\max\left(-\log \beta_\ell^{(a)}, 1\right)\right)^2.
+			\end{equation}
+			We now take the expectation and apply H\"{o}lder's Inequality with $1/s + 1/t =1$, giving
+			\begin{equation}
+			\E\left[\left|\log \beta_\ell^{(a)}-\beta_\ell^{(a)} + 1\right|^2\right] \le \left\|\left|\beta_\ell^{(a)}-1\right|^{2r}\right\|_{L^s} \left\|\left(\max\left(-\log \beta_\ell^{(a)}, 1\right)\right)^2\right\|_{L^t}.
+			\end{equation}
+			For the first term, we apply Corollary~\ref{cor:moment} to conclude that
+			\begin{equation}
+			\left\|\left|\beta_\ell^{(a)}-1\right|^{2r}\right\|_{L^s} \le D_{2rs}^{1/s}\E_{p(\rvx)p(\rvy)}\left[\left|\frac{p(\rvy|\rvx)}{p(\rvy)} \right|^{2sr}\right]^{1/s} (M_02^\ell)^{-r},
+			\end{equation}
+			for the second term, we use the fact that the functions $x\mapsto \max(-\log x, 1)$ and $x\mapsto x^{2t}$ are convex to give
+			\begin{align}
+			\left\|\left(\max\left(-\log \beta_\ell^{(a)}, 1\right)\right)^2\right\|_{L^t} &\le \left\|\left(\frac{1}{M_{\ell}} \sum_{j=1}^{M_{\ell}} \max\left(-\log\frac{p(\rvy_1|\rvx_{1j})}{p(\rvy_1)},1\right)\right)^2\right\|_{L^t} \\
+			&= \left( \E\left[\left(\frac{1}{M_{\ell}} \sum_{j=1}^{M_{\ell}} \max\left(-\log\frac{p(\rvy_1|\rvx_{1j})}{p(\rvy_1)},1\right)\right)^{2t}\right] \right)^{1/t} \\
+			&\le \left(\frac{1}{M_{\ell}} \E\left[ \sum_{j=1}^{M_{\ell}} \max\left(-\log\frac{p(\rvy_1|\rvx_{1j})}{p(\rvy_1)},1\right)^{2t}\right] \right)^{1/t} \\
+			&\le \left(\frac{1}{M_{\ell}} \E\left[ \sum_{j=1}^{M_{\ell}} \left|\log\frac{p(\rvy_1|\rvx_{1j})}{p(\rvy_1)}\right|^{2t} + 1\right] \right)^{1/t} \\
+			&=  \E_{p(\rvx)p(\rvy)}\left[ \left|\log\frac{p(\rvy|\rvx)}{p(\rvy)}\right|^{2t} + 1\right]^{1/t}.
+			\end{align}
+			We now choose $s = q/(q-2), t=q/2$ and $r = \min(p(q-2)/2q, 2)$. This gives
+			\begin{equation}
+			\E\left[\left|\log \beta_\ell^{(a)}-\beta_\ell^{(a)} + 1\right|^2\right] \le A_0 2^{-r\ell}
+			\end{equation}
+			where
+			\begin{equation}
+			A_0 =  D_{2rs}^{1/s}\E_{p(\rvx)p(\rvy)}\left[\left|\frac{p(\rvy|\rvx)}{p(\rvy)} \right|^{p}\right]^{1/s} \E_{p(\rvx)p(\rvy)}\left[ \left|\log\frac{p(\rvy|\rvx)}{p(\rvy)}\right|^{q} + 1\right]^{1/t}M_0^{-r}.
+			\end{equation}
+			Since we can bound the other two terms of (\ref{eq:threebeta}) in a similar way, we obtain a bound on $\Var(Z_\ell)$ that is of order $2^{-r\ell}$. A similar proof gives the bound for $\E[|Z_\ell|]$.
+		\end{proof}
+	\end{theorem}
+	An important result of this theorem is that we can obtain a MLMC estimator of $I(\rvx,\rvy)$ with total cost $T$ that converges at a rate $\mathcal{O}(T^{-1/2})$ in root mean square. This is achieved using standard MLMC technology \citep{giles2008multilevel}.
+	We define, analogously to the NMC case
+	\begin{equation}
+	\begin{split}
+	Z_{n,\ell} = & \frac{1}{n}\sum_{i=1}^n \left[  -\log \left(\frac{1}{M_{\ell}} \sum_{j=1}^{M_{\ell}} p(\rvy_i|\rvx_{ij})\right) \right .\\&\qquad+ \left. \frac{1}{2}\left[\log \left(\frac{1}{M_{\ell-1}} \sum_{j=1}^{M_{\ell-1}} p(\rvy_i|\rvx_{ij})\right) + \log \left(\frac{1}{M_{\ell-1}} \sum_{j=1+M_{\ell-1}}^{M_{\ell}} p(\rvy_i|\rvx_{ij})\right) \right]\right].
+	\end{split}
+	\end{equation}
+	Then
+	\begin{equation}
+	Z^\text{MLMC}_L = \sum_{\ell=0}^L Z_{N_\ell,\ell}
+	\end{equation}
+	with
+	\begin{equation}
+	\E\left[\left|Z_L^{\text{MLMC}} - I(\rvx,\rvy)\right|^2\right] = \sum_{\ell=0}^L \frac{\Var[Z_\ell]}{N_\ell} + \left[ \E[P_L] - I(\rvx,\rvy)  \right]^2.
+	\end{equation}
+	The cost of the estimator $Z_L^\text{MLMC}$ is $\mathcal{O}(N_LM_L)$.
+	What Theorem~\ref{thm:mlmc} shows is that the bias and variance of the $Z_\ell$ decay fast enough to offset the growth in cost.
+	For full details, see \citet{goda2020multilevel}.
+	
+	
+	\subsection{A rigorous delta method for the natural logarithm}
+	\label{sec:rigorous}
+	This self-contained section includes some of the mathematical machinery that is relied upon by the rest of this work.
+	As previously mentioned, most analyses of mutual information estimators \citep{zheng2018robust,beck2018fast,rainforth2018nesting} utilise the delta method for moments.
+	Unfortunately, the standard delta method that we derive here in Lemma~\ref{lemma:delta} is not valid for the natural logarithm function, because none of its derivatives are bounded on $(0,\infty)$.
+	In this section, we derive a rigorous delta method for the logarithm.
+	Whilst this is \emph{not} sufficient for all the Theorems in the preceding sections, it highlights and essentialises the key technical pieces required.
+	
+	
+	We begin with the Marcinkiewicz--Zygmund Inequality, which is used to derive the standard delta method.
+	\begin{lemma}[\citet{marcinkiewicz1937quelques}]
+		Let $X_1,\dots,X_m$ be independent random variables with $\E[X_i]=\mu$ and $\E\left[|X_i|^p\right]<\infty$. 
+		Then there exists a constant $D_p$ such that
+		\begin{equation}
+		\E\left( \left|\sum_{i=1}^m (X_i - \mu) \right|^p \right) \le D_p \E\left( \left( \sum_{i=1}^m |X_i|^2 \right)^{p/2} \right)
+		\end{equation}
+	\end{lemma}
+	\begin{corollary}
+		\label{cor:moment}
+		Let $X_1,\dots,X_m$ be i.i.d.~random variables with $\E[X_1]=\mu$ and $\E\left[|X_1|^p\right]<\infty$. 
+		Then there exists a constant $D_p$ such that
+		\begin{equation}
+		\E\left( \left| \frac{1}{m} \sum_{i=1}^m (X_i - \mu) \right|^p \right) \le D_p m^{-p/2} \E\left[|X_1|^p  \right]
+		\end{equation}
+		\begin{proof}
+			Applying the Marcinkiewicz--Zygmund Inequality, we have
+			\begin{align}
+			\E\left( \left| \frac{1}{m} \sum_{i=1}^m (X_i - \mu) \right|^p \right) & \le D_p m^{-p/2} \E\left( \left( \frac{1}{m} \sum_{i=1}^m |X_i|^2 \right)^{p/2} \right), \\
+			\intertext{by the convexity of $x \mapsto x^{p/2}$ on $(0,\infty)$, we have}
+			& \le D_p m^{-p/2} \E\left(  \frac{1}{m} \sum_{i=1}^m |X_i|^p  \right)\\
+			&= D_p m^{-p/2} \E\left[|X_1|^p  \right].
+			\end{align}
+		\end{proof}
+	\end{corollary}
+	Notice that Corollary~\ref{cor:moment} essentially gives the asymptotic moments that would be expected from the Central Limit Theorem, although they cannot be derived from the standard Central Limit Theorem which gives convergence \emph{in distribution} only.
+	\begin{lemma}[Delta method of order $k$]
+		\label{lemma:delta}
+		Let $X_i$ be a sequence of i.i.d.~random variables  with mean $\mu$ and $\E\left[|X_1|^{k+1}\right]<\infty$, and let $f$ be a smooth function with $\|f^{(k+1)}\|_\infty = M <\infty$.
+		Then
+		\begin{equation}
+		\E\left[ f\left( \frac{1}{m} \sum_{i=1}^m X_i \right) \right] = \sum_{j=0}^k  \frac{f^{(j)}(\mu)}{j!}\E\left[ \left( \frac{1}{m}\sum_{i=1}^m (X_i-\mu) \right)^j \right] + \mathcal{O}\left( m^{-(k+1)/2} \right).
+		\end{equation}
+		\begin{proof}
+			By Taylor's Theorem with Lagrange's form of the remainder, we have for any $x$ and for some $\xi$ between $x$ and $\mu$
+			\begin{equation}
+			f(x) = \sum_{j=0}^k  \frac{f^{(j)}(\mu)}{j!}(x-\mu)^k + \frac{f^{(k+1)}(\xi)}{(k+1)!}(x-\mu)^{k+1}.
+			\end{equation}
+			Applying this to $\frac{1}{m}\sum_{i=1}^m X_i$ and taking the expectation gives
+			\begin{equation}
+			\label{eq:mainxi}
+			\E\left[ f\left( \frac{1}{m} \sum_{i=1}^m X_i \right) \right] = \sum_{j=0}^k  \frac{f^{(j)}(\mu)}{j!}\E\left[\left(\frac{1}{m}\sum_{i=1}^m (X_i-\mu)\right)^j \right] + \E\left[\frac{f^{(k+1)}(\Xi)}{(k+1)!}\left(\frac{1}{m}\sum_{i=1}^m (X_i-\mu)\right)^{k+1} \right]
+			\end{equation}
+			where $\Xi$ is a random variable between $\mu$ and $\frac{1}{m}\sum_i X_i$. By assumption, we have $f^{(k+1)}(\Xi)\le M$. By Corollary~\ref{cor:moment}, we have
+			\begin{align}
+			\E\left(\left|\sum_{i=1} X_i - \mu \right|^{k+1} \right)\le D_{k+1}m^{(k+1)/2}\E\left[|X_1|^{k+1}\right].
+			\end{align}
+			Hence we conclude that 
+			\begin{equation}
+			\left|\E\left[\frac{f^{(k+1)}(\Xi)}{(k+1)!}\left(\frac{1}{m}\sum_{i=1}^m (X_i-\mu)\right)^{k+1} \right]\right| \le \frac{MD_{k+1}\E\left[|X_1|^{k+1}\right]m^{-(k+1)/2}}{(k+1)!} = \mathcal{O}(m^{-(k+1)/2}).
+			\end{equation}
+		\end{proof}
+	\end{lemma}
+	We now turn to the logarithm function in particular, bounding the difference between the function and its series approximation.
+	\begin{lemma}
+		\label{lemma:log}
+		Define 
+		\begin{equation}
+		L_k(x) = \sum_{j=1}^k \frac{(-1)^{j+1}}{j}(x-1)^j.
+		\end{equation}
+		Then $|\log x - L_k(x)| \le |x-1|^{k+1}\max(1, -\log x)$ for $0<x<\infty$.
+		\begin{proof}
+			By Taylor's Theorem with Cauchy's form of the remainder, for any $0 < x < \infty$ there exists $\xi$ that is between $1$ and $x$ such that
+			\begin{equation}
+			\log x = L_k(x) + \frac{(-1)^{k+2}}{\xi^{k+1}}(x-\xi)^k(x-1)
+			\end{equation}
+			For $x>1$, we must have $\xi^{k+1} > 1$, so $|\log x - L_k(x)| < |x-\xi|^k |x-1| < |x-1|^{k+1}$.
+			
+			For $x \le 1$, we have
+			\begin{equation}
+			\frac{\xi - x}{\xi} = 1 - x / \xi \text{ and } 0 \le 1 - x/\xi \le 1 - x \text{ since } x \le \xi \le 1.
+			\end{equation}
+			Thus, the magnitude of the remainder term becomes
+			\begin{equation}
+			\left|\frac{(-1)^{k+2}}{\xi^{k+1}}(x-\xi)^k(x-1)\right| = \left|\left(\frac{\xi-x}{\xi}\right)^k \frac{x-1}{\xi} \right| \le (1-x)^k \left| \frac{x-1}{\xi} \right| \le \frac{(1-x)^{k+1}}{x}
+			\end{equation}
+			which shows that the Taylor series for the logarithm is convergent on $(0, 1]$.
+			Therefore, we have
+			\begin{align}
+			\log x - L_k(x) &= \sum_{j=k+1}^\infty \frac{(-1)^{j+1}}{j}(x-1)^j \\
+			&= (x-1)^{k+1}(-1)^{k} \left( \frac{1}{k+1} - \sum_{j=1}^\infty \frac{(-1)^{j+1}}{k+1+j}(x-1)^j \right)\\
+			\intertext{noting that $x-1\le0$ we see that each term of the sum has the same sign, giving}
+			&= -|x-1|^{k+1} \left( \frac{1}{k+1} + \sum_{j=1}^\infty \frac{1}{k+1+j}|x-1|^j \right).
+			\end{align}
+			If $x \ge e^{-1}$, we have
+			\begin{align}
+			\frac{1}{k+1} + \sum_{j=1}^\infty \frac{1}{k+1+j}|x-1|^j  &\le  \frac{1}{k+1} + \sum_{j=1}^\infty \frac{1}{k+1+j}|e-1|^j 
+			\end{align}
+			by monotonicity. If $x \le e^{-1}$, we have 
+			\begin{align}
+			\frac{1}{k+1} + \sum_{j=1}^\infty \frac{1}{k+1+j}|x-1|^j &\le \frac{1}{k+1} + \frac{|x-1|}{k+2} +  \sum_{j=2}^\infty \frac{|x-1|^j}{k+1+j} \\
+			&\le |x-1| + \sum_{j=2}^\infty \frac{|x-1|^j}{j} = -\log x,
+			\end{align}
+			for any $k \ge 1$.
+			Combining these, we have
+			\begin{equation}
+			\frac{1}{k+1} + \sum_{j=1}^\infty \frac{1}{k+1+j}|x-1|^j  \le \max(-\log x, \log e) = \max(-\log x, 1).
+			\end{equation}
+		\end{proof}
+	\end{lemma}
+	For the following Proposition, the logic is inspired by \citet{goda2020multilevel}.
+	\begin{proposition}[Rigorous delta method for the logarithm]
+		\label{prop:rigorous}
+		Let $U_1,\dots,U_m$ be a sequence of i.i.d.~positive random variables with $\E[U_1]=1$.
+		Fix a natural number $k\ge 1$.
+		Suppose that for H\"{o}lder conjugate indices $p,q>0$ with $1/p + 1/q = 1$, we have $\E\left[U_1^{(k+1)p}\right]<\infty$ and $\E[|\log U_1|^q]<\infty$.
+		Then, 
+		\begin{equation}
+		\E\left[ \log \left(\frac{1}{m} \sum_{i=1}^m U_i \right) \right] = \sum_{j=2}^k \frac{(-1)^{j+1}}{j}\E\left[\left(\frac{1}{m} \sum_{i=1}^m (U_i-1) \right)^j\right] + E_k
+		\end{equation}
+		where $E_k = \mathcal{O}\left(m^{-(k+1)/2}\right)$.
+		\begin{proof}
+			Define $L_k$ as in Lemma~\ref{lemma:log}. By that Lemma, we have
+			\begin{equation}
+			\left| \log\left( \frac{1}{m}\sum_{i=1}^m U_i \right) - L_k\left(\frac{1}{m}\sum_{i=1}^m U_i  \right) \right| \le \left| \frac{1}{m}\sum_{i=1}^m U_i \right|^{k+1} \max\left(-\log\left( \frac{1}{m}\sum_{i=1}^m U_i \right), 1\right).
+			\end{equation}
+			We see that 
+			\begin{equation}
+			\E\left[L_k\left(\frac{1}{m}\sum_{i=1}^m U_i\right) \right] = \sum_{j=1}^k \frac{(-1)^{j+1}}{j}\E\left[\left(\frac{1}{m} \sum_{i=1}^m (U_i-1) \right)^j\right]
+			\end{equation}
+			and $\E[U_i - 1] = 0$.
+			
+			The error term $E_k$ is bounded in $L_1$ by
+			\begin{align}
+			\E[|E_k|] &\le \E\left[ \left| \frac{1}{m}\sum_{i=1}^m U_i \right|^{k+1} \max\left(-\log\left( \frac{1}{m}\sum_{i=1}^m U_i \right), 1\right) \right] \\
+			\intertext{apply H\"{o}lder's Inequality to give}
+			&\le \E\left[ \left| \frac{1}{m}\sum_{i=1}^m U_i \right|^{p(k+1)} \right]^{1/p}\E\left[ \max\left(-\log\left( \frac{1}{m}\sum_{i=1}^m U_i \right), 1\right)^q \right]^{1/q}.
+			\end{align}
+			For the first term, Corollary~\ref{cor:moment} shows that
+			\begin{equation}
+			\E\left[ \left| \frac{1}{m}\sum_{i=1}^m U_i \right|^{p(k+1)} \right]^{1/p} \le D_{(k+1)p}^{1/p}m^{-(k+1)/2}\E\left[ U_1^{(k+1)p} \right]^{1/p}
+			\end{equation}
+			for the second term we use the fact that $x \mapsto \max(-\log x, 1)$ is a convex function, so
+			\begin{align}
+			\max\left(-\log\left( \frac{1}{m}\sum_{i=1}^m U_i \right), 1\right)^q &\le \frac{1}{m} \sum_{i=1}^m \max\left(-\log\left( U_i \right), 1\right)^q \\
+			&\le \frac{1}{m} \sum_{i=1}^m \left(|\log U_i | + 1 \right)^q,
+			\end{align}
+			hence
+			\begin{equation}
+			\E\left[ \max\left(-\log\left( \frac{1}{m}\sum_{i=1}^m U_i \right), 1\right)^q \right]^{1/q} \le \left(\E\left[ |\log U_1|^q \right] + 1 \right)^{1/q}.
+			\end{equation}
+			By assumption, we have $\E\left[U_1^{(k+1)p}\right]<\infty$ and $\E\left[|\log U_1|^q\right]<\infty$. Putting the pieces together, we have
+			\begin{equation}
+			\E[|E_k|] \le  m^{-(k+1)/2}\, D_{(k+1)p}^{1/p}\E\left[ U_1^{(k+1)p} \right]^{1/p} \left(\E\left[ |\log U_1|^q \right] + 1 \right)^{1/q},
+			\end{equation}
+			so $E_k$ is $\mathcal{O}\left(m^{-(k+1)/2}\right)$ as required.
+		\end{proof}
+	\end{proposition}
+	Notice that we recover the regular delta method with $\log U_i$ bounded if $p=1,q=\infty$.
+	
+	
+	
+	
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% ESSAY FIVE BOUNDS
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	\clearpage
+	\section{The generalized Donsker-Varadhan representation}
+	\label{sec:bounds}
+	
+	\subsection{Introduction}
+	In this essay, we present a generalization of the classical Donsker-Varadhan representation of the KL-divergence \citep{donsker1975asymptotic}.
+	Our purpose is twofold. 
+	Firstly, the new representation of the KL-divergence sheds further light on mutual information and may motivate the development of new statistical estimators of information.
+	Secondly, our new representation is a powerful tool that connects a number of \emph{existing} mutual information estimators under one umbrella.
+	An important feature of the generalized Donsker-Varadhan representation is that it includes self-normalized bounds such as InfoNCE \citep{oord2018representation} as a special case, something which is not true of the classical Donsker-Varadhan representation.
+	
+	\subsection{Information-theoretic quantities}
+	Throughout machine learning, we have cause to consider the entropy of probability measure $p$
+	\begin{equation}
+	\entrop{p} = \E_{p(\rvx)}[-\log p(\rvx)],
+	\end{equation}
+	the KL divergence between two probability measures $p \ll q$
+	\begin{equation}
+	\kld{p}{q} = \E_{p(\rvx)}\left[\log \frac{p(\rvx)}{q(\rvx)} \right]
+	\end{equation}
+	and the mutual information between jointly distributed random variables $\rvx,\rvy \sim p(\rvx,\rvy)$
+	\begin{equation}
+	I(\rvx,\rvy) = \kld{p(\rvx,\rvy)}{p(\rvx)p(\rvy)}.
+	\end{equation}
+	These are foundational quantities in information theory \citep{shannon1948mathematical}, Bayesian experimental design \citep{lindley1956} and deep learning \citep{linsker1988self}.
+	A key result in information theory is the following.
+	\begin{theorem}[Gibbs' Inequality]
+		For any probability measures $p\ll q$, $\kld{p}{q}\ge 0$.
+	\end{theorem}
+	
+	\subsection{The Donsker-Varadhan representation}
+	An important lower bound on the KL divergence is the Donsker-Varadhan (DV) representation.
+	\begin{theorem}[\citet{donsker1975asymptotic}]
+		\label{thm:dv}
+		Let $p \ll q$ be probability measures on $\gX$, then
+		\begin{equation}
+		\kld{p}{q} = \sup_{T:\gX\to\R \textup{ measurable}} \E_{p(\rvx)}[T(\rvx)] - \log\left(\E_{q(\rvx)} \left[\exp(T(\rvx))\right] \right)
+		\end{equation}
+	\end{theorem}
+	One important bound that can be obtained as a consequence of the Donsker-Varadhan representation is the following.
+	\begin{corollary}[\citet{ba}]
+		Let $q(\rvy|\rvx)$ be a conditional distribution. Then
+		\begin{equation}
+		I(\rvx,\rvy) \ge \E_{p(\rvx,\rvy)}\left[\log \frac{q(\rvy|\rvx)}{p(\rvy)}\right]
+		\end{equation}
+		\begin{proof}
+			Since mutual information is defined as a KL divergence, the DV representation is applicable.
+			Let $T(\rvx,\rvy) = \log q(\rvx,\rvy)/p(\rvy)$ in Theorem~\ref{thm:dv}. We have
+			\begin{equation}
+			\E_{p(\rvx)p(\rvy)}[{q(\rvy|\rvx)}/{p(\rvy)}] = 1
+			\end{equation}
+			so the bound is \emph{self-normalized}. The result follows.
+		\end{proof}
+	\end{corollary}
+	The Barber-Agakov bound can be written as
+	\begin{equation}
+	I(\rvx,\rvy) \ge \E_{p(\rvx,\rvy)}\left[\log {q(\rvy|\rvx)}\right] + \entrop{p(\rvy)}
+	\end{equation}
+	which can be helpful in cases in which the $\entrop{p(\rvy)}$ term is unknown but also unneeded for e.g. gradient estimation.
+	Another bound, that appears in \citet{nguyen2010estimating,nowozin2016f,mine} has a connection to the theory of $f$-divergences. Applying the inequality $\log x  \le e^{-1}x$ to Theorem~\ref{thm:dv} gives the \textbf{NWJ bound}
+	\begin{equation}
+	I(\rvx,\rvy) \ge \E_{p(\rvx)}[T(\rvx)] -e^{-1}\E_{q(\rvx)} \left[\exp(T(\rvx))\right].
+	\end{equation}
+	An advantage of this looser bound is that it can be directly estimated by samples.
+	
+	
+	\subsection{A generalization of the Donsker-Varadhan representation}
+	To generalize Theorem~\ref{thm:dv}, suppose we extend the sample space to $\gX\times\gS$, where $\gS$ represents `side-information'. Suppose we have a conditional distribution $p(\rvs|\rvx)$. Then we can extend the Donsker-Varadhan representation as follows.
+	\begin{theorem}[Generalized Donsker-Varadhan representation]
+		\label{thm:gdv}
+		Under the assumptions of Theorem~\ref{thm:dv}, let $p(\rvs|\rvx)$ be a valid conditional distribution for each $\rvx\in\gX$. Then,
+		\begin{equation}
+		\kld{p}{q} = \sup_{U:\gX\times\gS\to\R \textup{ measurable}} \E_{p(\rvx)p(\rvs|\rvx)}[U(\rvx,\rvs)] - \log\left(\E_{q(\rvx)p(\rvs|\rvx)} \left[\exp(U(\rvx,\rvs))\right] \right)
+		\end{equation}
+		\begin{proof}
+			Since any function $T:\gX\to\R$ can be extended to a new function on $\gX\times\gS$ by ignoring the side information, Theorem~\ref{thm:dv} immediately tells us that 
+			\begin{equation}
+			\kld{p}{q} \le \sup_{U:\gX\times\gS\to\R \textup{ measurable}} \E_{p(\rvx)p(\rvs|\rvx)}[U(\rvx,\rvs)] - \log\left(\E_{q(\rvx)p(\rvs,\rvx)} \left[\exp(U(\rvx,\rvs))\right] \right).
+			\end{equation}
+			To prove the $\ge$ inequality, we consider some measurable $U:\gX\times\gS\to\R$.
+			We have
+			\begin{align}
+			\kld{p}{q} &= \E_{p(\rvx)}\left[\log \frac{p(\rvx)}{q(\rvx)} \right] \\
+			&= \E_{p(\rvx)p(\rvs|\rvx)}\left[\log \frac{p(\rvx)p(\rvs|\rvx)}{q(\rvx)p(\rvs|\rvx)} \right]
+			\intertext{define $V(\rvx,\rvs) = \exp(U(\rvx,\rvs)) / \E_{q(\rvx)p(\rvs|\rvx)}[\exp(U(\rvx,\rvs))]$}
+			&= \E_{p(\rvx)p(\rvs|\rvx)}\left[\log \frac{p(\rvx)p(\rvs|\rvx)}{q(\rvx)p(\rvs|\rvx)V(\rvx,\rvs)} \right] + \E_{p(\rvx)p(\rvs|\rvx)}[\log V(\rvx,\rvs)]
+			\intertext{now note that by definition of $V$, $\int_{\gX\times\gS} q(\rvx)p(\rvx|\rvs)V(\rvx,\rvs) = 1$, so $q(\rvx)p(\rvx|\rvs)V(\rvx,\rvs)$ is a probability measure}
+			&= \kld{p(\rvx)p(\rvs|\rvx)}{q(\rvx)p(\rvs|\rvx)V(\rvx|\rvs)} + \E_{p(\rvx)p(\rvs|\rvx)}[\log V(\rvx,\rvs)]
+			\intertext{now by Gibbs' Inequality}
+			&\ge \E_{p(\rvx)p(\rvs|\rvx)}[\log V(\rvx,\rvs)] \\
+			&= \E_{p(\rvx)p(\rvs|\rvx)}[U(\rvx,\rvs)] - \log\left(\E_{q(\rvx)p(\rvs|\rvx)} \left[\exp(U(\rvx,\rvs))\right] \right).
+			\end{align}
+			This completes the proof.
+		\end{proof}
+	\end{theorem}
+	
+	\subsection{Self-normalized bounds}
+	One particular use of Theorem~\ref{thm:gdv} is for cases in which $\E_{p(\rvx)p(\rvs|\rvx)} \left[\exp(U(\rvx,\rvs))\right] = 1$. For such a self-normalized bound, the task of estimating the potentially high-dimensional term $\E_{q(\rvx)p(\rvs|\rvx)} \left[\exp(U(\rvx,\rvs))\right]$ is removed, and the bound reduces to $\E_{p(\rvx)p(\rvs|\rvx)}[U(\rvx,\rvs)]$ for which unbiased estimators can be constructed directly from samples.
+	\begin{theorem}[Self-normalized KL bound]
+		\label{thm:sn}
+		Let $k:\gX\to\R$ be any measurable function. Then we have the following bound on the KL divergence
+		\begin{equation}
+		\kld{p}{q} \le \E_{p(\rvx_1)q(\rvx_{2})...q(\rvx_m)}\left[ \log \frac{\exp (k(\rvx_1))}{\frac{1}{m}\sum_{i=1}^m \exp (k(\rvx_i)) }\right].
+		\end{equation}
+		\begin{proof}
+			We apply Theorem~\ref{thm:gdv} with $\rvx=\rvx_1$, $\gS=\gX^{m-1}$, $\rvs=(\rvx_2,...,\rvx_m)$ and $p(\rvs|\rvx)=q(\rvx_2)\cdot...\cdot q(\rvx_m)$ is independent of $\rvx_1$. We have
+			\begin{equation}
+			U(\rvx,\rvs) = \log \frac{\exp (k(\rvx))}{\frac{1}{m} \sum_{i=1}^m \exp (k(\rvx_i))}
+			\end{equation}
+			To apply the theorem, we consider 
+			\begin{align}
+			\E_{q(\rvx)p(\rvs|\rvx)} \left[\exp(U(\rvx,\rvs))\right] &= \E_{q(\rvx_1)...q(\rvx_m)}\left[ \frac{\exp (k(\rvx))}{\frac{1}{m} \sum_{i=1}^m \exp (k(\rvx_i)) } \right]. \\
+			\intertext{Since the $\rvx_1,...,\rvx_{m}$ are all equal in distribution, we can replace the index of the sample used in the numerator by any $j\in\{1,...,m\}$}
+			&= \E_{q(\rvx_1)...q(\rvx_{m})}\left[ \frac{\exp (k(\rvx_{j}))}{\frac{1}{m}\sum_{i=1}^{m} \exp (k(\rvx_i))} \right] \\
+			\intertext{we can take the mean over all possible values of $j$}
+			&= \frac{1}{m} \sum_{j=1}^{m} \E_{q(\rvx_1)...q(\rvx_{m})}\left[ \frac{\exp (k(\rvx_{j}))}{\frac{1}{m}\sum_{i=1}^{m} \exp (k(\rvx_i))} \right]
+			\intertext{now by linearity of the expectation we have}
+			&=  \E_{q(\rvx_1)...q(\rvx_{m})}\left[ \frac{\frac{1}{m} \sum_{j=1}^{m}\exp (k(\rvx_{j}))}{\frac{1}{m}\sum_{i=1}^{m} \exp (k(\rvx_i))} \right] \\
+			&=1.
+			\end{align}
+			Thus the bound is self-normalized and the result follows.
+		\end{proof}
+	\end{theorem}
+	We note that this bound cannot typically recover the KL divergence, because
+	\begin{align}
+	\log \frac{\exp (k(\rvx_1))}{\frac{1}{m}\sum_{i=1}^m \exp (k(\rvx_i))} \le \log \frac{\exp (k(\rvx))}{\frac{1}{m}\exp (k(\rvx)) } = \log m.
+	\end{align}
+	We can apply a related idea to mutual information. The following theorem provides a self-normalized bound on $I(\rvx,\rvy)$ that is closely related to the popular InfoNCE \citep{oord2018representation} bound.
+	\begin{theorem}[Self-normalized information bound]
+		\label{thm:isn}
+		Let $k:\gX\times\gY\to\R$ be any measurable function. Then we have the following bound on the mutual information
+		\begin{equation}
+		I(\rvx,\rvy) \le \E_{p(\rvx_1,\rvy_1)p(\rvx_{2})\dots p(\rvx_m)}\left[ \log \frac{\exp (k(\rvx_1,\rvy_1))}{\frac{1}{m} \sum_{i=1}^m  \exp (k(\rvx_i,\rvy_1)) }\right].
+		\end{equation}
+		\begin{proof}
+			Since $I(\rvx,\rvy) = \kld{p(\rvx,\rvy)}{p(\rvx)p(\rvy)}$, we can apply Theorem~\ref{thm:gdv}. 
+			% For ease of notation, we have labeled $\rvx$ and $\rvy$ as $\rvx_1$ and $\rvy_1$. 
+			We set $\gS=\gX^{m-1}$ and $\rvs=(\rvx_2,...,\rvx_m)$.
+			We have
+			\begin{equation}
+			U((\rvx_1,\rvy_1),\rvs) = \log \frac{\exp (k(\rvx_1,\rvy_1))}{\frac{1}{m} \sum_{i=1}^m  \exp (k(\rvx_i,\rvy_1)) }.
+			\end{equation}
+			To show that this bound is self-normalized, we consider
+			\begin{align}
+			\E_{p(\rvx_1)p(\rvy_1)p(\rvs)}[\exp(U((\rvx_1,\rvy_1),\rvs))] &= \E_{p(\rvx_{1})\dots p(\rvx_m)p(\rvy_{1})}\left[ \frac{\exp (k(\rvx_1,\rvy_1))}{\frac{1}{m} \sum_{i=1}^m  \exp (k(\rvx_i,\rvy_1))}  \right], \\
+			\intertext{for any $\ell\in\{1,...,m\}$, we have}
+			&= \E_{p(\rvx_{1})\dots p(\rvx_m)p(\rvy_{1})}\left[ \frac{\exp (k(\rvx_\ell,\rvy_1))}{\frac{1}{m} \sum_{i=1}^m  \exp (k(\rvx_i,\rvy_1))}  \right] \\
+			\intertext{since the $\rvx_i$ are all equal in distribution. Then,}
+			&= \frac{1}{m}\sum_{\ell=1}^m  \E_{p(\rvx_{1})\dots p(\rvx_m)p(\rvy_{1})}\left[ \frac{\exp (k(\rvx_\ell,\rvy_1))}{\frac{1}{m} \sum_{i=1}^m  \exp (k(\rvx_i,\rvy_1))}  \right] \\
+			&=  \E_{p(\rvx_{1})\dots p(\rvx_m)p(\rvy_{1})}\left[ \frac{\frac{1}{m}\sum_{\ell=1}^m  \exp (k(\rvx_\ell,\rvy_1))}{\frac{1}{m} \sum_{i=1}^m  \exp (k(\rvx_i,\rvy_1))}  \right] \\
+			&=1.
+			\end{align}
+			This completes the proof.
+		\end{proof}
+	\end{theorem}
+	Finally, it is possible to change the distribution that is used to generate $\rvs$ as long as we compensate with importance weighting. The following theorem gives a bound that is closely connected to the likelihood-free Adaptive Contrastive Estimation bound of \citet{foster2020unified} eq.~(14). 
+	\begin{theorem}[Importance weighted self-normalized information bound]
+		Let $k:\gX\times \gY\to\R$ be any measurable function. Consider a conditional distribution $q(\rvx'|\rvy)$ on $\gX$. Then we have the following bound on the mutual information
+		\begin{equation}
+		I(\rvx,\rvy) \le \E_{p(\rvx_1,\rvy_1)q(\rvx_{2}|\rvy_1)...q(\rvx_m|\rvy_1)}\left[ \log \frac{\exp (k(\rvx_1,\rvy_1))}{\frac{1}{m} \sum_{i=1}^m \frac{\exp (k(\rvx_i,\rvy_1))p(\rvx_i)}{q(\rvx_i|\rvy_1)} }\right].
+		\end{equation}
+		\begin{proof}
+			Following the same strategy as the previous two proofs, we consider 
+			\begin{align}
+			\E_{p(\rvx_1)p(\rvy_1)p(\rvs)}[\exp(U((\rvx_1,\rvy_1),\rvs))] &= \E_{p(\rvx_{1})p(\rvy_{1})q(\rvx_{2:m}|\rvy_1)}\left[ \frac{\exp (k(\rvx_1,\rvy_1))}{\frac{1}{m} \sum_{i=1}^m \frac{\exp (k(\rvx_i,\rvy_1))p(\rvx_i)}{q(\rvx_i|\rvy_1)} }  \right] \\
+			&= \E_{p(\rvy_{1})q(\rvx_{1:m}|\rvy_1)}\left[ \frac{\frac{\exp (k(\rvx_1,\rvy_1))p(\rvx_1)}{q(\rvx_1|\rvy_1)}}{\frac{1}{m} \sum_{i=1}^m \frac{\exp (k(\rvx_i,\rvy_1))p(\rvx_i)}{q(\rvx_i|\rvy_1)} }  \right] \\
+			\intertext{for any $\ell\in\{1,...,m\}$, we have}
+			&= \E_{p(\rvy_{1})q(\rvx_{1:m}|\rvy_1)}\left[ \frac{\frac{\exp (k(\rvx_\ell,\rvy_1))p(\rvx_\ell)}{q(\rvx_\ell|\rvy_1)}}{\frac{1}{m} \sum_{i=1}^m \frac{\exp (k(\rvx_i,\rvy_1))p(\rvx_i)}{q(\rvx_i|\rvy_1)} }  \right] \\
+			\intertext{since the $\rvx_i$ are all now equal in distribution. Then,}
+			&= \frac{1}{m}\sum_{\ell=1}^m\E_{p(\rvy_{1})q(\rvx_{1:m}|\rvy_1)}\left[ \frac{\frac{\exp (k(\rvx_\ell,\rvy_1))p(\rvx_\ell)}{q(\rvx_\ell|\rvy_1)}}{\frac{1}{m} \sum_{i=1}^m \frac{\exp (k(\rvx_i,\rvy_1))p(\rvx_i)}{q(\rvx_i|\rvy_1)} }  \right] \\
+			&= \E_{p(\rvy_{1})q(\rvx_{1:m}|\rvy_1)}\left[ \frac{\frac{1}{m}\sum_{\ell=1}^m\frac{\exp (k(\rvx_\ell,\rvy_1))p(\rvx_\ell)}{q(\rvx_\ell|\rvy_1)}}{\frac{1}{m} \sum_{i=1}^ \frac{\exp (k(\rvx_i,\rvy_1))p(\rvx_i)}{q(\rvx_i|\rvy_1)} }  \right] \\
+			&=1.
+			\end{align}
+			This completes the proof.
+		\end{proof}
+	\end{theorem}
+	A limitation of this bound is that we need to know the density $p(\rvx)$.
+	
+	
+	
+	
+	\clearpage
+	% \bibliographystyle{plainnat}
+	\bibliography{refs}
 	
 	
 	
