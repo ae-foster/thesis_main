@@ -2,10 +2,9 @@
 
 \usepackage[right=1in, left=1in, top=1in, bottom=1in]{geometry}
 \linespread{1.5}
-\usepackage{amsmath, amsthm, amssymb} %math's packages
+\usepackage{amsmath, amsthm, amssymb, amsfonts} %math's packages
 \usepackage[utf8]{inputenc} %document encoding
 
-\usepackage{amsmath, amsthm, amssymb}
 \usepackage{enumerate}
 \usepackage{verbatim}
 %\usepackage{indentfirst}
@@ -28,67 +27,25 @@
 \usepackage{setspace}
 \usepackage{tabu}
 \usepackage{pdfpages}
+\usepackage[round]{natbib}
 
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex}
+% \setcounter{secnumdepth}{4}
 
-\newcommand{\cov}{\mathbb{C}\text{ov}}
-\newcommand{\eig}{\text{EIG}}
-\newcommand{\ape}{\text{APE}}
-\newcommand{\kl}[2]{\text{KL}\left(\ #1\ ||\ #2\ \right)}
-\newcommand{\entropy}[1]{H\left(\ #1\ \right)}
-\newcommand{\expect}{\mathbb{E}}
-\newcommand{\argmax}{\text{argmax}}
-\newcommand{\simiid}{\overset{\text{\tiny iid}}{\sim}}
-\newcommand{\qp}{q_p}
-\newcommand{\qm}{q_m}
-\newcommand{\ql}{q_\ell}
-\newcommand{\R}{\mathbb{R}}
-\newcommand{\prob}{\mathbb{P}}	
-\newcommand{\tP}{\tilde{P}}	
-\newcommand{\tPg}{\tilde{P}_{\gamma}}	
-\newcommand{\tpi}{\tilde{\pi}}	
-\newcommand{\tpig}{\tilde{\pi}_{\gamma}}
-\newcommand{\tpigLi}{\tilde{P}_{\gamma,L,i}} 
-\newcommand{\tpigLk}{\tilde{P}_{\gamma,L,k}} 
-\newcommand{\tpigJi}{\tilde{P}_{\gamma,J,i}} 
-\newcommand{\tpigJk}{\tilde{P}_{\gamma,J,k}} 
-\newcommand{\RJi}{R_{\gamma,J,i}} 
-\newcommand{\RJk}{R_{\gamma,J,k}}
-\newcommand{\RLi}{R_{\gamma,L,i}} 
-\newcommand{\RLk}{R_{\gamma,L,k}}
-\newcommand{\Qgi}{Q_{\gamma,i}} 
-\newcommand{\Qgk}{Q_{\gamma,k}}
-\newcommand{\E}{\mathbb{E}}
-\newcommand{\x}{\mathbf{x}}
-\newcommand{\y}{\mathbf{y}}
-\newcommand{\z}{\mathbf{z}}
-\newcommand{\bu}{\mathbf{u}}
-\newcommand{\bv}{\mathbf{v}}
-\newcommand{\w}{\mathbf{w}}
-\newcommand{\iid}{\overset{\scriptstyle{\text{i.i.d.}}}{\sim}}
-
-\newcommand{\agi}{a_{\gamma,i}} 
-\newcommand{\agk}{a_{\gamma,k}}  
-\newcommand{\agj}{a_{\gamma,j}}  
-\newcommand{\wgi}{w_{\gamma,i}} 
-\newcommand{\wgk}{w_{\gamma,k}}
-\newcommand{\wgj}{w_{\gamma,j}}
-\newcommand{\giY}{\gamma \in \mathcal{Y}} 
-\newcommand{\bb}[1]{\mathbb{#1}}
+% theorem
 \theoremstyle{plain}
-\newtheorem{thm}{Theorem}%[section]
-\newtheorem{assu}[thm]{Assumption}
-\newtheorem{prop}[thm]{Proposition}
-\newtheorem{lemma}[thm]{Lemma}
-\newtheorem{cor}[thm]{Corollary}
-%
-\theoremstyle{definition}
-\newtheorem{ex}[thm]{Example}
-\newtheorem{defi}[thm]{Definition}
-\newtheorem{alg}{Algorithm}
-%
-\theoremstyle{remark}
-\newtheorem{remark}[thm]{Remark}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{example}[theorem]{Example}
+
+
 \renewcommand{\baselinestretch}{1.5}
+
+\input{math_commands}
 
 \begin{document}
 	
@@ -150,16 +107,1851 @@
 \newpage
 	
 	
-	\chapter{Introduction and Literature Review}
+	
+	\chapter{Bayesian Experimental Design Literature Review: Connections with Bayesian Active Learning, Bayesian Optimisation and Bayesian Reinforcement Learning}
 	\label{chap:intro}
-	In this chapter, we present a self-contained literature review of the field of Bayesian Experimental Design.
-	In Chapter~\ref{chap:vboed}, we present work on the variational estimation of the expected information gain.
-	Chapter~\ref{chap:sgboed} discusses stochastic-gradient optimisation of Bayesian experimental designs.
-	In Chapter~\ref{chap:mlmc}, we extend this by deriving an unbiased gradient estimator of the expected information gain.
-	In Chapter~\ref{chap:dad}, we consider the problem of sequential experimental design, and present a policy-based algorithm for real-time adaptive experimental design.
-	Chapter~\ref{chap:idad} is an extension of Chapter~\ref{chap:dad} to implicit models.
-	We conclude with the discussion, in Chapter~\ref{chap:discussion}. 
-	\includepdf[pagecommand={}, pages=-, trim=0mm 17.5mm 0mm 17.5mm, clip]{litreview.pdf}
+%	In this chapter, we present a self-contained literature review of the field of Bayesian Experimental Design.
+%	In Chapter~\ref{chap:vboed}, we present work on the variational estimation of the expected information gain.
+%	Chapter~\ref{chap:sgboed} discusses stochastic-gradient optimisation of Bayesian experimental designs.
+%	In Chapter~\ref{chap:mlmc}, we extend this by deriving an unbiased gradient estimator of the expected information gain.
+%	In Chapter~\ref{chap:dad}, we consider the problem of sequential experimental design, and present a policy-based algorithm for real-time adaptive experimental design.
+%	Chapter~\ref{chap:idad} is an extension of Chapter~\ref{chap:dad} to implicit models.
+%	We conclude with the discussion, in Chapter~\ref{chap:discussion}. 
+	
+	\section{Introduction}
+	If true knowledge arises from empirical observations, it is natural to ask which kinds of observations we should actively seek out to further our understanding of nature.
+	In its broadest sense, this is the question that the design of experiments seeks to answer.
+	An \emph{experimental design} is an allocation of resources---e.g.~time, human attention, chemical reagents, physical space---that will be used to obtain empirical observations.
+	The \emph{design space} is the set of designs that we could feasibly choose for the experiment; the problem of experimental design is to pick a design to use for the real experiment.
+	The choice of design is an important one: we could easily waste resources on poorly designed experiments that do not further our understanding.
+	By carefully designing experiments, we can efficiently gather empirical observations that lead to new ideas, hypotheses, conclusions and models.
+	
+	It is therefore unsurprising that we find experimental design to be a key concern in scientific disciplines as diverse as psychology \citep{myung2013}, bioinformatics \citep{vanlier2012}, pharmacology \citep{lyu2019ultra}, physics \citep{dushenko2020sequential}, neuroscience \citep{shababo2013bayesian}, astronomy \citep{loredo2004bayesian} and engineering \citep{papadimitriou2004optimal}.
+	It is also is a natural abstraction for several central problems in machine learning, including active learning \citep{houlsby2011bayesian,gal2017deep}, Bayesian optimisation \citep{hernandez2014,shahriari2015taking} and exploration \citep{sun2011planning,shyam2019model}.
+	
+	
+	In many practical cases, experimental design is not used just once.
+	Indeed, many experiments are naturally \emph{adaptive}: they are an iterative process in which we can select the designs for later iterations on the basis of data already gathered. 
+	This allows feedback from the outcome of one experiment iteration to be used to guide the design of the next iteration.
+	This setting can be particularly powerful because, as we gain some information about the system, it may become clearer how we should proceed to design our experiments to investigate further, thereby honing in quickly on the truth.
+	
+	To choose between different possible experimental designs requires an objective function.
+	In general, the objective depends not only on known quantities (such as the cost of the experiment), but also on the not-yet-observed outcome of the experiment and potentially on other unobserved quantities. %  (such as whether an interesting result is obtained).
+	For example, the objective function for a chemical experiment might reward correctly synthesising a product, something that will only be observed once the experiment is completed.
+	%A natural objective function measures how well we estimate an unknown quantity of interest.
+	%This incorporates both the true value of that unknown quantity---so we know how far away we are---and the estimate of it that will be obtained after the experiment.
+	To reason about objective functions that depend on unknowns in this way requires the incorporation of some \emph{a priori} knowledge. This \emph{a priori} knowledge is then used to select the design before commencing the experiment.
+	In this work, we focus on the Bayesian approach to this problem~\citep{lindley1956,lindley1972,chaloner1995,ryan2016review,foster2019variational} in which \emph{a priori} knowledge is encoded in two ways---first, the specification of a model for the experiment, and second in the prior distribution for the unknown parameters of that model.
+	Typically, the model itself is assumed to be correct.
+	The prior distribution explicitly represents initial beliefs about unknown parameters of the model.
+	Furthermore, uncertainty in the prior is exactly the epistemic uncertainty that can be reduced by running experiments and collecting data, resulting in more precise \emph{a posteriori} knowledge.
+	
+	In this literature review, we begin with a brief survey of foundational concepts in Bayesian data analysis (Sec.~\ref{sec:background}).
+	We then turn to the core theory of Bayesian experimental design (Sec.~\ref{sec:bed}), discussing criteria that have been used within the statistics community, with an emphasis on expected information gain. In Sec.~\ref{sec:computation}, we discuss computational methods for Bayesian experimental that have been used within statistics, and in Sec.~\ref{sec:bal} we discuss active learning.
+	We then discuss models in which the target of experimental design is embedded in a larger model (Sec.~\ref{sec:embedded}); Bayesian optimisation (Sec.~\ref{sec:bo}) is a specific instance of this.
+	Finally, we delve into the theory of the sequential experimental design problem (Sec.~\ref{sec:sequential}), and highlight connections with exploration and Bayesian reinforcement learning (Sec.~\ref{sec:brl}).
+	
+	
+	\section{Background on Bayesian statistics}
+	\label{sec:background}
+	We first introduce necessary notation and key concepts in Bayesian data analysis\footnote{More details on Bayesian data analysis can be found in modern textbooks on the topic, such as \citet{gelman2013bayesian} and \citet{kruschke2014doing}.}.
+	The first ingredient of any Bayesian analysis is a full probability model that places a joint distribution over all observable and unobservable quantities. We denote the parameters of interest, also called the latent variable of interest, by $\theta\in\Theta$. This may be a scalar, vector, or a function depending on the model. We denote the observed data, or outcome, as $y\in\mathcal{Y}$. The full probability model is simply a probability distribution $p(\theta,y)$ on $\Theta \times \mathcal{Y}$. Typically, the full probability model can be factorised as
+	\begin{equation}
+	p(\theta,y) = p(\theta)p(y|\theta)
+	\end{equation}
+	where $p(\theta)$ denotes the \emph{prior} on $\theta$, and $p(y|\theta)$ is the \emph{likelihood} function\footnote{Strictly, the likelihood describes the sampling distribution $p(y|\theta)$ as a function of $\theta$ for a fixed $y$; we use likelihood in a slightly looser sense to refer to $p(y|\theta)$ in general.}, or sampling distribution.
+	
+	Since we are interested in experimental design, we also introduce the \emph{design} or \emph{covariate} $\xi\in\Xi$. This is not typically treated as a random variable, because it is assumed to be directly under the experimenter's control. Instead, for each possible design $\xi$, we have a different probability model $p(\theta,y|\xi)$. Different choices of $\xi$ should not alter our prior $p(\theta)$, thus the change in the probability model is only felt through the likelihood, so we can write $p(\theta,y|\xi)=p(\theta)p(y|\theta,\xi)$. 
+	Intuitively, this says that the design of the experiment $\xi$ does not change the natural environment, but it can change the outcome of an experiment that we choose to run.
+	
+	Once we have chosen $\xi$ and run our experiment to obtain $y$, we can make probability statements about $\theta$ by applying Bayes' Rule to calculate the posterior 
+	\begin{equation}
+	\label{eq:bayes}
+	p(\theta|\xi,y) = \frac{p(\theta)p(y|\theta,\xi)}{\int_\Theta p(\theta')p(y|\theta',\xi)d\theta'} = \frac{p(\theta)p(y|\theta,\xi)}{p(y|\xi)}.
+	\end{equation}
+	In general, actually performing Bayesian inference to calculate $p(\theta|\xi,y)$ can be computationally challenging.
+	
+	
+	
+	
+	\subsection{Explicit and implicit models}
+	\label{sec:explicit_implicit}
+	If the likelihood $p(y|\theta,\xi)$ is known in closed form, then the probability model is called an \emph{explicit likelihood} model. 
+	Most Bayesian statistics assumes an explicit likelihood.
+	If no closed form likelihood is available, the model is an \emph{implicit likelihood} model \citep{sisson2018handbook}.
+	Implicit models often arise when $\theta,y$ and $\xi$ are related by a simulator \citep{alsing2019fast,brehmer2018constraining,gonccalves2020training} that can produce samples of $p(y|\theta,\xi)$, but does not have a closed form probability density.
+	
+	Similarly, if $p(\theta)$ is known in closed form, then the model is said to have an \emph{explicit prior}, otherwise, the prior is said to be \emph{implicit}.
+	
+	
+	
+	\subsection{Sequential data collection}
+	\label{sec:seq_data}
+	So far, we have considered choosing $\xi$, collecting $y$, and analysing the data by computing $p(\theta|\xi,y)$.
+	A more realistic setting is to consider a sequence $\xi_1\dots\xi_T$ of designs with corresponding outcomes $y_1,\dots,y_T$.
+	This means that we run $T$ different experiments with $T$ different designs, each with its own corresponding outcome. The value of $\theta$, although unknown, is assumed to be the same across all the $T$ experiments---that means that we are conducting multiple experiments in the same natural environment to gather further information about it, instead of starting afresh in a new environment for each new experiment.
+	
+	In an \emph{exchangeable} model \citep{bloem2019probabilistic}, the order of the experiments does not matter. This is equivalent \citep{oksendal2003stochastic} to the following factorisation of the full probability model
+	\begin{equation}
+	\label{eq:exchangeable_joint}
+	p(\theta,y_{1:T}|\xi_{1:T}) = p(\theta)\prod_{t=1}^T p(y_t|\theta,\xi_t).
+	\end{equation}
+	for some random variable $\theta$.
+	The question is whether we can identify this $\theta$ with the model parameters of interest $\theta$.
+	In general, this is valid when there are no other model parameters besides $\theta$.
+	Indeed, in a full statistical model with parameters $\theta$ \citep{cox2006principles}, it is common to assume that the outcomes of different experiments are independent given $\theta$, which is equivalent to the factorisation in \eqref{eq:exchangeable_joint}.
+	We discuss the case in which there are other model parameters aside from $\theta$ in Sec.~\ref{sec:embedded}.
+	
+	In non-exchangeable models, there is no assumption of conditional independence between experiments.
+	Such models are uncommon, but can arise in settings such as time series \citep{pole2018applied}. In a non-exchangeable model, the distribution of $y_t$ can, for example, be influenced by $y_{t-1}$ as well as by $\theta$ and $\xi_t$. Without loss of generality, the probability model for a non-exchangeable model can be written
+	\begin{equation}
+	p(\theta,y_{1:T}|\xi_{1:T}) = p(\theta)\prod_{t=1}^T p(y_t|\theta,\xi_{1:t},y_{1:t-1}).
+	\end{equation}
+	which encodes only the assumption that future experiments cannot affect the outcome of earlier experiments. 
+	% \footnote{It is not necessary to incorporate a richer model parameter $\psi$ for a non-exchangeable model. If we have the case of a non-exchangeable model with model parameters $\psi$ and parameter of interest $\theta$, then inference about $\psi$ is implicitly incorporated into the sampling distribution $p(y_t|\theta,\xi_{1:t},y_{1:t-1})$.}.
+	
+	\paragraph{Static and adaptive experiments}
+	An orthogonal distinction in sequential experiments is how the designs are generated.
+	In a \emph{static} experiment, also called fixed, batch, or open loop \citep{distefano2014schaum}, the designs $\xi_1,\dots,\xi_T$ are chosen before the beginning of the experiment.
+	In an \emph{adaptive} experiment \citep{myung2013}, each $\xi_t$ is chosen depending on data already seen $\xi_1,\dots,\xi_{t-1},y_1,\dots,y_{t-1}$.
+	A simple consequence of the likelihood principle \citep{barnard1962likelihood,birnbaum1962foundations} is that the mode in which the $\xi_t$ are generated does not affect the posterior distribution on $\theta$ calculated from the data. Indeed, suppose each new design is chosen adaptively from a density $p(\xi_t|\xi_{1:t-1},y_{1:t-1})$. Then the resulting posterior distribution is
+	\begin{align}
+	p(\theta|\xi_{1:T},y_{1:T}) &= \frac{p(\theta)\prod_{t=1}^T p(\xi_t|\xi_{1:t-1},y_{1:t-1}) p(y_t|\theta,\xi_{1:t},y_{1:t-1})}{\int_\Theta p(\theta')\prod_{t=1}^T p(\xi_t|\xi_{1:t-1},y_{1:t-1}) p(y_t|\theta',\xi_{1:t},y_{1:t-1}) d\theta'} \\
+	&=\frac{\prod_{t=1}^T p(\xi_t|\xi_{1:t-1},y_{1:t-1}) \ p(\theta) \prod_{t=1}^T p(y_t|\theta,\xi_{1:t},y_{1:t-1})}{\prod_{t=1}^T p(\xi_t|\xi_{1:t-1},y_{1:t-1}) \ \int_\Theta p(\theta')\prod_{t=1}^T p(y_t|\theta',\xi_{1:t},y_{1:t-1}) d\theta'} \\
+	&=\frac{p(\theta) \prod_{t=1}^T p(y_t|\theta,\xi_{1:t},y_{1:t-1})}{\int_\Theta p(\theta')\prod_{t=1}^T p(y_t|\theta',\xi_{1:t},y_{1:t-1}) d\theta'},
+	\end{align}
+	which is independent of the mechanism of choosing designs.
+	
+	%\textbf{We might drop the following if it is not referenced from anywhere.}
+	%A useful property of sequential Bayesian analysis in the exchangeable case is the following.
+	%Suppose we decide to treat experiments $1,\dots,S$ as a pilot, leading to the distribution $p(\theta|\xi_{1:S},y_{1:S})$ which is treated as the prior for the remaining experiments. We then conduct experiments $S+1,\dots,T$ and analyse them with this prior. The resulting posterior is
+	%\begin{align}
+	%	p(\theta|\xi_{1:S},y_{1:S},\xi_{S+1:T},y_{S+1:T}) &\propto \left( p(\theta) \prod_{s=1}^S p(y_s|\theta,\xi_{s}) \right) \prod_{t=S+1}^T p(y_t|\theta,\xi_{t}) \\
+	%	&\propto p(\theta) \prod_{t=1}^T p(y_t|\theta,\xi_{t}) = p(\theta|\xi_{1:T},y_{1:T})
+	%\end{align}
+	%which is equivalent to analysing all the data with the original prior $p(\theta)$. This `compositionality' property is a consequence of the associativity of multiplying the likelihood.
+	
+	
+	\newcommand\decision{\delta}
+	\newcommand\decisionspace{\Delta}
+	\subsection{Bayesian decision making}
+	\label{sec:decision}
+	After collecting data $\xi_{1:T},y_{1:T}$, suppose that we must choose some decision $\decision$, for example whether to prescribe a medication or not.
+	The Bayesian approach to selecting the optimal decision \citep{lindley1972,robert2007bayesian} is to specify a utility function $U(\decision, \theta)$ which should assign a value to the decision $\decision$ \emph{in the case that} $\theta$ is the true value of the unobserved parameter.
+	The optimal decision is then found by maximising expected utility under the current posterior
+	\begin{equation}
+	\decision^* = \argmax_{\decision\in\decisionspace} \quad \E_{p(\theta|\xi_{1:T},y_{1:T})}[U(\decision,\theta)]
+	\end{equation}
+	For a more extensive discussion of Bayesian decision theory, see \citet{berger2013statistical}.
+	
+	
+	\section{Bayesian Experimental Design}
+	\label{sec:bed}
+	Experimental design with a Bayesian data analysis model means choosing the design using the likelihood model and the prior $p(\theta)$ as \emph{a priori} information.
+	What criterion should be used to select the design?
+	Following from Bayesian decision theory, \citet{lindley1972} proposed a decision-theoretic approach to Bayesian experimental design that focuses on maximising a utility. \citet{chaloner1995} provides a more recent summary of Lindley's approach.
+	
+	First, let us restrict ourselves to a single design $\xi$ with outcome $y$, leaving the sequential design problem to Sec.~\ref{sec:sequential}.
+	In the spirit of Sec.~\ref{sec:decision}, we consider a utility function $U(\theta,\xi,y)$ that may reflect the value of obtaining the data $(\xi, y)$ when $\theta$ is the true value of the parameters, and may also incorporate costs of the experimental design and outcome.
+	Whilst our discussion in Sec.~\ref{sec:decision} assumed that the data $\xi,y$ had already been gathered, we now need to consider the choice of the design $\xi$. The order of operation for the experimenter is as follows:
+	\begin{enumerate}
+		\item choose design $\xi$;
+		\item perform experiment with design $\xi$, obtaining experimental outcome $y$;
+		\item compute the posterior $p(\theta|\xi,y)$;
+		\item the expected utility obtained is then $\E_{p(\theta|\xi,y)}[U(\theta,\xi,y)]$.
+	\end{enumerate}
+	In order to choose $\xi$ optimally, we should therefore consider the different possible observations $y$ that could arise.
+	Specifically, we will choose $\xi$ to maximise the expected utility, taking an outer expectation over the observation $y$ using the Bayesian marginal (also called prior predictive) distribution $p(y|\xi) = \E_{p(\theta)}[p(y|\theta,\xi)]$.
+	This leads to the following method of choosing the optimal design
+	\begin{equation}
+	\label{eq:general_u}
+	\xi^* = \argmax_{\xi\in\Xi}\ \E_{p(y|\xi)} \left[ \E_{p(\theta|\xi,y)}[U(\theta,\xi,y)] \right].
+	\end{equation}
+	\begin{proposition}[\citet{lindley1972}]
+		It is not necessary to introduce randomness into the selection of $\xi$.
+	\end{proposition}
+	\begin{proof}
+		Suppose we consider a randomised way of selecting $\xi$ with distribution $p(\xi)$. The expected reward of this approach is
+		\begin{equation}
+		\begin{split}
+		\E_{p(\xi)p(y|\xi)} \left[  \E_{p(\theta|\xi,y)}[U(\theta,\xi,y)] \right]
+		\le \sup_{\xi\in\Xi} \E_{p(y|\xi)} \left[ \E_{p(\theta|\xi,y)}[U(\theta,\xi,y)] \right]
+		\end{split}
+		\end{equation}
+		where the righthand side is the expected utility using the non-random $\xi^*$.
+		So a randomised design is not required.
+	\end{proof}
+	
+	The remaining piece of the puzzle is to select a utility function. 
+	Some applications feature a highly problem-specific utility.
+	In other cases, we can rely on general purpose utilities.
+	
+	
+	% Once the experiment is completed, we choose a decision $d$ to maximise $\E_{p(\theta|\xi,y)}[U(d,\theta,\xi,y)]$.
+	
+	%The key question of experimental design in this framework is to choose the design $\xi$ so that, whatever the data we may obtain, we will be well-placed to choose a highly optimal decision and obtain a high utility value. For example, if the experiment leaves us with some uncertainty over the value of $\theta$, we may be left having to choose a rather conservative decision, so missing out on a potentially high reward if we had known the value of $\theta$ more accurately. 
+	
+	
+	%The choice of utility therefore determines what constitutes a Bayesian optimal design. 
+	%In the absence of a problem-specific utility, several utility functions exist to evaluate the quality of inference that will result from using $\xi,y$ to learn about $\theta$.
+	
+	%TODO the sequential version of this is Bayesian RL
+	
+	
+	\subsection{Expected Information Gain}
+	\label{sec:eig}
+	Perhaps the most well-studied of all criteria for Bayesian experimental design is expected information gain (EIG).
+	Within Bayesian experimental design, EIG appears to be dominant in a number of fields.
+	EIG was proposed by \citet{lindley1956}. Important statistical review papers \citep{chaloner1995,ryan2016review} give EIG pride of place within Bayesian experimental design.
+	In psychology, \citet{myung2013} promote the use of EIG to run adaptive trials. Several toolboxes \citep{watson2017quest+,vincent2017} have been designed specifically for the problem of performing adaptive psychology trials using EIG as the criterion for selecting designs. \citet{heck2019maximizing} suggest EIG for experimental design for cognitive models and \citet{cavagnaro2010adaptive} consider its application in the context of model discrimination in cognitive science. \citet{shababo2013bayesian} applied EIG maximisation within a Bayesian model of neural microcircuits to choose the right subset of neurons to stimulate in an experiment.
+	\citet{dushenko2020sequential} proposed EIG as a criterion for designing measurement settings in magnetometry.
+	In biochemistry, \citet{busetto2009optimized} compared EIG with several other criteria for the design of experiments for biochemical dynamical systems, finding EIG to perform best.
+	In pharmacology, \citet{lyu2019ultra,foster2020unified} applied EIG maximisation to design experiments to calibrate a docking model.
+	\citet{loredo2004bayesian} used EIG for active exploration, specifically investigating the scheduling of observations of a star to characterise the orbit of a planet.
+	EIG has also been used in active learning, Bayesian optimisation and reinforcement learning. We discuss these fields separately in Sections \ref{sec:bal}, \ref{sec:bo} and \ref{sec:brl}.
+	
+	There are several reasons for the dominance of the EIG. First, it has mathematical properties that make it very natural for describing information gained from experimentation. We discuss some key properties of the EIG in this section, and we discuss EIG in sequential settings in Sec.~\ref{sec:sequential}. More practically, EIG applies to a range of linear and nonlinear models (unlike some criteria which are more restricted in their applicability) and handles both continuous and discrete $\theta$.
+	
+	What does EIG measure? EIG quantifies the amount of  information that the experiment with design $\xi$ is expected to produce about the unknown parameter of interest $\theta$.
+	A higher EIG indicates that doing the experiment with design $\xi$ is likely to produce data that will be helpful in reducing uncertainty about the true value of $\theta$.
+	
+	To precisely define EIG, we utilise the rigorous probabilistic definition of information that was first given by \citet{shannon1948mathematical}.
+	\citet{lindley1956} used this work to quantify the information provided by an experiment.
+	Lindley began by considering the Shannon \emph{entropy} of a random variable $\theta$
+	\begin{equation}
+	\label{eq:entropy}
+	H[p(\theta)] = -\E_{p(\theta)}[\log p(\theta)].
+	\end{equation}
+	One interpretation of entropy is uncertainty in what the true value of $\theta$ is.
+	In the experimental design context, we measure the amount of information that is gained about $\theta$ by performing the experiment with design $\xi$ and obtaining outcome $y$ using the reduction in entropy from the prior to the posterior. This is referred to as the information gain (IG)
+	%
+	%
+	%This definition applies to both discrete and continuous random variables (in the latter case, it may be called differential entropy).
+	%We can interpret entropy as a measure of uncertainty.
+	%More specifically, suppose that $\theta$ is discrete and we use a base 2 logarithm in \eqref{eq:entropy}, then $H[p(\theta)]$ is the expected number of yes--no questions that 
+	%
+	%\begin{example}[Interpretation of entropy \citep{shannon1948mathematical}]
+	%Supppose 
+	%	
+	%Suppose $\theta$ is a discrete random variable, and we use a base-2 logarithm in the definition of equation~\ref{eq:entropy}.
+	%Then $H[p(\theta)]$ equals the expected number of yes-no questions that must be answered to learn the value of $\theta$.
+	%\end{example}
+	%\begin{proof}
+	%	
+	%\end{proof}
+	%
+	%
+	%
+	%and of the posterior 
+	%\begin{equation}
+	%	H[p(\theta|\xi,y)] = -\E_{p(\theta|\xi,y)}[\log p(\theta|\xi,y)].
+	%\end{equation}
+	%The \emph{information gained} about $\theta$ by performing the experiment $\xi,y$ is the reduction in entropy from the prior to posterior
+	\begin{equation}
+	U_\mathcal{I}(\xi,y) = \E_{p(\theta|\xi,y)}[\log p(\theta|\xi,y)]-\E_{p(\theta)}[\log p(\theta)].
+	\end{equation}
+	To obtain an objective function for $\xi$, we can use this utility within the decision-theoretic framework laid out in the preceding section.
+	We substitute $U_\mathcal{I}$ into \eqref{eq:general_u}.
+	This gives the overall objective function to select $\xi$: the \emph{expected information gain} (EIG), formed by taking the expectation of $U_\mathcal{I}$ over $p(y|\xi)$, giving
+	\begin{align}
+	\mathcal{I}(\xi) &= \E_{p(y|\xi)}\left[ \E_{p(\theta|\xi,y)}[\log p(\theta|\xi,y)]-\E_{p(\theta)}[\log p(\theta)] \right].
+	\label{eq:eigmi}
+	\end{align}
+	
+	
+	\begin{proposition}[\citet{lindley1956}]
+		\label{prop:mi}
+		The EIG at design $\xi$, $\mathcal{I}(\xi)$, is the mutual information between $y$ and $\theta$ under design $\xi$.
+	\end{proposition}
+	\begin{proof} By repeatedly using Bayes Theorem, we have
+		\begin{align}
+		\mathcal{I}(\xi) &= \E_{p(y|\xi)}\left[ \E_{p(\theta|\xi,y)}[\log p(\theta|\xi,y)]-\E_{p(\theta)}[\log p(\theta)] \right]\\
+		&= \E_{p(y|\xi)p(\theta|\xi,y)}[\log p(\theta|\xi,y)] - \E_{p(\theta)}[\log p(\theta)]\\
+		&= \E_{p(\theta)p(y|\theta,\xi)}[\log p(\theta|\xi,y)-\log p(\theta)]\\
+		\label{eq:posterior_prior_ratio}
+		&= \E_{p(\theta)p(y|\theta,\xi)}\left[\log \frac{p(\theta|\xi,y)}{p(\theta)}\right]\\
+		&= \E_{p(\theta)p(y|\theta,\xi)}\left[\log \frac{p(\theta)p(y|\theta,\xi)}{p(\theta)p(y|\xi)}\right].
+		\end{align}
+	\end{proof}
+	
+	\begin{proposition}
+		EIG is unchanged under invertible reparametrisations of $\theta$ and $y$.
+	\end{proposition}
+	\begin{proof}
+		This follows from the well-known property of mutual information \citep{cover1999elements}.
+	\end{proof}
+	
+	\begin{proposition}[\citet{bernardo1979expected}]
+		EIG can equivalently be derived from the KL-divergence utility
+		\begin{equation}
+		U_{KL}(\xi,y) = \textup{KL}\left(p(\theta|\xi,y)  \| p(\theta) \right).
+		\end{equation}
+	\end{proposition}
+	\begin{proof}
+		Substituting this utility into \eqref{eq:general_u} gives us
+		\begin{align}
+		I_{KL}(\xi) &= \E_{p(y|\xi)}\left[ \text{KL}\left(p(\theta|\xi,y)  \| p(\theta) \right) \right] \\
+		&= \E_{p(y|\xi)p(\theta|y,\xi)}\left[ \log \frac{p(\theta|y,\xi)}{p(\theta)} \right] \\
+		&= \E_{p(\theta)p(y|\theta,\xi)}\left[ \log \frac{p(\theta|y,\xi)}{p(\theta)} \right] = \mathcal{I}(\xi) \text{ by \eqref{eq:posterior_prior_ratio}}.
+		\end{align}
+	\end{proof}
+	
+	\begin{proposition}[Theorem 6 of \citet{lindley1956}]
+		EIG is convex in the likelihood.
+	\end{proposition}
+	\begin{proof}
+		Let $\lambda \in [0,1]$ and $\xi_0,\xi_1$ be two designs. Suppose there exists a design $\xi_\lambda$ with the following likelihood
+		\begin{equation}
+		p(y|\theta,\xi_\lambda) = \lambda p(y|\theta,\xi_0) + (1-\lambda)p(y|\theta,\xi_1).
+		\end{equation}
+		We can interpret an experiment with likelihood $p(y|\theta,\xi_\lambda)$ as follows. 
+		With probability $\lambda$, the outcome $y$ is sampled from $p(y|\theta,\xi_0)$, and with probability $1-\lambda$ it is sampled from $p(y|\theta,\xi_1)$, but it is unknown which of the two likelihoods was chosen.
+		We could also consider a different experiment in which we observe $y$ \emph{and} the binary random variable $u$ which indicates which likelihood was used. 
+		Intuitively, the latter experiment must contain at least as much information as the first. We can demonstrate this formally using the information chain rule.
+		The expected information gain of the experiment with outcome $u, y$ can be expanded as
+		\begin{align}
+		I_{\xi,\lambda}(\theta; (u, y)) &= I_\lambda(\theta; u) + I_{\xi,\lambda}(\theta; y | u), \\
+		\intertext{we note $\theta$ and $u$ are independent, and we expand the definition of the conditional mutual information}
+		&= \lambda I_{\xi_0}(\theta; y) + (1-\lambda) I_{\xi_1}(\theta; y).
+		\end{align}
+		We can also expand the same mutual information as
+		\begin{align}
+		I_{\xi,\lambda}(\theta; (u, y)) &= I_{\xi,\lambda}(\theta; y) + I_{\xi,\lambda}(\theta; u | y) \\
+		& \ge I_{\xi,\lambda}(\theta; y)
+		\end{align}
+		since conditional mutual information is nonnegative. Finally, Proposition~\ref{prop:mi} tells us that $I_\lambda(\theta; y) = \mathcal{I}(\lambda)$. 
+		Hence,
+		\begin{equation}
+		\mathcal{I}(\xi_\lambda) \le \lambda \mathcal{I}(\xi_0) + (1-\lambda) \mathcal{I}(\xi_1).
+		\end{equation}
+	\end{proof}
+	
+	\begin{proposition}[\citet{sebastiani2000maximum}]
+		\label{prop:sebastiani}
+		EIG can be written as $\mathcal{I}(\xi) = \E_{p(\theta)}\left[H[p(y|\xi)] - H[p(y|\theta,\xi)]\right]$.
+		Furthermore, when $H[p(y|\theta,\xi)]$ does not depend on $\xi$, EIG maximisation is equivalent to maximum entropy design which selects $\xi$ to maximise $H[p(y|\xi)]$.
+	\end{proposition}
+	\begin{proof}
+		Starting from Proposition~\ref{prop:mi}, we have
+		\begin{align}
+		\mathcal{I}(\xi) &= \E_{p(\theta)p(y|\theta,\xi)}\left[\log \frac{p(\theta)p(y|\theta,\xi)}{p(\theta)p(y|\xi)}\right]\\
+		&= \E_{p(\theta)p(y|\theta,\xi)}[\log p(y|\theta,\xi) - \log p(y|\xi)]\\
+		&= \E_{p(\theta)p(y|\theta,\xi)}[\log p(y|\theta,\xi)]-\E_{p(y|\xi)}[\log p(y|\xi)]\\
+		&= \E_{p(\theta)}\left[H[p(y|\xi)] - H[p(y|\theta,\xi)]\right].
+		\label{eq:sebastiani}
+		\end{align}
+		Now, if $H[p(y|\theta,\xi)]$ is independent of $\xi$, then we have $\mathcal{I}(\xi) = H[p(y|\xi)] + \text{const.}$, so EIG maximisation and maximum entropy design lead to the same optimal design.
+	\end{proof}
+	
+	\begin{remark}[\citet{smith2018understanding}]
+		The EIG at design $\xi$ can be interpreted as a measure of epistemic uncertainty in the outcome of performing an experiment with design $\xi$.	
+	\end{remark}
+	\begin{proof}
+		\Eqref{eq:sebastiani} breaks the EIG into two terms. The first is the total entropy $H[p(y|\xi)]$, called the predictive entropy. The second is $-\E_{p(\theta)}[H[p(y|\theta,\xi)]]$, which represents the expectation of the uncertainty in $y$ \emph{conditional on $\theta$}. We can view this as a measure of aleatoric uncertainty---uncertainty which cannot be eliminated by knowing $\theta$ exactly. The EIG is the difference between the total and aleatoric uncertainties, hence we can interpret it as epistemic uncertainty---the part of $H[p(y|\xi)]$ that can be reduced by learning about $\theta$.
+	\end{proof}
+	This interpretation does have its limitations. First, this definition of epistemic uncertainty is a model-dependent quantity---if we choose a more powerful model, then some variation that had previously been characterised as aleatoric would now be seen as epistemic. It also rests on our model's ability to accurately capture aleatoric uncertainty. Second, the interpretation does not hold true in the case that $\theta$ is a function of a larger set of model parameters $\psi$, as in Sec.~\ref{sec:embedded}. This is because the term $-\E_{p(\theta)}[H[p(y|\theta,\xi)]]$ no longer represents aleatoric uncertainty, as it also includes some uncertainty that arises from not knowing the true value of $\psi$.
+	
+	Other important features of the EIG in sequential experiments will be discussed in Section~\ref{sec:sequential}.
+	
+	%
+	%
+	%\begin{proposition}
+	%	Interesting stuff from the original reference? $I \ge 0$ with exception that $y$ and $\theta$ are independent. Concavity and convexity results.
+	%\end{proposition}
+	%
+	%\textbf{We will hold back interesting things on sequential experiments (chain rule, Shannon information being additive, etc) until that section.}
+	%\begin{itemize}
+	%	\item Additivity Shannon information stuff
+	%	\item Submodular
+	%\end{itemize}
+	%
+	%Firstly, from (\ref{eq:eigmi}), we see that $\mathcal{I}(\xi)$ is actually the mutual information between the random variables $\theta$ and $y$ under the non-random design $\xi$.
+	%Secondly, using the KL-divergence in place of the difference of entropies to give the utility
+	%\begin{equation}
+	%	U_\text{KL}(\xi,y) = \text{KL}\left[ p(\theta|y,\xi) \| p(\theta) \right]
+	%\end{equation}
+	%yields the same objective function for $\xi$.
+	%In a similar way, we could define a probability density ratio utility
+	%\begin{equation}
+	%	U_\text{ratio}(\theta,\xi,y) = \log \frac{p(\theta|\xi,y)}{p(\theta)}
+	%\end{equation}
+	%which again gives rise to the same objective for $\xi$ when substituted in (\ref{eq:general_u}).
+	%Intuitively, this ratio utility says that the true value of $\theta$ should be much \emph{more probable} under the posterior than under the prior.
+	%Finally, EIG can be reached by considering another form of the ratio utility
+	%\begin{equation}
+	%U_\text{BALD}(\theta,\xi,y) = \log \frac{p(y|\theta,\xi)}{p(y|\xi)},
+	%\end{equation}
+	%leading to the Bayesian Active Learning by Disagreement (BALD) score \citep{houlsby2011bayesian,gal2017deep}, another way of writing the EIG
+	%\begin{equation}
+	%	\mathcal{I}(\xi) = H[p(y|\xi)] - \E_{p(\theta)}\left[ H[p(y|\theta,\xi)]  \right] .
+	%\end{equation}
+	%Written in this way, we see that EIG can be interpreted as an epistemic uncertainty. Specifically, $H[p(y|\xi)]$ represents the total uncertainty in the observation $y$ at design $\xi$, whereas $\E_{p(\theta)}\left[ H[p(y|\theta,\xi)]  \right]$ represents aleatoric uncertainty, i.e.~uncertainty that cannot be reduced by knowing $\theta$, in expectation over different values of $\theta$. The difference can therefore be interpreted as uncertainty which \emph{can} be reduced by knowing $\theta$, which is epistemic uncertainty.
+	%
+	%Since it was first proposed in \citet{lindley1956}, EIG has proved particularly popular as a criterion for Bayesian experimental design.
+	%The EIG has several attractive features:
+	%\begin{enumerate}
+	%	\item it is unchanged by any reparametrisation of $\theta$ or $y$,
+	%	\item it applies equally well to discrete and continuous $\theta$ and $y$,
+	%	\item it applies equally well to a range of Bayesian models,
+	%	\item it is the only objective to behave correctly in sequential experiments (see Sec. XX for a discussion).
+	%\end{enumerate}
+	
+	
+	\subsection{Alphabetic criteria}
+	
+	The EIG is only one approach to assigning value to the design of an experiment.
+	Whilst the EIG has a number of attractive properties, it is not the only criterion to have been explored in the literature.
+	Perhaps the more classical approach to experimental design is to use one of the `alphabetic' criteria.
+	Unlike the EIG, the alphabetic criteria stem from research into \emph{non-Bayesian linear models}, as it was in this context that the alphabetic criteria were originally proposed.
+	Authors have then sought to generalise these alphabetic criteria, first to the Bayesian linear model, and then to general Bayesian models.
+	Unfortunately, the resulting criteria do not always map onto Lindley's general Bayesian methodology as outlined in \eqref{eq:general_u}.
+	As the focus in this review is on the EIG, we provide only a brief introduction to the alphabetic criteria, emphasising the historical development from linear models, and the connection to the EIG.
+	
+	
+	
+	\subsubsection{Non-Bayesian linear model}
+	The alphabetic criteria were initially proposed in the context of non-Bayesian experimental design for the linear model
+	\begin{equation}
+	\label{eq:linearmodel}
+	y|\theta,\xi \sim N(\xi \theta, \sigma^2)
+	\end{equation}
+	where $\xi$ is the $n\times p$ design matrix and $\theta$ is a $p$\hspace{1pt}-vector. (In a linear model, we would conventionally replace $\theta \rightarrow \beta$ and $\xi \rightarrow X$.)
+	The least squares estimator for $\theta$ is $\hat{\theta} = (\xi^\top \xi)^{-1}\xi^\top y$. In frequentist analysis of this estimator, the covariance matrix of $\hat{\theta}$ is proportional to $(\xi^\top \xi)^{-1}$.	To guide the choice of $\xi$, \citet{box1982} discussed the following notions of optimality of $\xi$
+	\begin{description}
+		\item[$A$-optimality] minimise $\Tr (\xi^\top \xi)^{-1}$, or more generally, minimise $\Tr A(\xi^\top \xi)^{-1}$ for a matrix $A$;
+		\item[$D$-optimality] minimise $\det (\xi^\top \xi)^{-1}$;
+		\item[$E$-optimality] minimise $\max_i \lambda_i$, where $\lambda_1,\dots,\lambda_p$ are the eigenvalues of $(\xi^\top \xi)^{-1}$;
+		\item[$G$-optimality] minimise $\sup_{c \in \mathcal{C}} c^\top(\xi^\top \xi)^{-1}c$, where $\mathcal{C}$ is some target region for prediction.
+	\end{description}
+	Other alphabetic criteria include
+	\begin{description}
+		\item[$c$-optimality~\citep{elfving1952optimum}] minimise $c^\top(\xi^\top \xi)^{-1}c$ for some vector $c$.
+		\item[$T$-optimality~\citep{atkinson1975design}] for model discrimination, which maximises the minimal deviation between a null model and an alternative.
+	\end{description}
+	Several key results relate these classical criteria, such as \citet{kiefer1959optimum}.
+	
+	\subsubsection{Bayesian linear model}
+	The alphabetic criteria can be extended to Bayesian linear models \citep{chaloner1995}, using the observation that the posterior covariance matrix for $\theta$ is proportional to $(\xi^\top \xi + \Sigma_0^{-1})^{-1}$ when we augment the model in \eqref{eq:linearmodel} with a Gaussian prior $\theta \sim N(0,\Sigma_0)$.
+	This allows a direct generalisation of the alphabetic criteria with $(\xi^\top \xi + \Sigma_0^{-1})^{-1}$ playing the role of $(\xi^\top \xi)^{-1}$. For example, Bayesian $A$-optimality minimises $\Tr (\xi^\top \xi + \Sigma_0^{-1})^{-1}$, and Bayesian $D$-optimality minimises $\det (\xi^\top \xi + \Sigma_0^{-1})^{-1}$.
+	
+	One may well ask how these alphabetic criteria relate to our preceding work on the EIG. Superficially, the alphabetic criteria are simply functionals of the Gram matrix $\xi^\top \xi$, whilst the EIG is defined in terms of posterior entropy.
+	Fortunately, there is a point of close connection between the two for the Bayesian linear model.
+	\begin{proposition}[\citet{chaloner1995}]
+		For a Bayesian linear model, Bayesian $D$-optimality and EIG optimality are equivalent.
+	\end{proposition}
+	\begin{proof}
+		In the Bayesian linear model, the posterior on $\theta$ is Gaussian with covariance matrix that is proportional to $(\xi^\top \xi + \Sigma_0^{-1})^{-1}$, and is independent of $y$. 
+		The entropy of this Gaussian posterior is $\tfrac{1}{2}\log \det (\xi^\top \xi + \Sigma_0^{-1})^{-1} + \text{a constant}$. Substituting this into \eqref{eq:eigmi}, the EIG for the Bayesian linear model is
+		\begin{equation}
+		\mathcal{I}(\xi) = \tfrac{1}{2}\log \det \Sigma_0 - \tfrac{1}{2}\log \det (\xi^\top \xi + \Sigma_0^{-1})^{-1} - \text{const} = - \tfrac{1}{2}\log \det (\xi^\top \xi + \Sigma_0^{-1})^{-1} + \text{const}'.
+		\end{equation}
+		Thus, EIG optimality (maximise $\mathcal{I}(\xi)$) and Bayesian $D$-optimality (minimise $\det (\xi^\top \xi + \Sigma_0^{-1})^{-1}$) lead to the same optimal design.
+	\end{proof}
+	
+	\subsubsection{Bayesian non-linear models}
+	The `classical' approach \citep{tsutakawa1972design,chaloner1995} to generalising the alphabetic criteria to non-linear Bayesian models is to consider the Fisher information matrix (FIM), which is defined as
+	\begin{equation}
+	\label{eq:fim}
+	M(\theta,\xi) = -\E_{p(y|\theta,\xi)}\left[ \frac{\partial^2}{\partial \theta^2} \log p(y|\theta,\xi)  \right]
+	\end{equation}
+	where $\partial^2/\partial \theta^2$ denotes the Hessian when $\theta$ is a vector. 
+	The FIM has two important properties that motivate its use to extend the alphabetic criteria:
+	\begin{enumerate}
+		\item the FIM for the linear regression model is proportional to $(\xi^\top \xi)$;
+		\item the inverse FIM is related to the asymptotic covariance matrix of the Bayesian posterior by the Bernstein--von Mises Theorem \citep{van2000asymptotic}.
+	\end{enumerate}
+	For non-linear models, the FIM generally depends on $\theta$ as well as $\xi$, so forming a criterion for $\xi$ involves an integral over $p(\theta)$.
+	For instance, \citet{chaloner1995} gives a Bayesian non-linear version of $D$-optimality as
+	\begin{equation}
+	U_{\text{Bayesian-}D}(\theta,\xi) = \log\det M(\theta,\xi)^{-1};
+	\end{equation}
+	substituting this utility in \eqref{eq:general_u}, leads to the optimality condition
+	\begin{equation}
+	\xi^* = \argmax_\xi \E_{p(\theta)}[\log\det M(\theta,\xi)^{-1}].
+	\end{equation}
+	Using the FIM is not the only way to generalise the alphabetic criteria to non-linear models.
+	Indeed, \citet{ryan2016review} takes issue with the classical FIM approach, suggesting that ``to qualify as a `fully Bayesian design', one must obtain the design by using a design criterion that is a functional of the posterior distribution''. Whilst the EIG satisfies this requirement, the FIM extensions of the alphabetic criteria do not.
+	
+	An approach to generalising the alphabetic criteria that is consistent with Ryan's definition of `fully Bayesian' is to look at the covariance matrix of the Bayesian posterior $\Cov_{p(\theta|y,\xi)}[\theta]$, which depends on $\xi$ and $y$ and is a functional of the posterior.
+	For example, \citet{ryan2016review} mention two scalar objectives that can arise from this covariance matrix. One is termed the Bayesian $D$-posterior precision
+	\begin{equation}
+	U_{D\text{-precision}}(\xi,y) = \frac{1}{\det \Cov_{p(\theta'|y,\xi)}[\theta'] }
+	\end{equation}
+	the other is quadratic loss
+	\begin{equation}
+	U_Q(\xi,y,\theta) = (\theta-\hat{\theta}(y,\xi))^\top A (\theta-\hat{\theta}(y,\xi)) 
+	\end{equation}
+	for some matrix $A$ and for some posterior functional estimate $\hat{\theta}(y,\xi)$ of $\theta$, such as the posterior mean.
+	Both can be applied in the general framework of \eqref{eq:general_u}.
+	
+	
+	%The Bayesian $c$-optimal design for a function $c:\Theta \to \Theta$ is the one which maximises
+	%\begin{equation}
+	%	\Phi_c(\xi) = \E_{p(\theta)}[-c(\theta)^\top M(\theta,\xi)^{-1}c(\theta)].
+	%\end{equation}
+	%The Bayesian $A$-optimal design for a function $A:\Theta \to \Theta^2$ is the one which maximises
+	%\begin{equation}
+	%	\Phi_A(\xi) = \E_{p(\theta)}[-\Tr(A(\theta)M(\theta,\xi)^{-1})].
+	%\end{equation}coined
+	%Notably
+	%\begin{itemize}
+	%	\item Define $G$ and $E$ optimal?
+	%	\item The Kiefer Wolowitz connection between $D$ and $G$. Does it hold for non-linear models?
+	%	\item When Gaussian, $D$-optimality is the EIG
+	%\end{itemize}
+	%
+	%Rather than the FIM, we could consider properties of the posterior itself. For example, \citet{ryan2016review} mentions two scalar objectives that can arise. One is the Bayesian $D$-posterior precision
+	%\begin{equation}
+	%	U_D(\xi,y) = \frac{1}{\det \Cov_{p(\theta|y,\xi)}[\theta] }
+	%\end{equation}
+	%the other is Bayesian $A$-posterior which is very natural
+	%\begin{equation}
+	%	U_A(\xi,y,\theta) = \E_{p(\theta'|y,\xi)}\left[(\theta-\theta')^\top A (\theta-\theta') \right].
+	%\end{equation}
+	%There isn't a consistent way to extend these alphabetic criteria to general models. We can use FIM, we can use posterior matrices. etc.
+	%Some of Chaloner's don't really fit into the expected utility framework that well.
+	%
+	%Other key things to consider
+	%\begin{itemize}
+	%	\item Prediction, touching on $G$-optimality. 
+	%	\item Target oriented
+	%	\item Do justice to the classic Bayesian stuff, ignore the non-Bayesian
+	%\end{itemize}
+	
+	%\subsection{Other criteria}
+	%For a review of less common Bayesian experimental design criteria used within the statistics community, we recommend the reviews \citet{chaloner1995} and \citet{ryan2016review}. 
+	
+	
+	
+	
+	
+	
+	\section{Computational methods for one-step design}
+	\label{sec:computation}
+	Choosing Bayesian-optimal experimental designs brings tremendous promise for obtaining information more efficiently.
+	The utilisation of this method, however, is practically limited by the difficulty of quickly obtaining accurate estimates of the design criterion.
+	This is particularly true of the EIG, and we focus on computational methods for the EIG in this section.
+	The mathematical problem that must be solved to find the optimal design is the EIG maximisation problem
+	\begin{equation}\begin{split}
+	\label{eq:eig_max}
+	\xi^* &= \argmax_{\xi\in\Xi} \mathcal{I}(\xi) \\ &= \argmax_{\xi\in\Xi} \E_{p(y|\xi)}\left[ \E_{p(\theta|\xi,y)}[\log p(\theta|\xi,y)]-\E_{p(\theta)}[\log p(\theta)] \right].
+	\end{split}\end{equation}
+	Note that here we are restricting ourselves to one-step experimental design, with sequential and adaptive design being left to Sec.~\ref{sec:sequential}.
+	
+	Computational methods for solving the EIG maximisation problem defined in \eqref{eq:eig_max} can generally be further broken down into two parts. 
+	First, they often make point estimates of the EIG criterion at various candidate designs $\xi$.
+	The difficulty of this estimation procedure can immediately be seen from the definition of the EIG.
+	It entails the calculation of the posterior entropy $-\E_{p(\theta|\xi,y)}[\log p(\theta|\xi,y)]$.
+	For large-scale Bayesian models, density estimation of the posterior constitutes a complex computational task in of itself.
+	However, for the EIG, the problem is more challenging because the posterior entropy occurs inside an expectation $\E_{p(y|\xi)}$ over the observation $y$. Thus, a direct approach to estimating the EIG amounts to \emph{nested} estimation of potentially intractable posterior distributions.
+	It is for this reason that EIG estimation is sometimes referred to as a `double intractability' \citep{foster2019variational}.
+	In Sec.~\ref{sec:point_eig}, we review methods that have been proposed for EIG estimation.
+	
+	Second, there are still further difficulties in the problem of \emph{optimising} the EIG objective function over the space $\Xi$ of possible designs.
+	In the most naive methods, the optimisation simply adds an additional layer of nesting onto the EIG estimation computations, with an outer optimiser searching over candidate designs and feeding them into the EIG estimation.
+	Such optimisation procedures are generally best suited for smaller problems; for larger ones, more sophisticated approaches to the optimisation of the design have been studied.
+	In Sec.~\ref{sec:opt_eig} we review a range of techniques that have been proposed for this optimisation.
+	
+	Computational advances, both in the estimation and the optimisation of EIG, have significantly broadened the range of Bayesian models and design spaces for which Bayesian experimental design is a realistic possibility for practitioners. 
+	
+	
+	% \citet{ryan2016review} provides an excellent companion to this section.
+	
+	\subsection{Point estimates of EIG}
+	\label{sec:point_eig}
+	The EIG, $\mathcal{I}(\xi)$, represents the expected reduction in Shannon entropy between the prior and posterior (see Sec.~\ref{sec:eig}).
+	The first step in utilising EIG for experimental design is to compute an estimate of the EIG for a single design $\xi$.
+	Since $\mathcal{I}(\xi) = \E_{p(y|\xi)}\left[ H[p(\theta)] - H[p(\theta|\xi,y)] \right]$ involves an expectation over $y \sim p(y|\xi)$ of the posterior entropy $H[p(\theta|y,\xi)]$, a direct approach to its estimation requires repeated computations of the posterior $p(\theta|y,\xi)$ with different simulated observations $y$. 
+	Given that calculating just one posterior can be intractable, it can readily be observed that EIG estimation is a computationally challenging problem.
+	% \citet{foster2019variational} used the term `doubly intractable' for computational problems of this kind.
+	
+	A critical distinction when computing the EIG is whether the model has an explicit or an implicit likelihood (see Sec.~\ref{sec:explicit_implicit} for a definition).
+	In general, the explicit likelihood case contains strictly more information about the model, and so results in an easier, yet still doubly intractable, computational problem for the EIG.
+	The implicit likelihood case is more challenging still, as the unknown likelihood typically has to be estimated in some way.
+	We review computational methods for EIG estimation in both cases.
+	
+	\subsubsection{Explicit likelihood models}
+	The existence of an explicit likelihood allows conventional approaches to posterior estimation, including MCMC, importance sampling, and Laplace approximation, to be used. Each leads to a family of well-studied approaches to EIG estimation.
+	However, perhaps the most important computational methods are those which side-step direct estimation of the posterior, focusing on estimates of the marginal likelihoods $p(y|\xi)$ only.
+	The Nested Monte Carlo estimator \citep{ryan2003estimating} is the canonical method in this class, and been widely applied with a number of explicit likelihood models.
+	
+	\paragraph{MCMC}
+	A natural approach that is mostly suited to low $\theta$ dimension problems, is to estimate the posterior using Markov Chain Monte Carlo (MCMC) \citep{andrieu2003introduction}. 
+	Unfortunately, MCMC only produces samples of the target density.
+	This is problematic for EIG estimation, which also requires access to the posterior density $p(\theta|\xi,y)$.
+	To overcome this, \citet{heinrich2020information} used MCMC to sample the posterior, and a Gaussian Mixture Model \citep[Sec.~6.8]{hastie2009elements} to perform density estimation of the posterior.
+	MCMC has also been applied to estimate non-EIG criteria for Bayesian experimental design \citep{wakefield1994expected,han2004bayesian}.
+	
+	\paragraph{Importance sampling} Another family of methods for EIG estimation is based on importance sampling. 
+	These methods begin with the key observation that estimating the posterior density is not actually required for EIG estimation, because we can write
+	\begin{equation}
+	\label{eq:log_ratio}
+	\log \frac{p(\theta|\xi,y)}{p(\theta)} = \log \frac{p(y|\theta,\xi)}{p(y|\xi)}.
+	\end{equation}
+	The approach of \citet{cook2008optimal,ryan2014towards} is to estimate $p(y|\xi)$ using Monte Carlo samples from the prior, leading to the estimator
+	\begin{equation}
+	\label{eq:mc_marginal}
+	\log p(y|\xi) \approx \log \left(\frac{1}{N} \sum_{n=1}^N p(y|\theta_n,\xi)\right) \text{ where }\theta_1,\dots,\theta_N \iid p(\theta),
+	\end{equation}
+	the other component of the likelihood ratio $p(y|\theta,\xi)/p(y|\xi)$ is the known likelihood.
+	\citet{cook2008optimal,ryan2014towards} then estimate $\E_{p(\theta|\xi,y)}[\log p(y|\theta,\xi)]$ for some fixed $y$ by using importance sampling.
+	Specifically, given some fixed $y$ and the set of samples $\theta_1,\dots,\theta_n$ drawn independently of $p(\theta)$, they use the estimator
+	\begin{equation}
+	\E_{p(\theta|\xi,y)}[\log p(y|\theta,\xi)] \approx \frac{1}{N}\sum_{n=1}^N \frac{p(y|\theta_n,\xi)}{\frac{1}{N} \sum_{p=1}^N p(y|\theta_p,\xi)} \log p(y|\theta_n,\xi).
+	\end{equation}
+	The final estimator of EIG is formed by combining this estimator with the estimator in \eqref{eq:mc_marginal} for $\log p(y|\xi)$, 
+	and then taking the Monte Carlo integral over $y\sim p(y|\xi)$, giving
+	\begin{equation}
+	\mathcal{I}(\xi) \approx \frac{1}{M} \sum_{m=1}^M \left[ \frac{1}{N}\sum_{n=1}^N \frac{p(y_m|\theta_n,\xi)}{\frac{1}{N} \sum_{p=1}^N p(y_m|\theta_p,\xi)} \log p(y_m|\theta_n,\xi) - \log \left(\frac{1}{N} \sum_{n=1}^N p(y_m|\theta_n,\xi)\right)\right]
+	\end{equation}
+	where $y_1\dots,y_m\iid p(y|\xi)$ and $\theta_1,\dots,\theta_n \iid p(\theta)$ are independent.
+	
+	\paragraph{Monte Carlo and Nested Monte Carlo} \citet{hamada2001finding,ryan2003estimating} considered a closely related family of estimators.
+	They also used \eqref{eq:log_ratio} to avoid computing posterior densities.
+	Unlike \citet{cook2008optimal,ryan2014towards}, they observed that $p(y|\xi)p(\theta|\xi,y) = p(\theta)p(y|\theta,\xi)$, allowing them to write the EIG as 
+	\begin{equation}
+	\mathcal{I}(\xi) = \E_{p(\theta)p(y|\theta,\xi)}\left[\log\frac{p(y|\theta,\xi)}{p(y|\xi)} \right].
+	\end{equation}
+	The only unknown quantity in the integrand here is $p(y|\xi)$. Assuming some estimator $\hat{p}(y|\xi)$ for $p(y|\xi)$, we have the Monte Carlo estimator
+	\begin{equation}
+	\mathcal{I}(\xi) \approx \frac{1}{N}\sum_{n=1}^N \log \frac{p(y_n|\theta_n,\xi)}{\hat{p}(y_n|\xi)} \text{ where } \theta_n,y_n \iid p(\theta)p(y|\theta,\xi).
+	\end{equation}
+	In \citet{hamada2001finding}, $\hat{p}$ was computed by numerical integration, for a low dimensional $\theta$.
+	In \citet{ryan2003estimating}, two approaches for $\hat{p}$ were considered---the first was a Laplacian approximation using the posterior mode $\hat{\theta}$.
+	The second was to use to an inner Monte Carlo estimation step to estimate $p(y|\xi)$ as in \eqref{eq:mc_marginal}.
+	This latter approach, also considered by \citet{myung2013,rainforth2017thesis}, results in the double loop, or Nested Monte Carlo (NMC) estimator of EIG
+	\begin{equation}
+	\label{eq:nmc_estimator}
+	\hat{\mathcal{I}}_{NMC}(\xi) = \frac{1}{N} \sum_{n=1}^N \log \frac{p(y_n|\theta_n,\xi)}{\frac{1}{M}\sum_{m=1}^M p(y_n|\theta'_m,\xi)} \text{ where } \theta_n,y_n \iid p(\theta)p(y|\theta,\xi),\theta'_m\iid p(\theta).
+	\end{equation}
+	The asymptotic properties of this estimator were studied by \citet{rainforth2018nesting,zheng2018robust,beck2018fast}, showing that $\hat{\mathcal{I}}_{NMC}(\xi)$ converges to $\mathcal{I}(\xi)$ with asymptotic error $\mathcal{O}(N^{-1}) + \mathcal{O}(M^{-2})$. Hence, it is optimal to set $M \propto \sqrt{N}$.
+	
+	
+	\paragraph{Laplace approximation}
+	Another important line of work \citep{lewi2009sequential,cavagnaro2010adaptive,long2013} uses a Laplace approximation to the posterior to estimate the posterior entropy.
+	The Laplace estimate uses the following Taylor expansion of a scalar function about a point $\hat{\theta}$ 
+	\begin{align}
+	f(\theta) \approx f(\hat{\theta}) + (\theta-\hat{\theta})^\top \left. \pypx{f}{\theta}\right|_{\hat{\theta}} + (\theta-\hat{\theta})^\top \left. \pypx{^2 f}{\theta^2} \right|_{\hat{\theta}}(\theta-\hat{\theta}).
+	\end{align}
+	If we apply this approximation to the log posterior density $f(\theta) = \log p(\theta|\xi,y) = \log p(\theta) + \log p(y|\theta,\xi) +C$ at a point $\hat{\theta}$ for which the log posterior density has zero gradient, then we find the following Gaussian approximation
+	\begin{equation}
+	\log p(\theta|\xi,y) \approx (\theta-\hat{\theta})^\top \hat{\Sigma}^{-1} (\theta- \hat{\theta}) + C' \text{ where }
+	\hat{\Sigma}^{-1} = \left. \pypx{^2 \log \left( p(\theta) p(y|\theta,\xi) \right)}{\theta^2} \right|_{\hat{\theta}}.
+	\end{equation}
+	One advantage of this approach is that the entropy of this Gaussian approximation is known in closed form.
+	A drawback is that the Laplace approximation makes a strong structural assumption about the posterior. This was partially relaxed by \citet{long2021multimodal}, who considered a multi-modal Laplace approximation.
+	Another approach is to combine Laplace estimation and importance sampling \citep{ryan2015fully}.
+	Finally, \citet{beck2018fast} analysed the standard Laplace estimator, and further proposed combining Laplace importance sampling with the NMC estimator.
+	
+	%\paragraph{Semi-implicit likelihood models}
+	%\emph{Not sure how much of this is actually literature}
+	%
+	%The semi-implicit case, in which we have an explicit likelihood model $p(y|\psi,\xi)$ and $\theta = f_\theta(\psi)$, has been studied in the context of gaining information to make a targeted prediction by \citet{ma2018eddi,gong2019icebreaker} and as `extrapolation' by \citet{foster2019variational}.
+	%The Mutual Information Chain Rule \citep{cover1999elements} proves a useful tool in this context.
+	%Assuming no relationship at all between random variables $\theta$ and $\psi$, we have the relations
+	%\begin{align}
+	%	\text{MI}_\xi(y; (\theta,\psi)) &= \text{MI}_\xi(y;\psi) + \text{MI}_\xi(y;\theta|\psi) \\
+	%	&= \text{MI}_\xi(y;\theta) + \text{MI}_\xi(y;\psi|\theta)
+	%\end{align}
+	%where $\text{MI}$ denotes the (conditional) mutual information.
+	%Assuming $y \indep \theta | \psi$, we have $\text{MI}_\xi(y;\theta|\psi)=0$. This gives
+	%\begin{align}
+	%	\mathcal{I}(\xi) = \text{MI}_\xi(y;\theta) = \text{MI}_\xi(y;\psi) - \text{MI}_\xi(y;\psi|\theta)
+	%\end{align}
+	
+	%\begin{align}
+	%	\mathcal{I}(\xi) &= \E_{p(\theta)p(y|\xi,\theta)}\left[ \log\frac{p(y|\theta,\xi)}{p(y|\xi)} \right] \\
+	%	&= \E_{p(\psi)p(\theta|\psi)p(y|\xi,\psi)}\left[ \log\frac{p(y|\psi,\xi)}{p(y|\xi)} \right]
+	%\end{align}
+	
+	
+	\subsubsection{Implicit likelihood models}
+	When the likelihood is not available, EIG estimation is strictly more difficult than when the likelihood is known in closed form.
+	A direct approach to re-use explicit likelihood EIG estimators is to approximate the likelihood, and use this surrogate approximation as if it were the true likelihood.
+	Alternatively, authors have focused on existing methods for likelihood-free inference, which give posterior estimates for implicit likelihood models without requiring knowledge of the likelihood. 
+	
+	\paragraph{Approximating the likelihood}
+	In some models, the likelihood $p(y|\theta,\xi)$ can be computed, but it is too expensive to be used in extensive calculation.
+	The approach of \citet{huan2013simulation} is to approximate the likelihood using a polynomial chaos expansion.
+	Here, it is necessary to use a small number of evaluations of the likelihood to compute the polynomial chaos coefficients, but once this is done, the surrogate polynomial chaos approximate likelihood can be used in place of the true likelihood for all other calculations. \citet{huan2013simulation} specifically use the polynomial chaos approximation within a NMC estimator of the EIG.
+	
+	\citet{overstall2020bayesian} also consider approximating the likelihood. They assume a parametric family for distributions over $y$ with parameters $\phi$, so that $y|\theta,\xi \sim \mathcal{H}_X( \phi_f(\theta,\xi))$. They estimate the function $\phi_f(\theta,\xi)$ using a Gaussian Process \citep{williams2006gaussian}, trained with data obtained by maximum likelihood estimation of $\phi_f$. We note the close connections between this idea and \citet{foster2019variational}.
+	
+	\paragraph{Approximate Bayesian Computation}
+	Approximate Bayesian Computation (ABC) \citep{csillery2010approximate} is a family of methods for performing inference without a tractable likelihood.
+	In its simplest form, ABC simulates $(\tilde{\theta}_i,\tilde{y}_i)_{i=1}^N$ from the joint model $p(\theta,y|\xi)$. Given a metric  $\rho$ on $\mathcal{Y}$, a sample $\tilde{\theta}_i$ is accepted as a valid sample from $p(\theta|\xi,y)$ if
+	\begin{equation}
+	\rho(y,\tilde{y}_i) < \epsilon
+	\end{equation} 
+	for tolerance $\epsilon$.
+	\citet{drovandi2013bayesian}, \citet{hainy2016likelihood}, \citet{price2016efficient} and \citet{dehideniya2018optimal} have applied ABC within the context of Bayesian experimental design.
+	
+	\paragraph{LFIRE}
+	Another more recent approach to inference in intractable likelihood models is Likelihood-free Inference by Ratio Estimation (LFIRE) \citep{dutta2016likelihood}.
+	This method uses logistic regression to approximate the \emph{likelihood ratio}
+	\begin{equation}
+	r(\xi,\theta,y) = \frac{p(y|\theta,\xi)}{p(y|\xi)}.
+	\end{equation}
+	Importantly, this ratio is exactly the likelihood ratio that appears in the definition of the EIG, indeed we have $\mathcal{I}(\xi) = \E_{p(y|\xi)p(\theta|\xi,y)}[\log r(\xi,\theta,y)] = \E_{p(\theta)p(y|\theta,\xi)}[\log r(\xi,\theta,y)]$. Thus, if we are able to estimate $r(\xi,\theta,y)$ accurately, then EIG estimation can be performed by simple Monte Carlo integration.
+	On this basis, LFIRE was applied in a Bayesian experimental design context by \citet{kleinegesse2018efficient}. 
+	They sampled $(\theta_i,y_i)_{i=1}^N$ from the joint model $p(\theta)p(y|\theta,\xi)$.
+	For each $\theta_i$, they trained a logistic regression model to distinguish samples from $p(y|\theta_i,\xi)$ and $p(y|\xi)$.
+	This results in an estimate $\hat{r}(\xi,\theta_i,y)$ of $r(\xi,\theta_i,y)$ across different values of $y$.
+	Finally, they form the Monte Carlo estimate of the EIG
+	\begin{equation}
+	\mathcal{I}(\xi) \approx \frac{1}{N} \sum_{i=1}^N \hat{r}(\xi,\theta_i,y_i).
+	\end{equation}
+	
+	
+	\subsection{Optimisation of EIG}
+	\label{sec:opt_eig}
+	We now turn to the problem of optimising the EIG over the design space $\Xi$. 
+	The simpler methods to perform this optimisation use point estimates of EIG.
+	For finite $\Xi$, we can estimate EIG for every design.
+	For infinite $\Xi$, we can use the EIG estimates at some design points to try and infer the EIG at others.
+	Most simply, this could take the form of fitting a regression model to predict $\mathcal{I}(\xi)$ from $\xi$.
+	More advanced methods use Bayesian optimisation---this both fits a Bayesian regression model of this form and uses Bayesian uncertainty estimates to propose new designs at which to compute the EIG.
+	%This leads to curve fitting and Bayesian optimisation approaches.
+	Another branch of thinking folds the EIG optimisation problem back into the problem of sampling from an unnormalised density.
+	In this approach, the unnormalised density in question places high mass where the utility $U(\theta,\xi,y)$ is high.
+	All aforementioned approaches are zeroth order methods---they do not make use of derivatives of $U(\theta,\xi,y)$.
+	Using gradient information, albeit approximate, leads to a class of first order methods for EIG optimisation.
+	
+	
+	\subsubsection{Discrete design space}
+	For a small, discrete design space, the simplest option is to form separate estimates of $\mathcal{I}(\xi)$ for each $\xi\in\Xi$, and choose the design with the highest estimated EIG.
+	This approach was taken by \citet{carlin1998approaches,palmer1998bayesian} and others. %, and has been used implicitly by numerous other authors that use a discrete or discretised design space.
+	\citet{vincent2017} dynamically allocated resources between different discrete designs using ideas from the theory of bandit optimisation \citep{neufeld2014adaptive}. In essence, this approach provides more accurate EIG estimates for designs that are likely to be optimal, spending less time on designs that are not promising.
+	
+	
+	
+	\subsubsection{Continuous design space}
+	\paragraph{Discretisation}
+	Perhaps the simplest approach to continuous design optimisation is to discretise the design space, for example using uniformly or log-uniformly spaced points \citep{ryan2003estimating,van2003optimal,watson2017quest+,vincent2017}.
+	Alternatively, a discrete set of candidate designs can be chosen by hand by the experimenter, and each evaluated \citep{han2004bayesian,terejanu2012bayesian,lyu2019ultra}.
+	
+	
+	\paragraph{Curve fitting}
+	Given a finite set of randomly sampled designs $\xi_i$ with EIG estimates $\hat{\mathcal{I}}(\xi_i)$, \citet{muller1995optimal} proposed a curve fitting approach that fits a regression model to this data. The optimal design is then estimated as the optimum of the fitted regression model.
+	
+	\paragraph{Bayesian optimisation}
+	Beyond simple curve fitting, Bayesian Optimisation (BO) \citep{snoek2012practical} is a well-established method for gradient-free optimisation.
+	Like any other curve fitting approach, BO fits a model, specifically a Gaussian Process (GP), \citep{williams2006gaussian} to the observed data $(\xi_i, \hat{\mathcal{I}}(\xi_i))$.
+	However, BO iteratively suggests new designs at which to estimate the EIG, in order to efficiently seek the optimal design.
+	We fully discuss BO and its connection with Bayesian experimental design itself in Sec.~\ref{sec:bo}.
+	For the purposes of solving the EIG optimisation problem, \eqref{eq:eig_max}, we treat BO as a black box optimisation algorithm.
+	The application of BO to optimising EIG over the design space was explored by \citet{kleinegesse2018efficient,foster2019variational,von2019optimal}.
+	
+	\paragraph{Co-ordinate exchange}
+	The classical co-ordinate exchange algorithm for optimising design was proposed by \citet{meyer1995coordinate}.
+	\citet{overstall2017bayesian} proposed Approximate Co-ordinate Exchange. 
+	This is a two phase optimisation algorithm specifically designed for Bayesian experimental design.
+	In the first phase, designs are optimised co-ordinate-wise by fitting a one-dimensional GP to the EIG surface for each co-ordinate in turn, with other elements of the design held fixed, and selecting the optimal value for that co-ordinate.
+	In the second phase, different co-ordinates of the design are aggregated using a point exchange algorithm \citep{meyer1995coordinate,atkinson2007optimum}.
+	
+	\paragraph{Optimisation by sampling}
+	\citet{clyde1996exploring} proposed an approach to optimising the design that uses algorithms for sampling unnormalised densities.
+	Their approach applies to any utility $U(\theta,\xi,y) > 0$ in the framework of \eqref{eq:general_u}.
+	The authors define an augmented probability model on $\Xi \times \Theta \times \mathcal{Y}$ by
+	\begin{equation}
+	\label{eq:optim_mcmc}
+	h(\xi,\theta,y) \propto p(\theta)p(y|\theta,\xi)U(\theta,\xi,y).
+	\end{equation}
+	The marginal distribution for $\xi$ is then
+	\begin{equation}
+	h(\xi) \propto \E_{p(\theta)p(y|\theta,\xi)}[U(\theta,\xi,y)],
+	\end{equation}
+	this guarantees that high probability regions for $\xi$ correspond to regions with a large utility.
+	The core approach, then, is to sample from the joint density $h(\xi,\theta,y)$ using a technique such as MCMC---\citet{clyde1996exploring} used the Metropolis--Hastings algorithm \citep{hastings1970monte}.
+	MCMC on $h(\theta,\xi,y)$ was also used by \citet{bielza1999decision,muller2005simulation}.
+	\citet{cook2008optimal,drovandi2013bayesian} used the MCMC technique, and fitted a density estimator to the MCMC samples to improve their estimation of the optimal design.
+	\citet{ryan2014towards} applied MCMC in combination with dimensionality reduction on the latent space to avoid problems with MCMC in higher dimensions.
+	
+	An extension of this idea, inspired by simulated annealing \citep{van1987simulated}, is to include the utility contributions from $J$ independent $(\theta, y)$ pairs, to create an unnormalised density on $\Xi \times \Theta^J\times \mathcal{Y}^J$
+	\begin{equation}
+	\label{eq:optim_mcmc_J}
+	h_J(\xi,\theta_{1:J},y_{1:J}) = \prod_{j=1}^J p(\theta_j)p(y_j|\theta_j,\xi)U(\theta_j,\xi,y_j).
+	\end{equation}
+	One can see that for larger $J$, the probability mass concentrates more strongly around the optimal $\xi$.
+	The simulated annealing mechanism is applied by \emph{increasing $J$ during the course of optimisation}.
+	This approach has been applied by \citet{muller2004optimal,muller2005simulation,stroud2001optimal,cook2008optimal}.
+	
+	Alternatively, one can sample $h_J(\xi,\theta_{1:J},y_{1:J})$ using Sequential Monte Carlo (SMC) \citep{doucet2000sequential}.
+	This was the approach taken by \citet{amzal2006bayesian,kuck2006smc}.
+	
+	
+	
+	\paragraph{Evolutionary algorithms}
+	Another approach to solving \eqref{eq:eig_max} is to optimise over the design space using evolutionary algorithms \citep{eiben2003introduction}.
+	\citet{hamada2001finding} applied genetic algorithms to this problem, and \citet{price2018induced} proposed the Induced Natural Selection Heuristic (INSH) method to optimise the design.
+	
+	\paragraph{Gradient-based optimisation}
+	Whilst gradient-driven optimisation methods are commonplace in optimisation theory, their adoption in Bayesian experimental design has been limited.
+	This is likely because, as with the EIG itself, estimating the gradient $\nabla_\xi \mathcal{I}$ is a computationally challenging problem, and it is rare that we can place a guarantee of accuracy on EIG gradient estimates.
+	Standard stepwise optimisation methods are relatively data hungry, requiring the estimate of gradients at many design points.
+	Given these challenges, approaches such as Bayesian optimisation, which emphasises optimisation with limited, expensive evaluations of the underlying objective function, predominate.
+	
+	Nevertheless, \citet{huan2014gradient} considered gradient-based methods for solving the EIG optimisation problem.
+	They considered the Robbins--Monroe stochastic gradient descent (SGD) \citep{robbins1951stochastic} algorithm applied to the NMC estimator of the EIG, \eqref{eq:nmc_estimator}, resampling $\theta_n,y_n$ and $\theta'_m$ at each iteration.
+	This leads to a gradient descent method with noisy and biased gradients.
+	They also considered applying the SAA-BFGS algorithm \citep{fletcher2013practical} to the NMC estimator, without resampling at each iteration.
+	% Note: so how does it work, doesn't y have to be sampled conditional on xi?
+	\citet{carlon2020nesterov} considered gradient optimisation of both NMC and Laplace estimators of the EIG using SGD.
+	
+	\textbf{Note:} At the time of writing Chapter 3, we were not aware of the work of \citet{huan2014gradient}. This is an important piece of prior work for this chapter, which also deals with the stochastic gradient optimisation of the EIG.
+	We regret the omission.
+	The key distinctions between Chapter 3 and \citet{huan2014gradient} are 1) the use of EIG lower bounds as surrogate differentiable objectives by the former as compared to the NMC surrogate used by the latter, 2) the simultaneous optimisation of a variational parameter to produce more accurate estimates of $\nabla_\xi \mathcal{I}$ of the former.
+	
+	
+	\paragraph{Other methods}
+	\citet{huan2013simulation} proposed the Nelder--Mead simplex method \citep{nelder1965simplex}, a gradient-free optimisation algorithm, and simultaneous perturbation stochastic approximation \citep{spall1998overview} as two alternative optimisation algorithms for Bayesian experimental designs.
+	
+	
+	%Curve fitting
+	%Bayes Opt
+	%MCMC + simulated annealing + SMC (same general idea of using inference)
+	%Crazy stuff that Huan \& Marzouk have tried
+	
+	
+	
+	
+	
+	
+	%We focus on methods to estimate the EIG.
+	%\begin{itemize}
+	%	\item Nested Monte Carlo
+	%	\item MCMC and all that crap
+	%	\item Laplace
+	%	\item Laplace + IS
+	%	\item Plain IS (is this just NMC then?) No, it's something messed up
+	%	\item LFIRE
+	%	\item Ma et al., using a variational posterior
+	%	\item ABC
+	%	\item SMC
+	%\end{itemize}
+	
+	% How does this community approach it?
+	
+	\section{Bayesian Active Learning}
+	\label{sec:bal}
+	Active learning allows a learning algorithm to ``choose the data from which it learns'' \citep{settles2009active}.
+	In the Bayesian setting, the learning algorithm is a Bayesian model.
+	In its most abstract form, then, Bayesian Active Learning is identical to Bayesian Experimental Design, but with different vocabulary: designs $\xi$ are referred to as queries,
+	observations $y$ are referred to as labels and are often provided by a human labeller, the design criterion is referred to as the acquisition function. Queries are selected to maximise the acquisition function, typically in an iterative process.
+	
+	\paragraph{Pool-based active learning} However, this abstract similarity disguises the common differences in applications of active learning and experimental design.
+	One hugely important sub-field of active learning, including Bayesian active learning, is \emph{pool-based active learning} \citep{lewis1994sequential}.
+	Here, the design space $\Xi$ consists of unlabelled examples (such as images or sentences), the observation $y$ is a human-provided label that corresponds to the unlabelled instance $\xi$, and the model is a classifier with parameters $\theta$ that predicts $y$ from $\xi$.
+	Pool-based active learning also applies less commonly to regression problems, for which $y$ is a continuous label.
+	
+	\paragraph{Sequential active learning with greedy acquisition}
+	In Sections~\ref{sec:bed} and ~\ref{sec:computation}, we focused on one-step design in which we begin with a prior $p(\theta)$, select a design $\xi$, obtain outcome $y$, and the experiment terminates.
+	In active learning, we rarely want to acquire just one label or one batch of labels---the true power of the framework is apparent in a sequential setting \citep{lewis1994sequential}.
+	This means that we pick design $\xi_1$ obtaining label $y_1$, then choose $\xi_2$ and receive label $y_2$, and so on.
+	The dataset that we have after $t$ experiments is $\mathcal{D}_t = \{(\xi_1,y_1),\dots,(\xi_t,y_t) \}$.
+	A simple approach to the sequential problem that is adopted in almost all of active learning \citep{gal2017deep} is \emph{greedy acquisition}.
+	In short, this strategy picks the next design to maximise the utility of the next label, without any consideration of how this will affect future queries.
+	
+	However, it is still essential to incorporate all existing data $\mathcal{D}_t$ into the model before making this choice.
+	To do this, we use the posterior\footnote{In active learning, we make the assumption that $\theta$ represents the full set of model parameters (see Sec.~\ref{sec:embedded}).} given existing data $p(\theta|\mathcal{D}_t)$ in place of the original prior $p(\theta)$.
+	For the EIG, for example, at each step we would choose the design that maximises
+	\begin{equation}
+	\mathcal{I}(\xi; \mathcal{D}_t) = \E_{p(y|\xi,\mathcal{D}_t)}\left[ \E_{p(\theta|\xi,y,\mathcal{D}_t)}[\log p(\theta|\xi,y,\mathcal{D}_t)]-\E_{p(\theta|\mathcal{D}_t)}[\log p(\theta|\mathcal{D}_t)] \right]
+	\end{equation}
+	where $p(y|\xi,\mathcal{D}_t) = \E_{p(\theta|\mathcal{D}_t)}[p(y|\theta,\xi)]$.
+	The high-level framework of greedy, sequential pool-based Bayesian active learning with a general acquisition function $\alpha$ is summarised in Algorithm~\ref{alg:pool}.
+	We discuss the theory of sequential experimentation in more detail in Sec.~\ref{sec:sequential}.
+	
+	\begin{algorithm}[t]
+		\caption{Pool-based Bayesian active learning with greedy acquisition}\label{alg:pool}
+		\begin{algorithmic}
+			\Require Acquisition function $\alpha$,  prior $p(\theta)$ on model weights, pool $\Xi$, initial dataset $\mathcal{D}_0$ may be empty.
+			\For{step $t = 1,\dots,T$}
+			\State Find $\xi_t = \argmax_{\xi\in\Xi} \alpha(\xi ; \mathcal{D}_{t-1})$ by scoring each unlabelled element of the pool
+			\State Obtain label $y_t$ for query $\xi_t$
+			\State Set $\mathcal{D}_{t} = \mathcal{D}_{t-1} \cup \{(\xi_t,y_t)\}$ and retrain model to compute $p(\theta|\mathcal{D}_t)$
+			\EndFor
+		\end{algorithmic}
+	\end{algorithm}
+	
+	\subsection{Acquisition functions}
+	
+	\subsubsection{Bayesian Active Learning by Disagreement}
+	A key point of intersection between Bayesian active learning and Bayesian experimental design is the Bayesian Active Learning by Disagreement (BALD) score \citep{houlsby2011bayesian}, a widely adopted acquisition function within Bayesian Active Learning.
+	\begin{proposition}[\citet{houlsby2011bayesian}]\label{prop:bald}
+		The BALD score is equivalent to the EIG.
+	\end{proposition}
+	\begin{proof}
+		The BALD score is the mutual information between $\theta$ and $y$, but typically rearranged as 
+		\begin{align}
+		\alpha_\text{BALD}(\xi;\mathcal{D}_t) &= \E_{p(\theta|\mathcal{D}_t)}\left[H[p(y|\xi,\mathcal{D}_t)] - H[p(y|\xi,\theta,\mathcal{D}_t)]\right].\\
+		\intertext{We have}
+		&= \E_{p(\theta|\mathcal{D}_t)}\left[-\E_{p(y|\xi,\mathcal{D}_t)}[\log p(y|\xi,\mathcal{D}_t)]  + \E_{p(y|\xi,\theta,\mathcal{D}_t)}[\log p(y|\xi,\theta,\mathcal{D}_t)]\right]\\
+		&= \E_{p(\theta|\mathcal{D}_t)p(y|\xi,\theta,\mathcal{D}_t)}\left[-\log p(y|\xi,\mathcal{D}_t)  + \log p(y|\xi,\theta,\mathcal{D}_t)\right]\\
+		&= \E_{p(\theta|\mathcal{D}_t)p(y|\xi,\theta,\mathcal{D}_t)}\left[\log\frac{p(y|\xi,\theta,\mathcal{D}_t)}{p(y|\xi,\mathcal{D}_t)}   \right]
+		\intertext{applying Bayes Theorem gives}
+		&= \E_{p(\theta|\mathcal{D}_t)p(y|\xi,\theta,\mathcal{D}_t)}\left[\log\frac{p(\theta|\xi,y,\mathcal{D}_t)}{p(\theta|\mathcal{D}_t)}   \right]\\
+		&= \E_{p(y|\xi,\mathcal{D}_t)}\left[ \E_{p(\theta|\xi,y,\mathcal{D}_t)}[\log p(\theta|\xi,y,\mathcal{D}_t)]-\E_{p(\theta|\mathcal{D}_t)}[\log p(\theta|\mathcal{D}_t)] \right] = \mathcal{I}(\xi; \mathcal{D}_t).
+		\end{align}
+		Note this is essentially the same proof as Proposition~\ref{prop:sebastiani}.
+	\end{proof}
+	The BALD score can be utilised directly in Algorithm~\ref{alg:pool}.
+	One important feature of writing EIG in BALD form is that it only depends on the actual experimental observation $y$, and does not require a probability density on $\theta$. This can be important if we do not have a closed form density for $\theta$ either in the prior $p(\theta)$ or in the posterior $p(\theta|\mathcal{D}_t)$. 
+	This is particularly useful in active learning, where we may consider particularly complex models with high-dimensional $\theta$.
+	
+	In Deep Bayesian Active Learning \citep{gal2017deep}, for instance, the model that predicts $y$ from $\xi$ is a neural network with parameters $\theta$.
+	In order to treat this model in a Bayesian manner, methods for Bayesian deep learning must be utilised. \citet{gal2017deep} specifically used Dropout as a way of estimating prior and posterior distributions on $\theta$  \citep{gal2016dropout}. Here, fitting $p(\theta|\mathcal{D}_t)$ amounts to retraining the network with Dropout.
+	\citet{beluch2018power} and \citet{pop2018deep} used a simple ensemble of models, treating different members of the ensemble as posterior samples of $\theta$.
+	To fit $p(\theta|\mathcal{D}_t)$, each deterministic model in the ensemble is retrained separately.
+	
+	A key computational insight when estimating $\mathcal{I}(\xi)$ for a classification model in which the observation space $\mathcal{Y}$ is finite was made by \citet{houlsby2011bayesian,gal2017deep}.
+	We have
+	\begin{equation}
+	\mathcal{I}(\xi) = \sum_{y\in\mathcal{Y}} \E_{p(\theta)}\left[  p(y|\theta,\xi) \log \frac{p(y|\theta,\xi)}{\E_{p(\theta)}[p(y|\theta,\xi)]}\right] 
+	\end{equation}
+	which can simply be estimated with Monte Carlo using samples $\theta_1,\dots,\theta_N\sim p(\theta)$. The same idea applied when we have $p(\theta|\mathcal{D}_t)$ in place of $p(\theta)$.
+	This estimator was also used by \citet{vincent2017}, who observed that, unlike the NMC estimator of \eqref{eq:nmc_estimator}, this estimator converges at the standard Monte Carlo rate with error $\mathcal{O}(N^{-1/2})$.
+	This speed-up is a consequence of being able to sum over $\mathcal{Y}$.
+	
+	\paragraph{BatchBALD}
+	\label{sec:batchbald}
+	In the pool-based active learning setting with a discrete pool of size $p$, each acquisition involves computing the BALD score for every element of the pool and choosing the best one (Algorithm~\ref{alg:pool}), which is an $\mathcal{O}(p)$ operation. \citet{kirsch2019batchbald} considered the problem of batch active learning, in which designs are $k$-subsets of the pool. This means that, at each iteration of active learning, $k$ different unlabelled examples will be selected and labelled. 
+	Naively scoring each $k$-subset of the unlabelled pool costs $\binom{p}{k}$, which rapidly becomes prohibitive.
+	BatchBALD instead creates the design by greedily adding elements from the pool one at a time, giving a more efficiently scalable algorithm.
+	This approach can be justified theoretically using the notion of submodularity---see Sec.~\ref{sec:submodular}.
+	
+	
+	\subsubsection{Other acquisition functions}
+	
+	Within the Bayesian active learning framework, a range of other acquisition functions and computational methods have been proposed.
+	It is possible to extend most common \emph{non-Bayesian} acquisition functions for use with Bayesian models.
+	These non-Bayesian acquisition rules are generally a function of the predictive distribution $p(y|\xi,\mathcal{D}_t)$. When using a Bayesian model we can use the Bayesian marginal (posterior predictive) $p(y|\xi,\mathcal{D}_t) = \E_{p(\theta|\mathcal{D}_t)}[p(y|\theta,\xi)]$ in place of the deterministic predictive distribution that arises in non-Bayesian models.
+	Standard acquisition functions such as uncertainty sampling \citep{lewis1994sequential}, margin sampling \citep{scheffer2001active}, and variation ratios \citep{freeman1965elementary} can be therefore be employed in this context.
+	Of particular note is the maximum entropy sampling method \citep{shannon1948mathematical,settles2008analysis}, which uses 
+	\begin{equation}
+	\alpha_{\textup{Entropy}}(\xi;\mathcal{D}_t) = H[p(y|\xi,\mathcal{D}_t)].
+	\end{equation}
+	As shown in Proposition~\ref{prop:sebastiani}, this approach is equivalent to EIG maximisation when the entropy $H[p(y|\theta,\xi)]$ does not depend on $\xi$. This can be interpreted as saying that, given the correct model, the level of noise is uniform across all examples in the pool $\Xi$. For instance, we could assume that every example has a true label that a human will assign with 100\% accuracy.
+	However, maximum entropy sampling (and, in general, rules based on uncertainty in the predictive distribution $p(y|\xi,\mathcal{D}_t)$) break down when there are designs $\xi$ which are very ambiguous, e.g.~the correct label is missing from the taxonomy. Maximum entropy and related acquisition rules can become fixated on ambiguous queries.
+	
+	Active learning has also considered Bayesian-specific acquisition functions.
+	\citet{kendall2015bayesian} proposed the mean standard deviation (Mean STD) acquisition rule for classification models.
+	Define $\sigma_y(\xi;\mathcal{D}_t)$ as the standard deviation over $\theta|\mathcal{D}_t$ of the probability of example $\xi$ being assigned to class $y$, i.e.~
+	\begin{equation}
+	\sigma_y(\xi;\mathcal{D}_t) = \sqrt{\Var_{p(\theta|\mathcal{D}_t)}[p(y|\theta,\xi)]},
+	\end{equation}
+	then the MeanSTD acquisition function is,
+	\begin{equation}
+	\alpha_\textup{MeanSTD}(\xi;\mathcal{D}_t) = \frac{1}{|\mathcal{Y}|}\sum_{y\in\mathcal{Y}} \sigma_y(\xi;\mathcal{D}_t).
+	\end{equation}
+	Following Bayesian decision theory, \citet{roy2001toward} considered minimising the Bayes posterior risk, focusing on log loss and 0/1 loss.  \citet{kapoor2007active} considered a range of Bayesian acquisition functions for binary classification, focusing on a score which combines the mean and variance of the prediction. \citet{yang2012bayesian} applied Bayesian active learning to metric learning, and used an acquisition function based on maximum entropy.
+	
+	
+	
+	
+	\section{Embedded models}
+	\label{sec:embedded}
+	So far, we have assumed that $\theta$, the parameters of interest, and $\theta$, the full set of model parameters, are one and the same.
+	In this section, we explore the case in which the parameters of interest and the full set of model parameters are different.
+	Model selection \citep{vanlier2014optimal,drovandi2014sequential}, in which we are only interesting in deciding which model is correct and not interested in learning the exact model parameters, is one important example of this setting.
+	Bayesian optimisation (Sec.~\ref{sec:bo}) is also an example in which we have a probability model for an unknown function, but we are only interest in learning the location of the maximum of that function.
+	
+	For this more general case, we assume that the model is fully specified by a set of parameters $\psi$, and that our parameters of interest $\theta$ are a function of the full parameter set $\theta=f_\theta(\psi)$. In this case, the full joint distribution of the model is $p(\psi,y|\xi)$, and we obtain a joint over $\Theta \times \mathcal{Y}$ by integrating 
+	\begin{equation}
+	p(\theta,y|\xi) = \int_{f_\theta^{-1}(\{\theta\})} p(\psi,y|\xi)\,d\psi.
+	\end{equation}
+	
+	\paragraph{Semi-implicit likelihood}
+	The embedded model setting allows us to extend our discussion of explicit and implicit models (Sec.~\ref{sec:explicit_implicit}).
+	It could be the case that we do have an explicit prior for $\psi$ and an explicit likelihood $p(y|\psi,\xi)$ for the observation $y$ given the full set of parameters $\psi$.
+	Then the likelihood $p(y|\theta,\xi)$ is given by
+	\begin{equation}
+	\label{eq:qoi}
+	p(y|\theta,\xi) = \int_{f_\theta^{-1}(\{\theta\})} p(y|\psi,\xi)\,d\psi,
+	\end{equation}
+	and the prior is given by
+	\begin{equation}
+	\label{eq:semi_implicit_prior}
+	p(\theta) = \int_{f_\theta^{-1}(\{\theta\})} p(\psi)\,d\psi.
+	\end{equation}
+	First, note that $p(\theta,y|\xi) \ne p(\theta)p(y|\theta,\xi)$ in an embedded model.
+	Second, computing one or both of these integrals may be an intractable computation.
+	We use the term \emph{semi-implicit} for this case in which the likelihood or prior for $\psi$ is explicit, but the likelihood or prior for $\theta$ involves an intractable integral.
+	So a semi-implicit likelihood is one which is formed as an integral of an explicit likelihood $p(y|\psi,\xi)$ and a semi-implicit prior is one which is an integral of explicit prior $p(\psi)$.
+	
+	
+	\paragraph{Exchangeability}
+	In an exchangeable embedded model, it is no longer true that different experiments are independent \emph{conditional on $\theta$}.
+	Intuitively, the reason for this is that one experiment gives us information about \emph{all of} $\psi$.
+	Without extra assumptions, information from the first experiment tells us something about $\psi$ even when we condition on $\theta$, and this influences the predictive distribution for the second experiment.
+	More formally, the factorisation \eqref{eq:exchangeable_joint} must be replaced by a factorisation conditional on $\psi$, and the natural assumption to make is that experiments are independent conditional on $\psi$
+	\begin{equation}
+	\label{eq:exchangeable_joint_psi}
+	p(\psi,y_{1:T}|\xi_{1:T}) = p(\psi)\prod_{t=1}^T p(y_t|\psi,\xi_t).
+	\end{equation}
+	
+	\paragraph{Sequential learning with greedy acquisition}
+	One of the consequences of \eqref{eq:exchangeable_joint_psi} is that Algorithm~\ref{alg:pool} is not quite correct for an embedded model.
+	Specifically, between iterations, it is necessary to update the full model on $\psi$ by fitting $p(\psi|\mathcal{D}_t)$, it is not enough to update beliefs about $\theta$.
+	
+	
+	
+	
+	\subsection{Expected Information Gain for embedded models}
+	\label{sec:embedded_eig}
+	The EIG can naturally extend to the case of embedded models.
+	The definition of information gain on the parameter of interest $\theta$ remains the same: $U_\mathcal{I}(\xi,y) = \E_{p(\theta|\xi,y)}[\log p(\theta|y,\xi)] - \E_{p(\theta)}[\log p(\theta)]$.
+	When we take the expectation over $y$, however, we use the Bayesian marginal that integrates over all of $\psi$, i.e.~$p(y|\xi) = \E_{p(\psi)}[p(y|\psi,\xi)]$, to give
+	\begin{equation}
+	I(\xi) = \E_{p(\psi)p(\theta|\psi)p(y|\psi,\xi)}\left[\log \frac{p(\theta|y,\xi)}{p(\theta)} \right].
+	\end{equation}
+	where $p(\theta|\psi)$ is a delta function on $f_\theta(\psi)$.
+	This is different to the definition in \eqref{eq:posterior_prior_ratio} because the expectation is taken over $p(\theta,y|\xi) \ne p(\theta)p(y|\theta,\xi)$ for an embedded model.
+	The EIG in an embedded model can also be expressed in BALD form (Proposition~\ref{prop:bald}) as
+	\begin{align}
+	I(\xi) &= H[p(y|\xi)] - \E_{p(\theta)}[H[p(y|\theta,\xi)]] \\
+	&=H\left[\E_{p(\psi)}[p(y|\psi,\xi)]\right] - \E_{p(\psi)p(\theta|\psi)}[H[p(y|\theta,\xi)]],
+	\end{align}
+	where the second line emphasises the difference with the standard case.
+	
+	
+	%As we have seen, in experimental design it may be that the parameter of interest $\theta$ and the full set of model parameters $\psi$ are not the same.
+	%We say that the parameter of interest $\theta$ is \emph{sufficient}\footnote{Sufficiency is not the same as the previous distinction between explicit and implicit likelihoods.
+	%	It is possible to envisage a model with $\theta$ as the only parameter in which \eqref{eq:sufficientexchangeable_joint} holds, but for which the likelihood $p(y|\theta,\xi)$ is computationally intractable.
+	%	When $\theta$ is not sufficient and there is a richer model with parameters $\psi$, we might be able to integrate out $\psi$ analytically so that $p(y|\theta,\xi)$ is known (explicit likelihood), we might know $p(y|\psi,\xi)$ but not be able to solve the integral \eqref{eq:qoi} (semi-implicit), or simply have no likelihood available (fully implicit).} in an exchangeable model, if experiments are independent conditional \emph{on $\theta$},~i.e.
+	%\begin{equation}
+	%\label{eq:sufficientexchangeable_joint}
+	%p(\theta,y_{1:T}|\xi_{1:T}) = p(\theta)\prod_{t=1}^T p(y_t|\theta,\xi_t).
+	%\end{equation}
+	
+	
+	\subsection{Computational methods for semi-implicit likelihood models}
+	
+	The NMC estimator of the EIG \citep{ryan2003estimating} can be extended to the semi-implicit case.
+	The central idea is that we form a Monte Carlo estimator of both $p(y|\theta,\xi)$ and $p(y|\xi)$ using appropriate Monte Carlo integrals over $\psi$.
+	As in the standard NMC estimator, we have
+	\begin{equation}
+	p(y|\xi)  = \E_{p(\psi)}[p(y|\psi,\xi)] \approx \frac{1}{M} \sum_{m=1}^M p(y|\psi_m,\xi) \text{ where } \psi_1,\dots,\psi_M \iid p(\psi).
+	\end{equation}
+	For $p(y|\theta,\xi)$, we need access to samples from the distribution $p(\psi|\theta)$. Then,
+	\begin{equation}
+	p(y|\theta,\xi)  = \E_{p(\psi|\theta)}[p(y|\psi,\xi)] \approx \frac{1}{M} \sum_{m=1}^M p(y|\psi_m,\xi) \text{ where } \psi_1,\dots,\psi_M \iid p(\psi|\theta).
+	\end{equation}
+	Combining, we have the semi-implicit NMC estimator of EIG
+	\begin{equation}
+	\hat{I}_\text{SI-NMC}(\xi) = \frac{1}{N} \sum_{n=1}^N \left[ \log\left( \frac{1}{M} \sum_{m=1}^M p(y_n|\psi_{nm},\xi) \right) - \log \left( \frac{1}{M} \sum_{m=1}^M p(y_n|\psi_m,\xi) \right)\right]
+	\end{equation}
+	where $\theta_n,y_n \iid p(\theta,y|\xi)$, $\psi_m \iid p(\psi)$ and $\psi_{nm} \iid p(\psi|\theta_n)$.
+	
+	
+	\citet{ma2018eddi} considered information acquisition for imputation in a semi-implicit setting. They used a Partial VAE which facilitated estimation of the EIG using the conditional independence assumptions of the model.
+	Extending this, \citet{gong2019icebreaker} considered a similar active imputation scenario. They used $\hat{I}_\text{SI-NMC}(\xi)$ to estimate an information criterion for experimental design.
+	In their probabilistic model, they had $\psi = (\theta,z)$ with $p(\psi) = p(\theta)p(z)$.
+	When conditioning on data $\mathcal{D}_t$, they used approximate inference in which the independence of $\theta$ and $z$ was maintained.
+	Under these conditions, sampling $p(\psi|\theta)$ amounted to fixing $\theta$ and taking new, independent samples of $z$. A simplified form of their estimator is
+	\begin{equation}
+	\hat{I}_\text{Icebreaker}(\xi) = \frac{1}{N} \sum_{n=1}^N \left[ \log\left( \frac{1}{M} \sum_{m=1}^M p(y_n|\theta_n,z_m,\xi) \right) - \log \left( \frac{1}{ML}  \sum_{m=1}^M \sum_{\ell=1}^L p(y_n|\theta_\ell,z_m,\xi) \right)\right]
+	\end{equation}
+	where $\theta_n,y_n \iid p(\theta,y|\xi)$, $z_m \iid p(z)$ and $\theta'_\ell\iid p(\theta)$.
+	\citet{overstall2017bayesian} considered almost the same setting when estimating the EIG utility. Specifically, they considered a semi-implicit case in which $\psi$ can be partitioned into parameters of interest and \emph{independent} nuisance parameters, and used this semi-implicit NMC estimator for the EIG.
+	
+	
+	
+	
+	
+	
+	\section{Bayesian Optimisation}
+	\label{sec:bo}
+	
+	Bayesian optimisation (BO) \citep{snoek2012practical,shahriari2015taking} considers the problem of finding the maximiser of an unknown objective function
+	\begin{equation}
+	\xi^* = \argmax_{\xi\in\Xi} f(\xi).
+	\end{equation}
+	To deal with the unknown function in a Bayesian manner, we consider a statistical model for $f$ with prior $p(f)$.
+	We assume that we can obtain relatively expensive measurements from the true function $f$ at design points $\xi$.
+	These measurements may be corrupted by noise, meaning that we obtain observations
+	\begin{equation}
+	\label{eq:bo_likelihood}
+	y|\xi,f \sim p(y|f(\xi)),
+	\end{equation}
+	for example, $y = f(\xi) + \varepsilon$ for $\varepsilon \sim N(0,\sigma^2)$.
+	
+	BO can naturally be cast within the framework of Bayesian experimental design.
+	We have designs $\xi$ and observations $y$ connected by the Bayesian model on $f$ and the noise model.
+	The missing piece is to specify the parameter of interest $\theta$.
+	The parameter of interest is not $f$, because Bayesian optimisation is explicitly concerned with \emph{maximising} $f$, meaning that any information about $f$ in regions where it is well below its maximum is not useful.
+	The most common formulation is to take to be the location of the maximiser of $f$ \citep{hernandez2014}, i.e.~$\theta = \argmax_{\xi\in\Xi} f(\xi)$.
+	The fact that $\theta$ is not all of $f$ means that BO is not an explicit likelihood (Sec.~\ref{sec:explicit_implicit}) experimental design problem, nor does it fit into the framework of Bayesian active learning (Sec.~\ref{sec:bal}). 
+	BO is experimental design for an embedded model (Sec.~\ref{sec:embedded}), with the function $f$ playing the role of the richer parameter set $\psi$. We will see that BO has its own character with a wide range of algorithms that apply specifically to the optimisation problem.
+	
+	To set up a BO system, we begin by specifying a Bayesian model for $f$ with prior $p(f)$, and a measurement noise model $p(y|f(\xi))$.
+	We then specify an acquisition function that guides our choice of designs at which we should take measurements.
+	The acquisition function in BO plays the same role as the design criterion in Bayesian experimental design and the acquisition function in active learning---we select the design that maximises the acquisition function to obtain new measurements of $f$.
+	As in active learning, BO typically adopts the \emph{greedy acquisition} approach that was outlined in Sec.~\ref{sec:bal}.
+	The entire approach is summarised in Algorithm~\ref{alg:bo}.
+	
+	We begin by discussing common choices for the Bayesian model and acquisition function in BO.
+	We focus specifically on the Entropy Search family of acquisition rules, highlighting the connection to experimental design with EIG.
+	
+	
+	
+	\subsection{Bayesian models for optimisation}
+	\subsubsection{Parametric models}
+	When the design space $\Xi$ is discrete, the function $f$ can be characterised by a finite number of latent variables.
+	This case is closely connected to theory of multi-armed bandits \citep{lai1985asymptotically}: we can view each $\xi\in\Xi$ as an `arm' of a bandit in a casino. Each arm has an unknown payout, and the aim is to identify the best arm.  Our mathematical set-up specifically relates the pure exploration scenario \citep{bubeck2009pure}, in which final knowledge of the location of the best arm is important, but function evaluations during the course of Algorithm~\ref{alg:bo} are not.
+	Finite-dimensional models such as the Beta-Bernoulli \citep{shahriari2015taking} and the Gaussian \citep{hoffman2014correlation} have been applied in the bandit context.
+	
+	Both Bayesian linear and generalised linear models have been utilised within the Bayesian optimisation context \citep{russo2014learning,shahriari2015taking}. In the bandit context, these models are applied by associating each bandit arm with a feature vector $\mathbf{x}_\xi$, and assuming that the arm payout depends on this feature vector. For a linear model, for example, we would assume $f(\xi) = \langle \mathbf{x}_\xi,\mathbf{w} \rangle$. These models can also be applied to optimisation over continuous design spaces.
+	\citet{snoek2015scalable} considered Bayesian optimisation using a Bayesian neural network as the model for $f$; they specifically took an `adaptive basis regression' approach that is only Bayesian on the last layer of the network.
+	
+	%Bandits \citep{lai1985asymptotically} with Normal inverse gamma \citep{hoffman2014correlation,shahriari2015taking}
+	%Linear models 
+	%Bayesian neural nets \citep{snoek2015scalable}
+	
+	\begin{algorithm}[t]
+		\caption{Bayesian Optimisation \citep{shahriari2015taking}}\label{alg:bo}
+		\begin{algorithmic}
+			\Require Acquisition function $\alpha$,  prior $p(f)$ on function, design space $\Xi$, initial dataset $\mathcal{D}_0$ may be empty.
+			\For{step $t = 1,\dots,T$}
+			\State Find $\xi_t = \argmax_{\xi\in\Xi} \alpha(\xi ; \mathcal{D}_{t-1})$
+			\State Obtain noisy measurement $y_t \sim p(y|f(\xi_t))$ at design $\xi_t$
+			\State Set $\mathcal{D}_{t} = \mathcal{D}_{t-1} \cup \{(\xi_t,y_t)\}$ and retrain the model to compute $p(f|\mathcal{D}_t)$
+			\EndFor
+			\State Use $p(f|\mathcal{D}_{T})$ to estimate the maximiser of $f$.
+		\end{algorithmic}
+	\end{algorithm}
+	
+	\subsubsection{Nonparametric models}
+	For continuous Bayesian optimisation, the Gaussian Process (GP) \citep{williams2006gaussian} has proved an extremely popular Bayesian nonparametric model for the unknown function $f$ \citep{osborne2009gaussian}.
+	The Gaussian process with a positive definite kernel $k$ and mean function $\mu$ assumes the following multivariate Gaussian distribution for the finite-dimensional marginal distributions \citep{oksendal2003stochastic} of $f$
+	\begin{equation}
+	\label{eq:gp}
+	\begin{pmatrix}
+	f(\xi_1) \\
+	\vdots \\
+	f(\xi_n)
+	\end{pmatrix}
+	\sim 
+	N \left(
+	\begin{pmatrix}
+	\mu(\xi_1)\\
+	\vdots\\
+	\mu(\xi_n)
+	\end{pmatrix},
+	\begin{pmatrix}
+	k(\xi_1,\xi_1) & \dots & k(\xi_1,\xi_n)\\
+	\vdots &  & \vdots \\
+	k(\xi_n,\xi_1) & \dots & k(\xi_n,\xi_n)
+	\end{pmatrix}
+	\right).
+	\end{equation}
+	Given a dataset of observations $\mathcal{D}_t = \{(\xi_i,y_i)\}_{i=1}^t$, the resulting posterior on $f$ is also a Gaussian process. The mean and covariance structure of the posterior can be derived by computing the conditional form of \eqref{eq:gp}, however, the necessary matrix computations come at cubic cost $\mathcal{O}(t^3)$; we refer to \citet{williams2006gaussian} for full details.
+	As a mark of its popularity, BO with a GP model for $f$ has been implemented in several software frameworks, such as BoTorch \citep{balandat2020botorch}.
+	
+	Within Bayesian optimisation, several extensions of the GP have also been considered as models for $f$.
+	Different variants of \emph{sparse} GPs have been proposed \citep{quinonero2005unifying,snelson2006sparse,lazaro2010sparse}, aiming to reduce the computational burden of using the standard GP conditioning formula.
+	\citet{calandra2016manifold} combined GPs with feature learning to propose the Manifold GP.
+	
+	Beyond the GP family, \citet{hutter2013evaluation} also considered a random forest model for $f$, but found GPs to be preferable.
+	Focusing on the application of hyperparameter optimisation, \citet{bergstra2011algorithms} proposed the Tree-structured Parzen Estimator model for $f$ that combines a tree-structured hierarchy with mixture modelling.
+	Finally, \citet{neiswanger2019probo} considered Bayesian optimisation in which an arbitrary probabilistic program is used as the model for $f$.
+	
+	
+	%GPs \citep{snoek2012practical}
+	%SSGP \citep{lazaro2010sparse}
+	%Manifold GP \citep{calandra2016manifold}
+	%Rand forest \citep{hutter2013evaluation}
+	%Tree-structured Parzen Estimator \citep{bergstra2011algorithms}
+	%Probabilistic programs \citep{rainforth2016bayesian}
+	
+	
+	\subsection{Acquisition functions}
+	
+	\subsubsection{The Entropy Search family}
+	To define an information-theoretic acquisition function for Bayesian optimisation, we want to gain information about the random variable $\theta = \argmax_{\xi\in\Xi} f(\xi)$.
+	To this end, \citet{villemonteix2009informational} proposed Stepwise Uncertainty Reduction (SUR).
+	This method aims to reduce posterior entropy in $\theta$ using the acquisition rule
+	\begin{equation}
+	\alpha_\text{SUR}(\xi;\mathcal{D}_t) := -\E_{p(y|\xi,\mathcal{D}_t)}[H[p(\theta|\mathcal{D}_t \cup \{(\xi,y)\})]].
+	\end{equation}
+	where $p(y|\xi,\mathcal{D}_t) = \E_{p(f|\mathcal{D}_t)}[p(y|f(\xi))]$.
+	In practice, \citet{villemonteix2009informational} estimated the acquisition function by discretising $\theta$ and using a GP model for $f$.
+	\citet{hennig2012entropy} considered a closely related acquisition function called Entropy Search (ES) that maximises the KL-divergence between the posterior on $\theta$ and a base measure $b(\theta)$.
+	This gives the acquisition function
+	\begin{equation}
+	\alpha_\text{ES}(\xi;\mathcal{D}_t) := \E_{p(y|\xi,\mathcal{D}_t)}[\text{KL}[p(\theta|\mathcal{D}_t \cup \{(\xi,y)\}) \| b(\theta)]].
+	\end{equation}
+	The following Proposition, due to \citet{mackay1992information}, shows that these in information measures are equivalent, and are equivalent to the EIG.
+	% Fortunately, \citet{mackay1992information}  (The theorem of \citet{mackay1992information} is more general, and did not refer explicitly the later methods SUR and ES.)
+	\begin{proposition}[\citet{mackay1992information}]
+		Consider the general experimental design set-up of Sec.~\ref{sec:bed}. The following acquisition functions all give the same optimal design
+		\begin{align}
+		\mathcal{I}(\xi) &= \E_{p(y|\xi)}\left[ \E_{p(\theta|\xi,y)}[\log p(\theta|\xi,y)]-\E_{p(\theta)}[\log p(\theta)] \right], \\
+		\mathcal{I}_2(\xi) &= -\E_{p(y|\xi)}[H[p(\theta|\xi,y)]], \\
+		\mathcal{I}_3(\xi) &= \E_{p(y|\xi)}[\textup{KL}[p(\theta|\xi,y) \| b(\theta)]]
+		\end{align}
+		where $p(y|\xi) = \E_{p(f)}[p(y|f(\xi))]$.
+	\end{proposition}
+	\begin{proof}
+		We have
+		\begin{align}
+		\mathcal{I}(\xi) &= \E_{p(y|\xi)}\left[ \E_{p(\theta|\xi,y)}[\log p(\theta|\xi,y)]-\E_{p(\theta)}[\log p(\theta)] \right] \\
+		&= \E_{p(y|\xi)}[- H[p(\theta|\xi,y)] + H[p(\theta)] ] \\
+		&=  \mathcal{I}_2(\xi) + H[p(\theta)].
+		\end{align}
+		and
+		\begin{align}
+		\mathcal{I}(\xi) &= \E_{p(y|\xi)}\left[ \E_{p(\theta|\xi,y)}[\log p(\theta|\xi,y)]-\E_{p(\theta)}[\log p(\theta)] \right] \\
+		&= 	\E_{p(y|\xi)}\left[ \E_{p(\theta|\xi,y)}\left[\log \frac{p(\theta|\xi,y)}{b(\theta)}\right]-\E_{p(\theta)}\left[\log \frac{p(\theta)}{b(\theta)}\right] \right] \\
+		&= \mathcal{I}_3(\xi) - \textup{KL}[p(\theta)\|b(\theta)].
+		\end{align}
+		Since $H[p(\theta)]$ and $\textup{KL}[p(\theta)\|b(\theta)]$ do not depend on $\xi$, choosing $\xi$ to maximise EIG is equivalent to maximising $\mathcal{I}_2$ and $\mathcal{I}_3$.
+		%	For ES, we have
+		%	\begin{align}
+		%		\alpha_\text{ES}(\xi;\mathcal{D}_t) &= \E_{p(y|\xi,\mathcal{D}_t)}[\text{KL}[p(\theta|\mathcal{D}_t \cup \{(\xi,y)\}) \| b(\theta)]] \\
+		%		&= \E_{p(y|\xi,\mathcal{D}_t)}\E_{p(\theta|\mathcal{D}_t \cup \{(\xi,y)\})}\left[\log\frac{p(\theta|\mathcal{D}_t \cup \{(\xi,y)\})}{b(\theta)} \right] \\
+		%		&= \E_{p(\theta|\mathcal{D}_t)p(y|\xi,\theta)}\left[\log\frac{p(\theta|\mathcal{D}_t \cup \{(\xi,y)\})}{b(\theta)} \right] \\
+		%		&= \E_{p(\theta|\mathcal{D}_t)p(y|\xi,\theta)}\left[\log\frac{p(\theta|\mathcal{D}_t \cup \{(\xi,y)\})}{p(\theta|\mathcal{D}_t)} \right] + \E_{p(\theta|\mathcal{D}_t)}\left[\log \frac{p(\theta|\mathcal{D}_t)}{b(\theta)} \right] \\ 
+		%		&= \mathcal{I}(\xi;\mathcal{D}_t) + \E_{p(\theta|\mathcal{D}_t)}\left[\log \frac{p(\theta|\mathcal{D}_t)}{b(\theta)} \right].
+		%	\end{align}
+		%	Since the term $\E_{p(\theta|\mathcal{D}_t)}\left[\log \frac{p(\theta|\mathcal{D}_t)}{b(\theta)} \right]$ does not depend on $\xi$, we see that ES is also equivalent to EIG maximisation.
+	\end{proof}
+	
+	\begin{corollary}
+		Stepwise Uncertainty Reduction \citep{villemonteix2009informational} and Entropy Search \citep{hennig2012entropy} are equivalent to EIG maximisation when $\theta = \argmax_{\xi\in\Xi} f(\xi)$.
+	\end{corollary}
+	\begin{proof}
+		Note that $\mathcal{I}_2 = \alpha_\text{SUR}$ and $\mathcal{I}_3 = \alpha_\text{ES}$ when we replace the prior $p(\theta)$ with the posterior $p(\theta|\mathcal{D}_t)$. 
+		Since the result holds for a general experimental design set-up, it specifically holds in the BO case when $\theta = \argmax_{\xi\in\Xi} f(\xi)$.
+	\end{proof}
+	
+	\citet{hernandez2014} proposed Predictive Entropy Search (PES).
+	Like previous methods, PES uses the EIG (accounting for the embedded model, as in Sec.~\ref{sec:embedded_eig}) as their acquisition function
+	\begin{equation}
+	\alpha_\text{PES}(\xi;\mathcal{D}_t) = \mathcal{I}(\xi;\mathcal{D}_t) = H[p(\theta|\mathcal{D}_t)] - \E_{p(y|\xi,\mathcal{D}_t)}[ H[p(\theta|\mathcal{D}_t \cup \{(\xi,y)\})]].
+	\end{equation}
+	However, the authors utilise the same insight as \citet{houlsby2011bayesian} to write EIG in the equivalent form (see Proposition~\ref{prop:bald})
+	\begin{equation}
+	\mathcal{I}(\xi;\mathcal{D}_t) = H[p(y|\xi,\mathcal{D}_t)] - \E_{p(\theta|\mathcal{D}_t)}[ H[p(y|\xi,\mathcal{D}_t,\theta)]].
+	\end{equation}
+	Within a GP model, the first term can be computed analytically, whilst the second is approximated by drawing samples of $\theta|\mathcal{D}_t$ and estimating $H[p(y|\xi,\mathcal{D}_t,\theta)]$ using expectation propagation \citep{minka2001family}.
+	PES can be extended to batch acquisition in which we query $f$ at multiple locations simultaneously on each iteration \citep{shah2015parallel}.
+	
+	In Maximum Entropy Search (MES) \citep{wang2017max}, the authors approach the problem differently. Instead of focusing on the latent variable of interest $\theta = \argmax_{\xi\in\Xi} f(\xi)$, they instead formulate the problem with variable of interest $\theta_m = \max_{\xi\in\Xi} f(\xi)$. Here, $\theta_m$ is a one-dimensional random variable that represents the maximum \emph{value} of the function $f$, rather than its $\argmax$.
+	The objective function for MES is then the EIG between a new observation $y$ at design $\xi$ and their parameter of interest $\theta_m$
+	\begin{equation}
+	\alpha_\text{MES}(\xi;\mathcal{D}_t) = H[p(y|\xi,\mathcal{D}_t)] - \E_{p(\theta_m|\mathcal{D}_t)}[ H[p(y|\xi,\mathcal{D}_t,\theta_m)]].
+	\end{equation}
+	The MES objective may be easier to compute than PES with a GP model for $f$ because $\theta_m$ is always one dimensional.
+	
+	Computationally, a distinctive feature of BO with a GP model that sets it apart from computing the EIG in standard models (Sec.~\ref{sec:computation}) is that many calculations can be performed analytically for the GP. 
+	For example, $H[p(y|\xi,\mathcal{D}_t)]$ is computed analytically in the PES acquisition function---this calculation would be intractable in a general model.
+	
+	%\emph{Not sure about this next paragraph, needs work}
+	%\paragraph{How does BO fit into Bayesian experimental design?}
+	%We have seen that many of the most popular acquisition rules for BO are forms of the EIG, making a strong formal connection between BO and Bayesian experimental design.
+	%However, as with active learning, there are practical differences between the typical applications.
+	%For BO, using a GP as a model for $f$ is common. The GP is a powerful model for which various calculations can be performed analytically, 
+	%Secondly, BO constitutes a semi-implicit model by the definition of Sec.~\ref{sec:explicit_implicit}.
+	%This means that the density $p(y|\theta,\xi)$ is not available (for both PES and MES), so a wide range of computational approaches to Bayesian experimental design that assume an explicit likelihood cannot be applied.
+	
+	
+	
+	
+	\subsubsection{Other acquisition functions}
+	
+	
+	\paragraph{Probability of improvement} Perhaps the simplest acquisition rule, probability of improvement \citep{kushner1964new} computes the probability that $f(\xi)$ is greater than some threshold $\tau$
+	\begin{equation}
+	\alpha_\text{PI}(\xi; \mathcal{D}_t) := \sP(f(\xi) < \tau | \mathcal{D}_t).
+	\end{equation}
+	Typically, the threshold $\tau$ is chosen adaptively to be the best objective value seen so far: $\tau_t = \max \{y_1,\dots,y_t\}$.
+	
+	\paragraph{Expected improvement} A related acquisition rule is expected improvement \citep{mockus1978application}. This incorporates the amount by which the function value can be expected to increase at the location $\xi$, giving
+	\begin{equation}
+	\alpha_\text{EI}(\xi; \mathcal{D}_t) := \E((f(\xi) - \tau)_+ | \mathcal{D}_t)
+	\end{equation}
+	where $x_+ = \max(0, x)$.
+	
+	\paragraph{Upper confidence bound}
+	Starting with theoretical work on multi-armed bandits \citep{lai1985asymptotically}, upper confidence bound (UCB) acquisition rules have been popular.
+	\citet{srinivas2009gaussian} explicitly considered the application of UCB functions with a GP model for BO.
+	In its most general form, we let $q_p(\cdot)$ denote to the $p$-quantile of a univariate distribution. Then the UCB-$p$ acquisition function is
+	\begin{equation}
+	\alpha_{\text{UCB-}p}(\xi;\mathcal{D}_t) := q_p(f(\xi) | \mathcal{D}_t).
+	\end{equation}
+	In the Gaussian case, $f(\xi) | \mathcal{D}_t \sim N(\mu(\xi|\mathcal{D}_t),\sigma(\xi|\mathcal{D}_t)^2)$, an equivalent parametrisation of the UCB acquisition function is
+	\begin{equation}
+	\alpha_{\text{UCB-}p}(\xi;\mathcal{D}_t) = \mu(\xi|\mathcal{D}_t) + \beta_p \sigma(\xi|\mathcal{D}_t)
+	\end{equation}
+	where $\beta_p$ is the $p$-quantile of the standard Normal distribution.
+	
+	\paragraph{Thompson sampling} \citet{thompson1933likelihood} proposed a \emph{stochastic} acquisition rule for Bayesian optimisation.
+	Given a sample of the functional posterior $f_t \sim p(f|\mathcal{D}_t)$, Thompson Sampling chooses the maximiser of this sample as the next sampling location. This amounts to using the acquisition function
+	\begin{equation}
+	\alpha_\text{TS}(\xi;\mathcal{D}_t) = f_t(\xi) \text{ where } f_t \sim p(f|\mathcal{D}_t).
+	\end{equation}
+	\citet{hernandez2014} showed how the optimisation of a sample from the GP posterior can be approximately calculated.
+	
+	
+	
+	
+	\section{Sequential Bayesian Experimental Design}
+	\label{sec:sequential}
+	
+	We now lay out the theory of sequential experimentation more formally.
+	Extending the basic sequential framework that we described for active learning in Sec.~\ref{sec:bal}, we suppose that we have a sequence of $T$ experiments.
+	For each experiment, we pick $\xi_t$ \emph{adaptively} using the data that has already been observed\footnote{For an exchangeable model, the order of the data does not matter, so we could write $\mathcal{D}_{t-1} = \{(\xi_1,y_1),\dots,(\xi_{t-1},y_{t-1})\}$, which we implicitly assumed was the case in Sections~\ref{sec:bal} and~\ref{sec:bo}. For a non-exchangeable model, we need to know the order that data was collected to conduct valid inference.} $\mathcal{D}_{t-1} = (\xi_1,y_1),\dots,(\xi_{t-1},y_{t-1})$.
+	Given this design, we conduct an experiment using $\xi_t$ and obtain outcome $y_t$.
+	After each step of the experiment, our beliefs about $\theta$ are summarised by the posterior $p(\theta|\mathcal{D}_t)$, which is calculated as in Sec.~\ref{sec:seq_data}. For an embedded model (Sec.~\ref{sec:embedded}), we would update our beliefs on the extended parameters $\psi$.
+	For simplicity in this section, we assume we are not in an embedded model, unless otherwise stated, so the parameter $\theta$ is a full description of the model.
+	
+	\paragraph{Policies and objectives}
+	The design $\xi_t$ must be chosen on the basis of $\mathcal{D}_{t-1}$.
+	A general abstraction to describe this is to introduce a \emph{stochastic policy} $\pi(\xi|\mathcal{D}_{t-1})$ that maps from $\mathcal{D}_{t-1}$ to a distribution over designs.
+	A special case of this is a deterministic policy, for which $\xi_t$ is simply a function of $\mathcal{D}_{t-1}$.
+	
+	
+	In the sequential setting, it no longer makes sense to talk of the optimality of individual designs.
+	Indeed, we cannot say whether a design $\xi_2$ will be optimal until we have observed the outcome $y_1$.
+	Instead, we can describe optimality in terms of the \emph{policy}---the policy which makes the best decision for $\xi_2$ for every possible value of $y_1$ would be an optimal policy.
+	
+	Optimality also requires a criterion, so we must extend the utility-based approach of Sec.~\ref{sec:bed} based on \citet{lindley1972} to the sequential setting.
+	Perhaps the most natural extension of Lindley's original theory, which is used implicitly by \citet{huan2016sequential,foster2021dad} is to consider a final utility, or reward, which is obtained after all data has been collected. In this \emph{terminal reward} framework, we assume that we have a utility function $U(\theta,\mathcal{D}_T)$. Once we have collected all our data, we have expected utility $\E_{p(\theta|\mathcal{D}_T)}[U(\theta,\mathcal{D}_T)]$.
+	The optimal policy, therefore, is the natural counterpart to \eqref{eq:general_u}, namely
+	\begin{equation}
+	\label{eq:policy_general_u}
+	\pi^* = \argmax_\pi \E_{p(\mathcal{D}_T|\pi)}\left[ \E_{p(\theta|\mathcal{D}_T)}[U(\theta,\mathcal{D}_T)] \right]
+	\end{equation}
+	where $p(\mathcal{D}_T|\pi) = \E_{p(\theta)}\left[\prod_{t=1}^T \pi(\xi_t|\mathcal{D}_{t-1})p(y_t|\theta,\xi_t)  \right]$ for an exchangeable model\footnote{For a non-exchangeable model, it would be $p(\mathcal{D}_T|\pi) = \E_{p(\theta)}\left[\prod_{t=1}^T \pi(\xi_t|\mathcal{D}_{t-1})p(y_t|\theta,\xi_t,\mathcal{D}_{t-1})  \right]$}.
+	The whole sequential experiment process is described in Algorithm~\ref{alg:seq}.
+	
+	\begin{algorithm}[t]
+		\caption{Terminal reward Sequential Bayesian Experimental Design}\label{alg:seq}
+		\begin{algorithmic}
+			\Require Prior $p(\theta)$, model $p(y|\xi,\theta)$, initial data $\mathcal{D}_0$ may be empty.
+			\For{step $t = 1,\dots,T$}
+			\State Use policy to compute design $\xi_t \sim \pi(\xi|\mathcal{D}_{t-1})$
+			\State Obtain experimental observation $y_t \sim p(y|\theta,\xi_t)$ with design $\xi_t$
+			\State Set $\mathcal{D}_{t} = (\xi_1,y_1),\dots,(\xi_t,y_t)$
+			\EndFor
+			\State Obtain reward $U(\theta,\mathcal{D}_T)$
+		\end{algorithmic}
+	\end{algorithm}
+	
+	\paragraph{Sequential EIG}
+	The natural extension of EIG to the sequential setting is to let \citep{foster2021dad}
+	\begin{equation}
+	\label{eq:seq_ig}
+	U_\mathcal{I}(\mathcal{D}_T) = H[p(\theta)] - H[p(\theta|\mathcal{D}_T)]
+	\end{equation}
+	or equivalently \citep{huan2016sequential}
+	\begin{equation}
+	U_\text{KL}(\mathcal{D}_T) = \text{KL}[p(\theta|\mathcal{D}_T) \| p(\theta)].
+	\end{equation}
+	The intuition behind this utility is to reduce our uncertainty in the value of $\theta$ from the sum total of all our experiments.
+	It is in the sequential setting that the naturalness of using information-theoretic objectives for experimental design becomes most apparent.
+	\begin{example}[\citet{shannon1948mathematical,lindley1956}]
+		\label{example:shannon}
+		Consider a model with $\theta = (L,R)$ where $L$ and $R$ are discrete random variables with independent uniform priors $\theta \sim \textup{Unif}(n_L) \times \textup{Unif}(n_R)$.
+		Suppose we have two experimental designs at our disposal: $\xi_L$ and $\xi_R$ which produce noiseless outcomes giving the values of $L$ and $R$ respectively.
+		Then, the utility of the sequence of experiments $\xi_L,\xi_R$ is equal to sum of the utilities of the separate experiments $\xi_L$ and $\xi_R$,~i.e.
+		\begin{equation}
+		U_\mathcal{I}((\xi_L,L),(\xi_R,R)) = U_\mathcal{I}((\xi_L, L)) + U_\mathcal{I}((\xi_R, R)).
+		\end{equation}
+	\end{example}
+	\begin{proof}
+		Direct calculation using \eqref{eq:seq_ig} gives
+		\begin{align}
+		U_\mathcal{I}((\xi_L,L),(\xi_R,R)) &= \log (n_Ln_R) = \log n_L + \log n_R \\
+		U_\mathcal{I}((\xi_L, L)) &= \log n_L \\
+		U_\mathcal{I}((\xi_R, R)) &= \log n_R.
+		\end{align}
+	\end{proof}
+	\citet{shannon1948mathematical} showed that this property (along with other technical requirements) can only be satisfied by utilities based on entropy, making the EIG arguably the most natural criterion for sequential Bayesian experimental design.
+	
+	\paragraph{Static and batch policies}
+	One simple approximation to the optimal policy is to select all designs $\xi_1,\dots,\xi_T$ before the start of the experiment.
+	This is known as \emph{static} design, also called \emph{open-loop} design \citep{distefano2014schaum}.
+	In effect, static design collapses the sequential design problem back into the one-step problem of Sec.~\ref{sec:bed}, albeit with a larger design space 
+	\begin{equation}
+	\Xi^T = \{ (\xi_1,\dots,\xi_T):  \xi_t \in  \Xi \text{ for all } t \}
+	\end{equation}
+	and corresponding observation space.
+	The probabilistic model is also augmented as in Sec.~\ref{sec:seq_data}.
+	Unfortunately, static design may be arbitrarily worse than the performance of the best fully adaptive policy.
+	% Unforunately, there is no guarantee on the relative performance of static design compared to a fully adaptive design policy (in which $\xi_t$ can adapt to $\mathcal{D}_{t-1}$ as in  Algorithm~\ref{alg:seq}).
+	
+	Rather than choosing all $T$ designs upfront, we could instead choose design in batches of $B$.
+	There can be practical benefits for choosing designs in batches \citep{lyu2019ultra}, as opposed to choosing them individually.
+	Mathematically, this \emph{batch} design procedure fits back into the sequential theory we have already laid out, with batches of designs being chosen from the new design space $\Xi^B$.
+	Static design corresponds to the case $B=T$ in which we stop after one batch.
+	Batch design in active learning is discussed on page~\pageref{sec:batchbald}.
+	
+	
+	
+	
+	\subsection{Greedy design policies}
+	\label{sec:greedy}
+	
+	Designing a policy to solve \eqref{eq:policy_general_u} can be challenging. 
+	One common approximate strategy is \emph{greedy} design (also called \emph{myopic} design).
+	A greedy policy can be characterised as choosing each design $\xi_t$ assuming that this is the final experiment---i.e.~that once $\xi_t$ has been chosen and $y_t$ observed, the sequence of experiments will terminate.
+	This means that the greedy policy will choose $\xi_t$ to maximise 
+	\begin{equation}
+	\label{eq:greedy_general_u}
+	\xi_t^* = \argmax_{\xi\in\Xi} \E_{p(y|\xi_t,\mathcal{D}_{t-1})}\left[ \E_{p(\theta|\mathcal{D}_t)}[U(\theta,\mathcal{D}_t)] \right].
+	\end{equation}
+	where $p(y|\xi_t,\mathcal{D}_{t-1}) = \E_{p(\theta|\mathcal{D}_{t-1})}[p(y|\theta,\xi)]$.
+	We can see that this amounts to solving the one-step design optimisation problem of \eqref{eq:general_u} at each $t$, with the important distinction that we \emph{replace the original prior $p(\theta)$ with the posterior given existing data $p(\theta|\mathcal{D}_{t-1})$}.
+	This agrees exactly with the greedy acquisition strategy described in Section~\ref{sec:bal}.
+	
+	There is a subtle distinction when $\theta$ is embedded in a larger model with parameters $\psi$ (Sec.~\ref{sec:embedded})---we must update our beliefs about all the parameters to $p(\psi|\mathcal{D}_{t-1})$ and use the predictive distribution $p(y|\xi_t,\mathcal{D}_{t-1}) = \E_{p(\psi|\mathcal{D}_{t-1})}[p(y|\psi,\theta)]$ for $y$.
+	This agrees with the greedy acquisition strategy of Section~\ref{sec:bo}, where we update the full model on the unknown function $f$ at each step.
+	
+	The greedy (myopic) approach to experimental design is very widely adopted \citep{cavagnaro2010adaptive,drovandi2014sequential,mcgree2012adaptive,myung2013,foster2019variational}.
+	As noted, it is also the typical sequential optimisation strategy in Bayesian active learning and Bayesian optimisation.
+	One benefit of the greedy strategy is its simplicity---it effectively reduces the sequential experimental design problem to repeated applications of one-step design.
+	It is typically observed that greedy optimisation for experimental design does not fail as catastrophically as greedy policies can do in general reinforcement learning tasks \citep{,bakker2020experimental}.
+	We explore a possible theoretical explanation for this phenomenon.
+	
+	% In Sec.~\ref{sec:greedy}, we explore theoretical analysis of the greedy strategy. We show that, for certain utilities, the greedy strategy can achieve an expected utility that is at least $(1 - 1/e)$ of the expected utility of the fully optimal policy.
+	
+	\subsubsection{Submodularity}
+	\label{sec:submodular}
+	How much do we lose by using a greedy approach?
+	A key theoretical tool for studying greedy policies is the notion of \emph{submodularity} \citep{krause2014submodular}.
+	In short, if a utility function obeys submodularity (and a number of other conditions), then the theorem of \citet{nemhauser1978analysis} proves that a greedy strategy can achieve at least $(1 - 1/e) \approx 63\%$ of the best possible utility.
+	
+	To precisely define submodularity, we must first define several other concepts.
+	For any (finite) set $V$, the \emph{power set} of $V$ is $2^V = \{ S: S \subseteq V \}$.
+	A \emph{set function} is any function $g: 2^V \to \sR$.
+	The \emph{discrete derivative} of $g$ is defined as 
+	\begin{equation}
+	\Delta_g (e | S)  = g( S \cup \{ e \}) - g(S),
+	\end{equation}
+	i.e.~ the extra value of adding element $e$ to the set $S \subseteq V$.
+	A set function $g: 2^V $ is \emph{submodular} if, for every $A \subseteq B \subseteq V$ and for every $e \in V \setminus B$,
+	\begin{equation}
+	\Delta_g(e|B) \le \Delta_g(e|A).
+	\end{equation}
+	Intuitively, the value of adding $e$ to the larger set $B$ is smaller than the value of adding $e$ to the smaller set $A$.
+	Submodularity captures the intuitive notion of `diminishing returns'.
+	We also define a set function to be \emph{monotone} if, for $A \subseteq B \subseteq V$, we have
+	\begin{equation}
+	g(A) \le g(B).
+	\end{equation}
+	The \emph{greedy strategy} to maximise a monotone set function is to increment $S$ by adding elements one at a time, following the rule
+	\begin{equation}
+	\label{eq:greedy_set_fun}
+	S_t = S_{t-1} \cup \{ e_t \} \quad\text{where}\quad e_t = \argmax_{e\in V } \Delta_g(e|S_{t-1}).
+	\end{equation}
+	The following theorem of \citet{nemhauser1978analysis} shows that the greedy strategy performs near-optimally for submodular set functions.
+	\begin{theorem}[\citet{nemhauser1978analysis}] \label{thm:submodular}
+		Let $g$ be a monotone, submodular set function $g : 2^V \to \sR$.
+		Let $(S_t)_{t\ge 0}$ be obtained by the greedy strategy of \eqref{eq:greedy_set_fun}.
+		Then for any $t\le |V|$ we have
+		\begin{equation}
+		g(S_t) \ge \left(1 - 1/e\right) \max_{S \subseteq V, |S| = t} g(S).
+		\end{equation}
+	\end{theorem}
+	This theorem proves that the greedy strategy can achieve at least $(1 - 1/e)$ of the best possible performance.
+	
+	\paragraph{Submodularity for static experimental design}
+	There is a direct connection between the theory of submodularity and the \emph{greedy construction of static experimental designs}.
+	Indeed, the static experimental design problem is to choose $(\xi_1,\dots,\xi_T)$ where each $\xi_t \in \Xi$.
+	We assign a value to each static design following \eqref{eq:policy_general_u}
+	\begin{equation}
+	g(\xi_1,\dots,\xi_T) = \E_{p(y_1,\dots,y_T|\xi_1,\dots,\xi_T)}\left[  \E_{p(\theta|\mathcal{D}_T)}[U(\theta, \mathcal{D}_T)] \right].
+	\end{equation}
+	Suppose we could show that $g$ is a monotone, submodular set function. 
+	Then the result of Theorem~\ref{thm:submodular} would apply, meaning that we could construct a static design greedily by adding one element at a time.
+	
+	To satisfy these conditions, we first need $g$ to be invariant to the order of $\xi_1,\dots,\xi_T$; we therefore assume that the model is exchangeable (Sec.~\ref{sec:seq_data}).
+	For the properties of submodularity and monotonicity, we need to choose a utility $U$, here we focus on the EIG with $U_\mathcal{I} = H[p(\theta)]-H[p(\theta|\mathcal{D}_T)]$.
+	Then the function $g$ becomes the mutual information between $\theta$ and $y_1,\dots,y_T$ given $\xi_1,\dots,\xi_T$.
+	\begin{proposition}[\citet{krause2012near}]
+		\label{prop:submodular_mi}
+		Suppose that, for any $k$ and for designs $\xi_1,\dots,\xi_k$, the random variables $y_1|\xi_1,\dots,y_k|\xi_k$ are independent conditional on $\theta$.
+		Then the mutual information 
+		\begin{equation}
+		g(\{\xi_1,\dots,\xi_k\}) = \E_{p(y_1,\dots,y_k|\xi_1,\dots,\xi_k)}\left[ H[p(\theta)]-H[p(\theta|\mathcal{D}_k)] \right]
+		\end{equation}
+		is a monontone, submodular set function.
+	\end{proposition}
+	The conditional independence assumption is equivalent to assuming an exchangeable model (Sec.~\ref{sec:seq_data}) in which $\theta$ is the only model parameter (Sec.~\ref{sec:embedded}).
+	Proposition~\ref{prop:submodular_mi} was also proved by \citet{kirsch2019batchbald} in the context of BatchBALD for active learning.
+	
+	
+	\subsubsection{Adaptive submodularity}
+	
+	The limitation of submodularity as a tool for analysing experimental design is that it does not consider \emph{adaptive} design policies where the choice of a later design could be conditional on the outcome of earlier experiments.
+	To address this limitation, \citet{golovin2011adaptive} introduced the notion of \emph{adaptive submodularity}.
+	
+	To define adaptive submodularity within our framework for experimental design, % we consider a model in which $p(y|\theta,\xi)$ is deterministic. In other words, we focus on noiseless models.
+	we focus on a discrete design space $|\Xi|<\infty$.
+	We can then define the \emph{conditional expected marginal benefit} of a design $\xi$ as
+	\begin{equation}
+	\Delta(\xi|\mathcal{D}_t) = \E_{p(\theta|\mathcal{D}_t)p(y|\theta,\xi)}[U(\theta,\mathcal{D}_t \cup \{ (\xi,y) \}) - U(\theta,\mathcal{D}_t)].
+	\end{equation}
+	The utility $U$ is \emph{adaptive monotone} with respect to model $p(\theta)p(y|\theta,\xi)$ if the conditional expected marginal benefit of all designs is positive. That is, for all $t\ge 0, \mathcal{D}_t$ and $\xi\not\in\mathcal{D}_t$ we have 
+	\begin{equation}
+	\Delta(\xi|\mathcal{D}_t) \ge 0.
+	\end{equation}
+	Furthermore, the utility $U$ is \emph{adaptive submodular} with respect to model $p(\theta)p(y|\theta,\xi)$ if for all $s \le t$ and all nested datasets $\mathcal{D}_s \subseteq \mathcal{D}_t$ and for all designs $\xi \not\in \mathcal{D}_t$ we have
+	\begin{equation}
+	\Delta(\xi|\mathcal{D}_t) \le \Delta(\xi|\mathcal{D}_s).
+	\end{equation}
+	This is a natural generalisation of submodularity for set functions, and again it captures the principle of `diminishing returns'.
+	\citet{golovin2011adaptive} were able to generalise the result of \citet{nemhauser1978analysis} to the adaptive case for noiseless experiments in which $p(y|\theta,\xi)$ is deterministic.
+	\begin{theorem}[\citet{golovin2011adaptive}]
+		\label{thm:adaptive_submodular}
+		Let $\pi^\text{greedy}$ be the greedy policy of \eqref{eq:greedy_general_u}. Assume $U$ is adaptive monotone and adaptive submodular for model $p(\theta)p(y|\theta,\xi)$.
+		Then,
+		\begin{equation}
+		\E_{p(\mathcal{D}_T|\pi^\text{greedy})}\left[ \E_{p(\theta|\mathcal{D}_T)}[U(\theta,\mathcal{D}_T)] \right] \ge \left(1 - 1/e \right)\sup_\pi \E_{p(\mathcal{D}_T|\pi)}\left[ \E_{p(\theta|\mathcal{D}_T)}[U(\theta,\mathcal{D}_T)] \right].
+		\end{equation}
+	\end{theorem}
+	\citet{golovin2010} explored the applicability of this framework to Bayesian active learning and Bayesian experimental design, focusing on the noiseless case in which $p(y|\theta,\xi)$ is deterministic.
+	They proved that the information gain utility $U_\mathcal{I}$ is adaptive monotone and adaptive submodular, so the result of Theorem~\ref{thm:adaptive_submodular} applies in this case.
+	
+	A key results of \citet{chen2015sequential} did away with the noiseless assumption.
+	Instead, they assumed that different experimental outcomes are independent conditional on $\theta$. This matches exactly with the factorisation \eqref{eq:exchangeable_joint}. They also assume that $\theta$ takes finitely many values $|\Theta|<\infty$. The key bound is as follows
+	\begin{theorem}[Theorem 2 of \citet{chen2015sequential}]
+		Let $\pi^\text{greedy}$ be the adaptive greedy experimental design policy. Assume that observations $y$ are conditionally independent given $\theta$.
+		Then, for any $\delta > 0$
+		\begin{equation}
+		\begin{split}
+		\E_{p(\mathcal{D}_T|\pi^\text{greedy})}\left[ U_\mathcal{I}(\mathcal{D}_T) \right]
+		\ge \left(1 - \exp\left[-\frac{1}{\gamma \max \{\log |\Theta|, \log (1/\delta)\}} \right] \right)\left(\sup_\pi \E_{p(\mathcal{D}_T|\pi)}\left[ U_\mathcal{I}(\mathcal{D}_T) \right] - \delta \right)
+		\end{split}
+		\end{equation}
+		where $\gamma$ is a constant that depends on the noise distribution (see \citet{chen2015sequential}), and $U_\mathcal{I}$ is the information gain defined in \eqref{eq:seq_ig}.
+	\end{theorem}
+	\citet{chen2017near} went on to consider the case of noisy and correlated experimental outcomes (violating both the noiseless and the conditionally independent assumptions). %, extending the approach of \citet{golovin2010}.
+	%
+	%They note that, for a finite design space $\Xi$ with noiseless outcomes, any policy $\pi$ can be represented as a decision tree.
+	%The Bayesian active learning problem can thus be recast as the \emph{Optimal Decision Tree (ODT)} problem.
+	%They proved that the information gain utility $U_\mathcal{I}$ is adaptive monotone and adaptive submodular for the ODT problem, and so the result of Theorem~\ref{thm:adaptive_submodular} applies in this case.
+	%
+	%\citet{golovin2010} also explored the case of a noisy model, in which $p(y|\theta,\xi)$ is not deterministic.
+	%They focused on a very specific case of binary outcomes $y\in\{-1,1\}$ in which the response for exactly one $\xi\in\Xi$ is randomly flipped. They introduced the $\text{EC}^2$ algorithm which is designed to solve this problem with a performance guarantee based on Theorem~\ref{thm:adaptive_submodular}.
+	
+	Finally, we note that the expected information gain is \emph{not} adaptive submodular without assumption. This is elucidated by the following example, in which outcomes are not independent conditional on $\theta$.
+	\begin{example}[Inspired by Theorem 9 of \citet{golovin2010}]\label{example:golovin}
+		Consider a model with prior $\theta \sim \textup{Unif}(\{-1, 1\})$ and with $v \sim \textup{Unif}(\{-1, 1\})$.
+		We have two potentially useful designs. $\xi_v$ reports the value of $v$. $\xi_{\theta v}$ reports the value of $\theta v$.
+		We also have $M$ `dummy' designs $\xi^d_1,\dots,\xi^d_M$ which report nothing.
+		Clearly, the optimal strategy to learn $\theta$ is to conduct experiments with $\xi_v$ and $\xi_{\theta v}$ in any order, since $v \cdot \theta v = \theta v^2 = \theta$.
+		However, if we analyse a one-step optimal greedy strategy, we observe that every design apart from $\xi_{\theta v}$ is independent of the value of $\theta$, and hence has EIG 0. We can also verify that, without knowing $v$, the posterior on $\theta$ given the outcome of design $\xi_{\theta v}$ is still $ \textup{Unif}(\{-1, 1\})$, hence the EIG of this design is also 0.
+		Thus the greedy strategy will pick a design at random. If $M$ is very large, the greedy strategy is likely to keep picking dummy designs.
+	\end{example}
+	
+	
+	\subsubsection{Asymptotic theory}
+	
+	A celebrated result of asymptotic statistics is the Bernstein--von Mises Theorem \citep{van2000asymptotic}.
+	In our experimental design set-up, this says that, under certain technical conditions and with i.i.d.~random designs $\xi_t \iid p(\xi)$, the posterior distribution $p(\theta|\mathcal{D}_t)$ is asymptotically Gaussian centred on the true value $\theta^*$ of the parameters of interest and with covariance matrix $t^{-1}M(\theta^*)^{-1}$. (Here, $M(\theta)$ is the Fisher information matrix, taking the expectation over $\xi\sim p(\xi)$.)
+	
+	\citet{paninski2005asymptotic} showed that a closely related result holds when designs are not random, but are chosen by greedy maximisation of the EIG.
+	\begin{theorem}[Theorem 1 of \citet{paninski2005asymptotic}]
+		Under certain technical conditions, the posterior distributions with greedy EIG maximisation are asymptotically Gaussian with mean $\theta^*$ and with covariance matrix $t^{-1}\Sigma_\text{info}$.
+		Furthermore, if $t^{-1}\Sigma_\text{iid}$ is the asymptotic covariance with i.i.d.~random designs, then
+		\begin{equation}
+		\det \Sigma_\text{info} \le \det \Sigma_\text{iid}.
+		\end{equation}
+	\end{theorem}
+	This result tells us that the EIG maximisation strategy is no worse than i.i.d.~sampling of designs, and that it will recover the true value $\theta^*$ in the limit as $t\to\infty$, i.e.~the procedure is statistically consistent.
+	
+	
+	\subsection{Non-greedy design policies}
+	
+	Whilst greedy policies enjoy computational tractability and some theoretical guarantees, a more direct approach to the problem of sequential experimental design is to seek the optimal policy that maximises \eqref{eq:greedy_general_u}.
+	As we discuss in Sec.~\ref{sec:brl}, finding this optimal policy can be cast in the language of reinforcement learning. In this section, we focus on computational approaches that have been suggested in the literature that specifically address non-greedy experimental design. These can generally be organised under two headings.
+	
+	\begin{description}
+		\item[Forward sampling] The forward sampling, or lookahead, family approaches relax the greedy assumption that the next experiment will be the last one.
+		Instead, they assume that there will be $m$ more experiments, and take account of these $m$ future steps when deciding on the next experimental design.
+		As $m$ grows larger, this approach more closely approximates the truly optimal decision.
+		However, with a larger $m$, the number of future outcomes to consider may grow exponentially.
+		Such approaches either try to limit the number of outcomes considered, or else use a smaller value of $m$.
+		\item[Backwards induction] An alternative solution is to begin at the end. 
+		Classical optimisation theory \citep{bellman1966dynamic} shows that sequential optimisation problems are often more easily solved by starting with the final decision to be made at time $T$.
+		For this final decision, the greedy solution is exactly optimal. 
+		The values of designs at later steps can be propagated backwards to inform earlier decisions.
+		(See Sec.~\ref{sec:brl} for a fuller discussion.)
+	\end{description}
+	
+	
+	Non-greedy optimisation has typically been confined to low-dimensional cases within experimental design \citep{ryan2016review}.
+	In medicine, \citet{whitehead1995bayesian} and \citet{whitehead1998bayesian} used a multi-step lookahead when finding optimal treatment doses.
+	\citet{berry1988one} explored optimal stopping when testing a one-sided hypothesis.
+	\citet{lewis1994group} applied backwards induction in a Bayesian clinical trials setting.
+	\citet{carlin1998approaches} used forward sampling in a closely related clinical trial design problem.
+	\citet{brockwell2003gridding} implemented backwards induction on a grid, and applied this to clinical trial planning.
+	\citet{muller2006bayesian} explored forward sampling for dose-response finding in clinical trials.
+	
+	The main work to tackle the more general sequential experimental design problem, using the EIG utility, was \citet{huan2016sequential}.
+	They used approximate dynamic programming to perform backwards induction by estimating the \emph{value function}.
+	The value function was then used to select optimal designs at each stage.
+	The intermediate posterior distributions were estimated on a dynamically adapted grid.
+	
+	In another line of work, \citet{gonzalez2016glasses} build a predictor of future query locations given the current data.
+	This allows them to use a forward sampling approach that is restricted to a single future trajectory.
+	\citet{jiang2020binoculars} use a related approach in which the future query locations are learned by repeatedly solving the \emph{static} design optimisation problem with $T-t$ designs, but only using one of these designs at each step.
+	
+	
+	
+	
+	\section{Bayesian Reinforcement Learning}
+	\label{sec:brl}
+	
+	Reinforcement learning (RL) \citep{sutton1990integrated,szepesvari2010algorithms} has a number of important and fascinating connections to sequential Bayesian experimental design. First, the problem of sequential experimental design is a reinforcement learning problem. Specifically, we will show how the set-up of the preceding section can be cast as a Bayes Adaptive Markov Decision Process (BAMDP) \citep{ross2007bayes,guez2012efficient,ghavamzadeh2016bayesian}.
+	Second, the problem of making sequential decision to learn about a model is deeply connected to \emph{exploration} in model-based reinforcement learning \citep{sun2011planning,shyam2019model,sekar2020planning}.
+	
+	
+	\subsection{Sequential Bayesian Experimental Design as a BAMDP}
+	
+	The BAMDP is a generalisation of the Markov Decision Process \citep{bellman1957markovian,duff2002optimal} that accommodates an unknown transition model.
+	Adopting the notation of \citet{guez2012efficient}, a BAMDP can be described by its augmented state space $S^+$, action space $A$, augmented transition model $\mathcal{P}^+$, reward function $R^+$ and discount factor $\gamma$.
+	The augmented state space consists of the \emph{history} of all states and actions previously visited $h_t = s_1a_1\dots a_{t-1}s_t$.
+	This data is used to update the transition model in a Bayesian manner, using
+	\begin{equation}
+	p(\mathcal{P}|h_t) \propto p(\mathcal{P})p(h_t|\mathcal{P}).
+	\end{equation}
+	For a sampled transition model, the probability of moving from $s_t$ to $s_{t+1}$ when action $a_t$ was used is
+	\begin{equation}
+	p(s_{t+1}|s_t,a_t,\mathcal{P}) = \mathcal{P}(s_{t},a_t,s_{t+1}).
+	\end{equation}
+	The BAMDP transition model is therefore given by the marginal \citep{guez2012efficient}
+	\begin{equation}
+	\label{eq:bamdp_transition}
+	p(s_{t+1}|a_t,h_t) = \int p(\mathcal{P}|h_t)\mathcal{P}(s_{t},a_t,s_{t+1})\,d\mathcal{P}.
+	\end{equation}
+	The reward for using action $a$ in state $s$ is sampled as $r \sim R(s,a)$.
+	Planning in a BAMDP means finding the policy that maximises 
+	\begin{equation}
+	\label{eq:bamdp_objective}
+	\mathcal{J}(\pi) = \E_\pi\left[ \sum_{t=1}^T \gamma^{-t}r_t \right].
+	\end{equation}
+	
+	To set up sequential Bayesian experimental design in this framework, we associate the augmented history states with the data $\mathcal{D}_t$ up to time $t$.
+	The actions of the BAMDP are the experimental designs $\xi_t$.
+	The transition model is associated with the model parameters $\theta$ (we assume in this section that we are not considering an embedded model).
+	The `transitions' of a sequential experiment are given by
+	\begin{equation}
+	\label{eq:soed_transition}
+	p(\mathcal{D}_{t+1}|\mathcal{D}_t,\xi_{t+1}) = \E_{p(\theta|\mathcal{D}_t)}[p(y_{t+1}|\theta,\xi)] = \int p(\theta|\mathcal{D}_t)p(y_{t+1}|\theta,\xi_{t+1}) \, d\theta
+	\end{equation}
+	which agrees with \eqref{eq:bamdp_transition} if we take $\mathcal{P}_\theta(y_{t+1},\xi_{t+1},y_t) = p(y_{t+1}|\theta,\xi_{t+1})$.
+	Note that we write $a_t$ as $\xi_{t+1}$, and that in the exchangeable experimental design case the transition model does not depend explicitly on $y_t$.
+	
+	The only minor distinction from the set-up of \citet{guez2012efficient} is that the rewards in experimental design depend on the augmented state $\mathcal{D}_t$ rather than the state $s_t$. We can take the reward function for experimental design to be $R(\mathcal{D}_t) = \1[t = T]  \E_{p(\theta|\mathcal{D}_t)}[U(\theta,\mathcal{D}_t)]$.
+	Setting the discount factor $\gamma=1$, we see that the BAMDP objective \eqref{eq:bamdp_objective} is the same as the sequential experimental design problem \eqref{eq:policy_general_u}.
+	This shows the close connection between these two fields.
+	For completeness, the value function and $Q$-function \citep{szepesvari2010algorithms} for Bayesian experimental design are given by
+	\begin{align}
+	V^\pi(\mathcal{D}_t) &= \E_{p(\mathcal{D}_T|\mathcal{D}_t,\pi)}\left[ \E_{p(\theta|\mathcal{D}_T)} [U(\theta,\mathcal{D}_T)] \right]   \\
+	Q^\pi(\mathcal{D}_t,\xi_{t+1}) &= \E_{p(\mathcal{D}_T|\mathcal{D}_t,\xi_{t+1},\pi)}\left[ \E_{p(\theta|\mathcal{D}_T)} [U(\theta,\mathcal{D}_T)] \right]
+	\end{align}
+	where 
+	\begin{align}
+	p(\mathcal{D}_T|\mathcal{D}_t,\pi) &= \E_{p(\theta|\mathcal{D}_t)}\left[ \prod_{\tau=t+1}^T \pi(\xi_{\tau}|\mathcal{D}_{\tau-1})p(y_{\tau}|\theta,\xi_{\tau}) \right] \\
+	p(\mathcal{D}_T|\mathcal{D}_t,\xi_{t+1},\pi) &= \E_{p(\theta|\mathcal{D}_t)}\left[ p(y_{t+1}|\theta,\xi_{t+1}) \prod_{\tau=t+2}^T \pi(\xi_{\tau}|\mathcal{D}_{\tau-1})p(y_{\tau}|\theta,\xi_{\tau}) \right].
+	\end{align}
+	
+	\paragraph{Belief states}
+	In the previous section, we followed \citet{guez2012efficient} and took the state space for experimental design to be the dataset $\mathcal{D}_t$.
+	We see from \eqref{eq:soed_transition} that the transition model only depends on $\mathcal{D}_t$ via the posterior $p(\theta|\mathcal{D}_t)$.
+	Furthermore, our choice of reward function only depends on $p(\theta|\mathcal{D}_t)$ (plus an indicator that we have reached the final stage).
+	Thus, it is sufficient to take $p(\theta|\mathcal{D}_t)$ as our augmented state. 
+	Posterior distributions treated as states are referred to as \emph{belief states} \citep{igl2018deep}.
+	They have been utilised extensively in Bayesian RL \citep{igl2018deep,zintgraf2019varibad,ghavamzadeh2016bayesian} and are beginning to be used in Bayesian experimental design \citep{huan2016sequential}.
+	
+	
+	
+	%The framing of the sequential design problem of Sec.~\ref{sec:sequential} as a BAMDP 
+	%
+	%We now move on from 
+	%
+	%The Bayesian experimental design problem as stated can be reformulated as a Bayesian Reinforcement Learning problem.
+	%Specifically, the problem \eqref{eq:policy_general_u} is a .
+	%We make the following associations
+	%\begin{description}
+	%	\item[State] $s_t = \mathcal{D}_t$
+	%	\item[Action] $a_t = \xi_t$
+	%	\item[Transition kernel] $p(s_{t+1}|s_t,a_{t+1}) = \E_{p(\theta|\mathcal{D}_t)}[p(y_{t+1}|\xi_{1:t+1},y_{1:t},\theta)]$ for a general model, $\E_{p(\theta|\mathcal{D}_t)}[p(y_{t+1}|\xi_{t+1},\theta)]$
+	%	\item[Reward] $r_T = U(\theta,\mathcal{D}_T)$
+	%	\item[Discount factor] $\gamma=1$
+	%\end{description}
+	%
+	%\begin{proposition}
+	%	Belief states on $\theta$ are valid states if and only if $\theta$ is sufficient.
+	%\end{proposition}
+	%
+	%A comment on root sampling.
+	%
+	%\begin{proposition}
+	%	Rewards formulated step-by-step is equivalent
+	%\end{proposition}
+	
+	
+	\subsection{Exploration}
+	\label{sec:exploration}
+	We have seen the close connection between sequential Bayesian experimental design and Bayesian RL.
+	We associated the transition model of an unknown MDP with the model parameter $\theta$.
+	In this framing, we have a new interpretation of objective functions for experimental design---they encourage the collection of data to improve knowledge of the transition model and are motivated by model-derived quantities, rather than by an external reward signal.
+	Utility functions for experimental design can thus be reinterpreted as rewards for \emph{exploration} behaviour that leads to improved knowledge in a model of the environment. 
+	
+	The experimental design scenario is most closely connected with model-based reinforcement learning \citep{sutton1990integrated}.
+	Specifically, we consider reinforcement learning settings in which we have a Bayesian parametric model of the environment with parameter $\theta$.
+	A range of authors have considered `intrinsic rewards' \citep{singh2005intrinsically}---unlike external rewards which are separate from the model and environment dynamics, intrinsic rewards encourage behaviour to learn about the environment.
+	For example, \citet{itti2006bayesian} used surprisal as an intrinsic reward---agents are encouraged to take actions for which the outcome is not predictable, and hence will be surprising. Mathematically, surprisal can be defined using predictive entropy.
+	Empowerment \citep{klyubin2005all,salge2014empowerment,mohamed2015variational} is another intrinsic reward signal that is based on conditional mutual information between state and action variables.
+	\citet{sajid2021active} studied curiosity-driven exploration and the connection with free energy minimisation.
+	
+	One line of research uses EIG as an intrinsic reward signal \citep{storck1995reinforcement}.
+	This curiosity-driven exploration \citep{schmidhuber2010formal,sun2011planning} is therefore the closest part of the RL literature to sequential experimental design.
+	Specifically, \citet{sun2011planning} utilise information gain as a reward. Given history $h$ and $h'$ such that $h$ is a prefix of $h'$ they define
+	\begin{equation}
+	\text{IG}(h'\|h) = \text{KL}\left( p(\theta|h') \| p(\theta|h) \right).
+	\end{equation}
+	To motivate this choice, \citet{sun2011planning} proved the following result (a more formal version of Example~\ref{example:shannon})
+	\begin{proposition}[\citet{sun2011planning}]
+		Let $h \subseteq h' \subseteq h''$ be histories such that $h$ a prefix of $h'$ and $h'$ a prefix of $h''$.
+		Suppose $h'$ has been observed.
+		Then,
+		\begin{equation}
+		\E_{h''|h'}[\textup{IG}(h''\|h)] = \textup{IG}(h'\|h) + \E_{h''|h'}[\textup{IG}(h''\|h')]
+		\end{equation}
+		so the information gain is additive in expectation.
+	\end{proposition}
+	Information gain for exploration was applied to robotics by \citet{fung2016autonomous}.
+	
+	\subsubsection{Computational approaches to exploration in Bayesian RL with EIG}
+	
+	To utilise information gain as an intrinsic reward for exploration requires approximation and optimisation of this quantity.
+	\citet{storck1995reinforcement} focused on the tabular setting with finite states and actions, in which the transition model can be described with a finite number of parameters.
+	\citet{sun2011planning} also focused on the finite space case for their computations.
+	\citet{houthooft2016vime} tackled the continuous space problem. They used variational inference \citep{rezende2014stochastic,kingma2014auto} to estimate the posterior distributions $p(\theta|\mathcal{D}_t)$.
+	They then used the variational approximate posterior as a surrogate for the true posterior when computing the information gain reward.
+	Information gain was combined with an external reward signal to balance exploration and exploitation.
+	\citet{shyam2019model} used an ensemble to approximate the distribution $p(\theta|\mathcal{D}_t)$, to estimate information gain they replaced Shannon entropy with R\'enyi entropy which can be calculated for a mixture of Gaussians.
+	\citet{sekar2020planning} used a closely related approach. Rather than the R\'enyi entropy, they used the empirical variance of ensemble means as a way of estimating the intractable marginal entropy that occurs in the EIG.
+	
+	% \citet{storck1995reinforcement} another classical reference that uses MI. This could be the origin of information gain in RL.
+	% 
+	% \citet{schmidhuber2010formal} use KL between posterior and prior as a measure.
+	
+	%\citet{sun2011planning}---this is a good paper. They find EIG to be additive, they propose the right set-up for us.
+	%Additivity in expectation
+	%
+	%\citet{houthooft2016vime} is good, they are using variational to do sensible stuff.
+	%
+	%\citet{shyam2019model}  weird Gaussian and Renyi divergences, etc.
+	%
+	%\citet{sekar2020planning} a recent paper, that uses MI but computationally is quite loose
+	%
+	%
+	%
+	%\citet{sajid2021active} is good for the theory that is right close to our set-up
+	
+	
+	
+	%Empowerment is not our boy, we want curiosity driven exploration with EIG.
+	%
+	%\citet{fung2016autonomous} US Army document---exploration with actual robots
+	
+	
+	
+	%Paragraph 0: model based
+	%
+	%Paragraph 1: intrinsic rewards
+	%
+	%Paragraph 2: EIG comes up here! Curiosity, etc
+	%
+	%Paragraph 3: Why is EIG good here? Sun 2011 looked into it.
+	%
+	%Survey of intrinsic rewards. Mention empowerment in a single sentence. Crack onto intrinsic rewards
+	%
+	%Write out this theorem of Sun 2011
+	
+	
+	
+	
+	% Intrinsically motivated RL \citep{singh2005intrinsically}
+	% Bayesian surprisal \citep{itti2006bayesian}
+	% Empowerment \citep{salge2014empowerment} \citet{klyubin2005all}
+	
+	% \citet{mohamed2015variational} not so useful
+	
+	
+	
+	%
+	%This is where we do more recent papers
+	%
+	%We have VIME, which is quite decent
+	%
+	%We have Shyam and Sekar
+	
+	
+	%\section{Examples}
+	%\emph{Drop this section}
+	%
+	%These examples work best when fleshed out with actual equations and so on.
+	%
+	%\begin{example}[Sensor placement \citep{papadimitriou2004optimal}]
+	%	We can place sensors on a truss structure and take measurements as a force is exerted on the structure. The sensor locations constitute the experimental design.
+	%	The objective of the experiment is to learn about the stiffnesses of different trusses in the structure.
+	%\end{example}
+	%\begin{example}[Clinical trials \citep{berry2006bayesian}]
+	%	During a clinical trial of a drug, the experimenter must make design decisions such as the allocation of patients to the treatment or control group, selecting the dose to be used, and perhaps terminating the trial early. These decisions all form part of the experimental design.
+	%	The objectives in a clinical trial might be to establish efficacy of the drug, or to find the most effective dose.
+	%\end{example}
+	%\begin{example}[Active learning \citep{houlsby2011bayesian}]
+	%	Given a large unlabelled dataset, we can iteratively select a small subset of examples to be hand-labelled by a human expert.
+	%	The selection of the examples to be labelled constitutes the experimental design, with the given label being the experimental outcome.
+	%	The objective of the experiment is to efficiently train a model that makes good predictions on a test set.
+	%\end{example}
+	%\begin{example}[Exploration \citep{shyam2019model}]
+	%	An agent can move about in an environment, obtaining measurements. The experimental design is the choice of movements to make. The objective is to learn a good predictive model of the environment.
+	%\end{example}
+	%
+	%\citet{loredo2004bayesian} ``scheduling observations of a star in order to characterize the orbit of a planet''
+	%This should be in the preceding section.
+	
+	
+	%\section{Bayesian Active Learning}
+	%
+	%
+	%
+	%\begin{itemize}
+	%	\item The field has been reinvented many times
+	%	\item We need to first set up our own notation and key points first, before introducing other concepts during the review.
+	%	\item My decomposition is as follows:
+	%	\begin{itemize}
+	%		\item Bayesian experimental design (starting from Lindley, focused on A- and D-criterion)
+	%		\item Active learning
+	%		\item Bayesian optimization
+	%		\item Model-based reinforcement learning
+	%		\item Statistical estimation of information-theoretic quantities
+	%		\item Theory, like consistency, etc
+	%	\end{itemize}
+	%\end{itemize}
+	%
+	%\section{Set-up}
+	%Bayesian model with $\theta,\xi$ and $y$. Possibly iterated.
+	%
+	%\section{Self-styled Bayesian Experimental Design}
+	%We start by discussing \citet{lindley1956} and \citet{lindley1972}. Also \citet{box1982}.
+	%
+	%We should mention \citet{chaloner1995} and \citet{ryan2016review}.
+	%
+	%Plus all our other references that we already studied, trying to understand and summarise what those papers actually said. 
+	
+	
+	\bibliographystyle{plainnat}
+	\bibliography{refs}
 	
 	\chapter{Variational Bayesian Optimal Experimental Design}
 	\label{chap:vboed}
