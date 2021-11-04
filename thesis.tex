@@ -53,20 +53,13 @@
 	
 	\newpage
 	\chapter*{Abstract}
-	Bayesian experimental design (BED) is a powerful mathematical framework with diverse applications that include asking the most pertinent question in an online survey, designing a laboratory experiment, choosing sensor locations, obtaining labels in active learning, searching for the maximum of an unknown function, and exploring an unknown environment.
-	Automated design of optimal experiments will allow scientists to undertake experiments more efficiently, reach statistically valid conclusions more quickly, and unlock kinds of experiments that have been hitherto considered impractical.
-	Unfortunately, widespread utilisation of BED for designing optimal experiments is not yet a reality.
-	Adoption of BED is hampered by computational challenges that are inherent in finding experimental designs that maximise the expected information that will be gained about the underlying process by running the experiment.
-	Broadly, the computational challenges can be broken down into three parts of increasing complexity: 1) estimating the expected information gain, 2) optimising the expected information gain over the space of possible designs, and 3) choosing a sequence of optimal designs whilst incorporating feedback from the experiment.
+	Experimentation is key to learning about our world, but careful design of experiments is critical to ensure resources are used to conduct discerning investigations. Bayesian experimental design (BED) is an elegant framework that provides a mathematical definition of the expected information gain (EIG) of running a certain experiment. Finding the design with the maximal EIG will, in expectation, give experimental outcomes that are most informative about the underlying phenomenon.
 	
-	The goal of this thesis is to present methods to tackle these computational challenges by taking inspiration from the rapid development of modern probabilistic machine learning in areas such as variational inference, amortised inference, stochastic gradient optimisation, probabilistic deep learning, Monte Carlo methods, likelihood-free inference, constrastive learning and reinforcement learning.
-	We show how concepts from these areas can be brought together to create a modern approach to BED that begins to overcome the computational restrictions on the Bayesian design of experiments.
+	BED promises to launch a revolution in science and machine learning, but it is only beginning to realise its potential due to numerous unsolved computational problems. One fundamental computational issue is the estimation of EIG, where a naïve approach necessitates nested calculation of Bayesian posteriors. Further computational challenges concern the optimisation of the EIG across design space, and the design of adaptive experiments that use data that has been already observed to find the optimal design of the next experiment.
 	
-	Specifically, we begin by presenting advances in the estimation of expected information gain, incorporating ideas from variational and amortised inference.
-	We make several contributions to the optimisation of experimental designs using stochastic gradient methods.
-	Finally, we turn to the sequential design problem, and demonstrate how efficient, adaptive design may be achieved through the use of a policy.
-	In concert, these methods allow us to expand the range of circumstances in which BED can be used to design optimal experiments, with implications for both machine learning and the sciences.
-
+	In this thesis, we ask whether the machinery of modern machine learning can be brought to bear on these computational challenges, demonstrating that significant advances are possible when modern ML is combined with a deep understanding of BED. We begin by examining the EIG estimation problem, being the first to apply variational inference and inference amortisation to the problem. We then turn to optimisation of the EIG over a continuous design space, showing that stochastic gradient methods, which have not been widely adopted in BED, combine with simultaneous optimisation of variational parameters to great effect. Continuing on this theme, we show that it is possible to obtain unbiased gradients of EIG using Multi-level Monte Carlo. For the adaptive design problem, a key limitation of most methods is that they require substantial computation at each iteration of the experiment. We ask whether this process itself cannot be amortised, ultimately deriving an algorithm that trains a design policy network offline to be deployed with lightning-fast design decisions during a live experiment. Finally, we show how this policy-driven approach extends to implicit models.
+	
+	Together, these contributions move the field of Bayesian experimental design forward significantly in terms of what is computationally possible. Our hope is that practitioners will be able to apply these ideas to advance human understanding in many scientific disciplines.
 	
 	\newpage
 	\chapter*{Acknowledgements}
@@ -1594,7 +1587,7 @@
 	\begin{equation}
 	\Delta(\xi|\mathcal{D}_t) = \E_{p(\theta|\mathcal{D}_t)p(y|\theta,\xi)}[U(\theta,\mathcal{D}_t \cup \{ (\xi,y) \}) - U(\theta,\mathcal{D}_t)].
 	\end{equation}
-	The utility $U$ is \emph{adaptive monotone} with respect to model $p(\theta)p(y|\theta,\xi)$ if the conditional expected marginal benefit of all designs is positive. That is, for all $t\ge 0, \mathcal{D}_t$ and $\xi\not\in\mathcal{D}_t$ we have 
+	The utility $U$ is \emph{adaptive monotone} with respect to model $p(\theta)p(y|\theta,\xi)$ if the conditional expected marginal benefit of all designs is nonnegative. That is, for all $t\ge 0, \mathcal{D}_t$ and $\xi\not\in\mathcal{D}_t$ we have 
 	\begin{equation}
 	\Delta(\xi|\mathcal{D}_t) \ge 0.
 	\end{equation}
@@ -1606,6 +1599,7 @@
 	\citet{golovin2011adaptive} were able to generalise the result of \citet{nemhauser1978analysis} to the adaptive case for noiseless experiments in which $p(y|\theta,\xi)$ is deterministic.
 	\begin{theorem}[\citet{golovin2011adaptive}]
 		\label{thm:adaptive_submodular}
+		Assume the likelihood $p(y|\theta,\xi)$ is deterministic.
 		Let $\pi^\text{greedy}$ be the greedy policy of \eqref{eq:greedy_general_u}. Assume $U$ is adaptive monotone and adaptive submodular for model $p(\theta)p(y|\theta,\xi)$.
 		Then,
 		\begin{equation}
@@ -1661,7 +1655,7 @@
 		\det \Sigma_\text{info} \le \det \Sigma_\text{iid}.
 		\end{equation}
 	\end{theorem}
-	This result tells us that the EIG maximisation strategy is no worse than i.i.d.~sampling of designs, and that it will recover the true value $\theta^*$ in the limit as $t\to\infty$, i.e.~the procedure is statistically consistent.
+	This result tells us that the EIG maximisation strategy is no worse than i.i.d.~sampling of designs in terms of asymptotic posterior variance, and that it will recover the true value $\theta^*$ in the limit as $t\to\infty$, i.e.~the procedure is statistically consistent.
 	
 	
 	\subsection{Non-greedy design policies}
