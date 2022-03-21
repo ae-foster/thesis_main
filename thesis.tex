@@ -135,7 +135,7 @@
 	%This incorporates both the true value of that unknown quantity---so we know how far away we are---and the estimate of it that will be obtained after the experiment.
 	To reason about objective functions that depend on unknowns in this way requires the incorporation of some \emph{a priori} knowledge. This \emph{a priori} knowledge is then used to select the design before commencing the experiment.
 	In this work, we focus on the Bayesian approach to this problem~\citep{lindley1956,lindley1972,chaloner1995,ryan2016review,foster2019variational} in which \emph{a priori} knowledge is encoded in two ways---first, the specification of a model for the experiment, and second in the prior distribution for the unknown parameters of that model.
-	Typically, the model itself is assumed to be correct.
+	In classical Bayesian experimental design, the model itself is assumed to be correct.
 	The prior distribution explicitly represents initial beliefs about unknown parameters of the model.
 	Furthermore, uncertainty in the prior is exactly the epistemic uncertainty that can be reduced by running experiments and collecting data, resulting in more precise \emph{a posteriori} knowledge.
 	
@@ -196,7 +196,7 @@
 	We discuss the case in which there are other model parameters aside from $\theta$ in Sec.~\ref{sec:embedded}.
 	
 	In non-exchangeable models, there is no assumption of conditional independence between experiments.
-	Such models are uncommon, but can arise in settings such as time series \citep{pole2018applied}. In a non-exchangeable model, the distribution of $y_t$ can, for example, be influenced by $y_{t-1}$ as well as by $\theta$ and $\xi_t$. Without loss of generality, the probability model for a non-exchangeable model can be written
+	Such models can arise in settings such as time series \citep{pole2018applied}. In a non-exchangeable model, the distribution of $y_t$ can, for example, be influenced by $y_{t-1}$ as well as by $\theta$ and $\xi_t$. Without loss of generality, the probability model for a non-exchangeable model can be written
 	\begin{equation}
 	p(\theta,y_{1:T}|\xi_{1:T}) = p(\theta)\prod_{t=1}^T p(y_t|\theta,\xi_{1:t},y_{1:t-1}).
 	\end{equation}
@@ -717,7 +717,7 @@
 	\label{eq:nmc_estimator}
 	\hat{\mathcal{I}}_{NMC}(\xi) = \frac{1}{N} \sum_{n=1}^N \log \frac{p(y_n|\theta_n,\xi)}{\frac{1}{M}\sum_{m=1}^M p(y_n|\theta'_m,\xi)} \text{ where } \theta_n,y_n \iid p(\theta)p(y|\theta,\xi),\theta'_m\iid p(\theta).
 	\end{equation}
-	The asymptotic properties of this estimator were studied by \citet{rainforth2018nesting,zheng2018robust,beck2018fast}, showing that $\hat{\mathcal{I}}_{NMC}(\xi)$ converges to $\mathcal{I}(\xi)$ with asymptotic error $\mathcal{O}(N^{-1}) + \mathcal{O}(M^{-2})$. Hence, it is optimal to set $M \propto \sqrt{N}$.
+	The asymptotic properties of this estimator were studied by \citet{rainforth2018nesting,zheng2018robust,beck2018fast}, showing that $\hat{\mathcal{I}}_{NMC}(\xi)$ converges to $\mathcal{I}(\xi)$ with asymptotic error $\mathcal{O}\left(\sqrt{N^{-1} + cM^{-2}}\right)$ in root mean square. Hence, it is optimal to set $M \propto \sqrt{N}$.
 	
 	
 	\paragraph{Laplace approximation}
@@ -792,7 +792,7 @@
 	This results in an estimate $\hat{r}(\xi,\theta_i,y)$ of $r(\xi,\theta_i,y)$ across different values of $y$.
 	Finally, they form the Monte Carlo estimate of the EIG
 	\begin{equation}
-	\mathcal{I}(\xi) \approx \frac{1}{N} \sum_{i=1}^N \hat{r}(\xi,\theta_i,y_i).
+	\mathcal{I}(\xi) \approx \frac{1}{N} \sum_{i=1}^N \log \hat{r}(\xi,\theta_i,y_i).
 	\end{equation}
 	
 	
@@ -1044,7 +1044,7 @@
 	
 	\section{Embedded models}
 	\label{sec:embedded}
-	So far, we have assumed that $\theta$, the parameters of interest, and $\theta$, the full set of model parameters, are one and the same.
+	So far, we have assumed that $\theta$ the parameters of interest, and the full set of model parameters, are one and the same.
 	In this section, we explore the case in which the parameters of interest and the full set of model parameters are different.
 	Model selection \citep{vanlier2014optimal,drovandi2014sequential}, in which we are only interesting in deciding which model is correct and not interested in learning the exact model parameters, is one important example of this setting.
 	Bayesian optimisation (Sec.~\ref{sec:bo}) is also an example in which we have a probability model for an unknown function, but we are only interest in learning the location of the maximum of that function.
@@ -1505,7 +1505,7 @@
 	The greedy (myopic) approach to experimental design is very widely adopted \citep{cavagnaro2010adaptive,drovandi2014sequential,mcgree2012adaptive,myung2013,foster2019variational}.
 	As noted, it is also the typical sequential optimisation strategy in Bayesian active learning and Bayesian optimisation.
 	One benefit of the greedy strategy is its simplicity---it effectively reduces the sequential experimental design problem to repeated applications of one-step design.
-	It is typically observed that greedy optimisation for experimental design does not fail as catastrophically as greedy policies can do in general reinforcement learning tasks \citep{,bakker2020experimental}.
+	It is typically observed that greedy optimisation for experimental design does not fail as catastrophically as greedy policies can do in general reinforcement learning tasks \citep{bakker2020experimental}.
 	We explore a possible theoretical explanation for this phenomenon.
 	
 	% In Sec.~\ref{sec:greedy}, we explore theoretical analysis of the greedy strategy. We show that, for certain utilities, the greedy strategy can achieve an expected utility that is at least $(1 - 1/e)$ of the expected utility of the fully optimal policy.
@@ -2311,6 +2311,16 @@
 	
 	Despite the fact that we are using an analytic entropy for one term, and a Monte Carlo estimate for the other, it's easy to see that this new estimator is a \emph{partially Rao-Blackwellised} PCE estimator. (This can be proved starting from \eqref{eq:pce}.)
 	That means all the existing facts, such as the estimator being a stochastic lower bound on $I(\xi)$, carry over naturally to the regression case.
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% ESSAY TWO AND A HALF IMPORTANCE SAMPLING AND SEQUENTIAL MONTE CARLO
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	\clearpage
+	\section{Constrastive Information Estimation }
+	\label{sec:smcessay}
+	
+	The purpose of this essay is to discuss connections 
 	
 	
 	
