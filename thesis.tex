@@ -1996,12 +1996,13 @@
 	In Section~\ref{sec:brlessay}, we draw another connection, this time between the sequential experiment methods in Chapters~\ref{chap:dad} and~\ref{chap:idad} and the field of Bayesian reinforcement learning. We show that reinforcement learning provides a natural language to express the sequential experimental design problem.
 	In Section~\ref{sec:estimators}, we investigate some of the statistical properties of various estimators discussed in this thesis. We focus on the NMC estimator, the PCE estimator introduced in Chapter~\ref{chap:sgboed}. We connect these more basic estimators with MLMC estimators, creating a stronger connection between earlier chapters and Chapter~\ref{chap:mlmc}.
 	In Section~\ref{sec:bounds}, we present new results on mutual information bounds. This can be seen a generalising theory for some of the bounds derived in Chapters~\ref{chap:vboed}, \ref{chap:sgboed}, \ref{chap:dad} and \ref{chap:idad}.
+	We conclude with a discussion of limitations of our work in Section~\ref{sec:limitations}.
 
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	% ESSAY ONE MODEL SELECTION
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
+	\clearpage
 	\section{Bayesian experimental design for model selection: variational and classification approaches}
 	\label{sec:modelselection}
 	
@@ -2312,16 +2313,6 @@
 	Despite the fact that we are using an analytic entropy for one term, and a Monte Carlo estimate for the other, it's easy to see that this new estimator is a \emph{partially Rao-Blackwellised} PCE estimator. (This can be proved starting from \eqref{eq:pce}.)
 	That means all the existing facts, such as the estimator being a stochastic lower bound on $I(\xi)$, carry over naturally to the regression case.
 	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	% ESSAY TWO AND A HALF IMPORTANCE SAMPLING AND SEQUENTIAL MONTE CARLO
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	
-	\clearpage
-	\section{Constrastive Information Estimation }
-	\label{sec:smcessay}
-	
-	The purpose of this essay is to discuss connections 
-	
 	
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2538,7 +2529,7 @@
 	This is because, until we have observed some data, it is almost impossible to know which later experiments will be optimal to run.
 	The DAD approach is to simulate different possibilities and learn to `play' well across the board.
 	The retraining alternative would be a hybrid approach between the standard greedy method and DAD in which some real data is used to retrain the policy as we progress.
-	
+
 	
 	
 	
@@ -3387,11 +3378,80 @@
 	\end{theorem}
 	A limitation of this bound is that we need to know the density $p(\rvx)$.
 	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% LIMITATIONS
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	\clearpage
+	\section{Limitations}
+	\label{sec:limitations}
+	
+	We conclude with a discussion on the limitations of the methods presented in this thesis.
+	
+	\subsection{Model misspecification}
+	
+	Given the heavily model-based nature of the Bayesian experimental design framework, model misspecification is an important source of error across the field \citep{chaloner1995,feng2015optimal}. 
+	Bayesian experimental design may be \emph{more sensitive} to model misspecification than, for example, Bayesian data analysis. To understand why this may be, consider the EIG criterion
+	\begin{equation}
+		\mathcal{I}(\xi) = \E_{p(y|\xi)}\left[\E_{p(\theta|y,\xi)}\left[ \log \frac{p(\theta|y,\xi)}{p(\theta)} \right]\right].
+	\end{equation}
+	Written in this way, we see that the EIG uses the model `twice': once to simulate putative outcomes $y$ from the prior predictive distribution $p(y|\xi) = \E_{p(\theta)}[p(y|\theta,\xi)]$, and once to evaluate the information gain in the model from observing outcome $y$ under design $\xi$. Some authors have sought to reduce the reliance on the prior predictive by defining an alternative EIG in which $y$ is sampled from a distribution other than $p(y|\xi)$, see e.g.~\citet{ouyang2016,overstall2021bayesian}. 
+	However, sampling $y$ from an alternative distribution sacrifices an important computational trick that arises when we rewrite the objective as
+	\begin{equation}
+	\mathcal{I}(\xi) = \E_{p(\theta)}\left[\E_{p(y|\theta,\xi)}\left[ \log \frac{p(\theta|y,\xi)}{p(\theta)} \right]\right].
+	\end{equation}
+	This equivalent form of EIG first samples $\theta$ from the prior, and subsequently samples $y$ conditional on $\theta$. Thus, without performing Bayesian inference, we have one sample $\theta$ from the true posterior distribution, this is akin to root sampling \citep{guez2012efficient}.
+	This trick is particularly helpful when we then replace the integrand with an estimate, such as in the `posterior' estimate of EIG \citep{foster2019variational}
+	\begin{equation}
+	\mathcal{I}(\xi) \ge \E_{p(\theta)}\left[\E_{p(y|\theta,\xi)}\left[ \log \frac{q_\phi(\theta|y,\xi)}{p(\theta)} \right]\right].
+	\end{equation}
+	which circumvents the need to perform explicit Bayesian inference.
+	Variational and policy-based methods make extensive use of this trick \citep{foster2020unified,foster2021dad}, thereby tying them into using the prior predictive distribution as a simulator for $y$.
+	
+	One avenue to deal with the problem of model misspecification is to place more emphasis on designing a truly realistic simulator model with a prior predictive distribution that matches with expert prior knowledge. Such a simulator, though, may not be an explicit likelihood model. 
+	This suggests that \emph{implicit likelihood} methods \citep{kleinegesse2018efficient,kleinegesse2020sequential,ivanova2021implicit} may be of particular importance within Bayesian experimental design, where defining an accurate simulator model is important when attempting to avoid pitfalls associated with model misspecification.
+	
+	\subsection{Long experiments with DAD}
+	In DAD \citep{foster2021dad}, we introduced the sPCE objective
+	\begin{equation}
+		\mathcal{L}_T(\pi,L) = \E_{p(\theta_0,h_T|\pi)p(\theta_{1:L})}\left[\log \frac{p(h_T|\theta_0,\pi)}{\frac{1}{L+1}\sum_{\ell=0}^L p(h_T|\theta_\ell,\pi)}\right].
+	\end{equation}
+	We can interpret the sPCE objective as rewarding the \emph{total} information gained from the entire sequence of experiments $h_T$ about $\theta$.
+	We investigated DAD with a number of steps up to about $T=30$ and found that it performed well. However, one can imagine potential problems with this approach as $T$ grows to be very large.
+	
+	First, DAD in its current formulation only `rewards' the design network at the final step of the experiment, when the sPCE objective is computed. This has practical benefits for the computational cost of the algorithm and avoids intermediate posterior calculation.
+	However, the terminal reward formulation may fall afoul of the temporal credit assignment problem \citep{sutton1984temporal} as $T$ grows to be large.
+	
+	Second, statistically speaking the sPCE objective relies on contrastive samples $\theta_{1:L}$ from the prior.
+	The estimate of marginal likelihood used in the sPCE objective, namely $\frac{1}{L+1}\sum_{\ell=0}^L p(h_T|\theta_\ell,\pi)$, is not much different from an importance sampling estimate using the prior, although with the distinction of using the true sample $\theta_0$ in the estimate.
+	As such, it is likely that the quality of sPCE will degrade as the prior becomes a worse proposal distribution for estimating marginal likelihood. Since we have $p(h_T|\theta,\pi) = \prod_{t=1}^T p(y_t|\theta,\xi_t)$, we see that additional likelihood terms are incorporated for each step of the experiment, likely meaning that the true posterior moves further and further from the prior as $T$ increases. This intuition is borne out by the asymptotic theory.
+	A possible solution for designing large $T$ experiments with DAD is to switch to using the sACE objective
+	\begin{equation}
+	\text{sACE}_T(\pi,L,q) = \E_{p(\theta_0,h_T|\pi)q(\theta_{1:L}|h_T)}\left[\log \frac{\frac{p(h_T|\theta_0,\pi)p(\theta_0)}{q(\theta_0|h_T)}}{\frac{1}{L+1}\sum_{\ell=0}^L \frac{p(h_T|\theta_\ell,\pi)p(\theta_\ell)}{q(\theta_\ell|h_T)}}\right].
+	\end{equation}
+	This form of the objective incorporates an explicit proposal distribution $q$.
+	Using sACE, the question becomes how to define a suitable proposal distribution.
+	In DAD, we focused on \emph{variational} proposal distributions that are learned simultaneously with the design policy network. However, the sACE objective is not formally limited to variational proposal distributions. We could, for example, consider proposals that are obtained using sequential Monte Carlo samplers \citep{del2006sequential}.
+	
+	
+
+	
+	\subsection{Expertise and practical considerations}
+	By introducing deep learning into Bayesian experimental design, the need to perform hyperparameter optimization \citep{bergstra2011algorithms} and neural network architecture design now play a role in BED.
+	The choice of neural network architecture, in particular, will influence the quality of EIG estimates that can be obtained with variational methods and the quality of design policy networks learned with DAD.
+	Whilst automated methods for designing neural networks are a topic of current research \citep{baker2016designing}, much of the field currently relies on designs chosen by hand, requiring significant expertise.
+	
+	
+	Other practical considerations include the ease of use of software for Bayesian experimental design, where users might wish to quickly specify new models and priors for use with the current state-of-the-art methods. In this context, the use of probabilistic programming languages for experimental design \citep{ouyang2016} provides a framework for writing experimental design algorithms in a model agnostic way, allowing the user to specify their model as a stochastic program. In our work, we have focused on the Pyro language \citep{pyro} as a framework for combining probabilistic programming, deep learning, and Bayesian experimental design (links to the code can be found in the relevant chapters).
+	
+	
+	
+	
 	
 	
 	
 	\clearpage
-	% \bibliographystyle{plainnat}
+	%\bibliographystyle{plainnat}
 	\bibliography{refs}
 	
 	
