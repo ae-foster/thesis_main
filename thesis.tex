@@ -3400,13 +3400,14 @@
 	\begin{equation}
 	\mathcal{I}(\xi) = \E_{p(\theta)}\left[\E_{p(y|\theta,\xi)}\left[ \log \frac{p(\theta|y,\xi)}{p(\theta)} \right]\right].
 	\end{equation}
-	This equivalent form of EIG first samples $\theta$ from the prior, and subsequently samples $y$ conditional on $\theta$. Thus, without performing Bayesian inference, we have one sample $\theta$ from the true posterior distribution, this is akin to root sampling \citep{guez2012efficient}.
-	This trick is particularly helpful when we then replace the integrand with an estimate, such as in the `posterior' estimate of EIG \citep{foster2019variational}
+	This equivalent form of EIG first samples $\theta$ from the prior, and subsequently samples $y$ conditional on $\theta$. Thus, without performing Bayesian inference, we have one sample of $\theta$ from the true posterior distribution; this is akin to root sampling in Bayesian reinforcement learning \citep{guez2012efficient}.
+	This trick is particularly helpful when we then replace the integrand with an estimate, such as in the `posterior' estimator of EIG \citep{foster2019variational}
 	\begin{equation}
 	\mathcal{I}(\xi) \ge \E_{p(\theta)}\left[\E_{p(y|\theta,\xi)}\left[ \log \frac{q_\phi(\theta|y,\xi)}{p(\theta)} \right]\right].
 	\end{equation}
-	which circumvents the need to perform explicit Bayesian inference.
-	Variational and policy-based methods make extensive use of this trick \citep{foster2020unified,foster2021dad}, thereby tying them into using the prior predictive distribution as a simulator for $y$.
+	An unbiased estimator of this lower bound can be computed without the need to perform explicit Bayesian inference.
+	Variational and policy-based methods make extensive use of this trick of sampling from $p(\theta)p(y|\theta,\xi)$ and evaluating a function that approximates the log density ratio $\log p(\theta|y,\xi)/p(\theta)$ \citep{foster2020unified,foster2021dad}.
+	However, using this trick implicitly ties these methods into using the prior predictive distribution as a simulator for $y$.
 	
 	One avenue to deal with the problem of model misspecification is to place more emphasis on designing a truly realistic simulator model with a prior predictive distribution that matches with expert prior knowledge. Such a simulator, though, may not be an explicit likelihood model. 
 	This suggests that \emph{implicit likelihood} methods \citep{kleinegesse2018efficient,kleinegesse2020sequential,ivanova2021implicit} may be of particular importance within Bayesian experimental design, where defining an accurate simulator model is important when attempting to avoid pitfalls associated with model misspecification.
@@ -3417,13 +3418,13 @@
 		\mathcal{L}_T(\pi,L) = \E_{p(\theta_0,h_T|\pi)p(\theta_{1:L})}\left[\log \frac{p(h_T|\theta_0,\pi)}{\frac{1}{L+1}\sum_{\ell=0}^L p(h_T|\theta_\ell,\pi)}\right].
 	\end{equation}
 	We can interpret the sPCE objective as rewarding the \emph{total} information gained from the entire sequence of experiments $h_T$ about $\theta$.
-	We investigated DAD with a number of steps up to about $T=30$ and found that it performed well. However, one can imagine potential problems with this approach as $T$ grows to be very large.
+	We investigated DAD with a number of steps up to about $T=30$ and found that it performed well. However, one can imagine several potential problems with this approach as $T$ grows to be very large.
 	
 	First, DAD in its current formulation only `rewards' the design network at the final step of the experiment, when the sPCE objective is computed. This has practical benefits for the computational cost of the algorithm and avoids intermediate posterior calculation.
 	However, the terminal reward formulation may fall afoul of the temporal credit assignment problem \citep{sutton1984temporal} as $T$ grows to be large.
 	
 	Second, statistically speaking the sPCE objective relies on contrastive samples $\theta_{1:L}$ from the prior.
-	The estimate of marginal likelihood used in the sPCE objective, namely $\frac{1}{L+1}\sum_{\ell=0}^L p(h_T|\theta_\ell,\pi)$, is not much different from an importance sampling estimate using the prior, although with the distinction of using the true sample $\theta_0$ in the estimate.
+	The estimate of marginal likelihood used in the sPCE objective, namely $\frac{1}{L+1}\sum_{\ell=0}^L p(h_T|\theta_\ell,\pi)$, is not much different from an importance sampling estimate using the prior, although with the distinction of using the true posterior sample $\theta_0$ in the estimate.
 	As such, it is likely that the quality of sPCE will degrade as the prior becomes a worse proposal distribution for estimating marginal likelihood. Since we have $p(h_T|\theta,\pi) = \prod_{t=1}^T p(y_t|\theta,\xi_t)$, we see that additional likelihood terms are incorporated for each step of the experiment, likely meaning that the true posterior moves further and further from the prior as $T$ increases. This intuition is borne out by the asymptotic theory.
 	A possible solution for designing large $T$ experiments with DAD is to switch to using the sACE objective
 	\begin{equation}
@@ -3442,7 +3443,7 @@
 	Whilst automated methods for designing neural networks are a topic of current research \citep{baker2016designing}, much of the field currently relies on designs chosen by hand, requiring significant expertise.
 	
 	
-	Other practical considerations include the ease of use of software for Bayesian experimental design, where users might wish to quickly specify new models and priors for use with the current state-of-the-art methods. In this context, the use of probabilistic programming languages for experimental design \citep{ouyang2016} provides a framework for writing experimental design algorithms in a model agnostic way, allowing the user to specify their model as a stochastic program. In our work, we have focused on the Pyro language \citep{pyro} as a framework for combining probabilistic programming, deep learning, and Bayesian experimental design (links to the code can be found in the relevant chapters).
+	Other practical considerations include the ease of use of software for Bayesian experimental design, where users might wish to quickly specify new models and priors for use with the current state-of-the-art methods. In this context, the use of probabilistic programming languages for experimental design \citep{ouyang2016} provides a framework for writing experimental design algorithms in a model agnostic way, allowing the user to specify their model as a stochastic program. In our work, we have focused on the Pyro language \citep{pyro} as a framework for combining probabilistic programming, deep learning, and Bayesian experimental design. Links to the code can be found in the relevant chapters.
 	
 	
 	
@@ -3452,6 +3453,7 @@
 	
 	\clearpage
 	%\bibliographystyle{plainnat}
+	\addcontentsline{toc}{chapter}{Bibliography}
 	\bibliography{refs}
 	
 	
