@@ -52,6 +52,9 @@
 	\include{title_page}
 	
 	\newpage
+	Updated with corrections 1st May 2023.
+	
+	\newpage
 	\chapter*{Abstract}
 	Experimentation is key to learning about our world, but careful design of experiments is critical to ensure resources are used efficiently to conduct discerning investigations. Bayesian experimental design (BED) is an elegant framework that provides a mathematical definition of the expected information gain (EIG) of running a certain experiment. Finding the design with the maximal EIG will, in expectation, give experimental outcomes that are most informative about the underlying phenomenon.
 	
@@ -1049,28 +1052,34 @@
 	Model selection \citep{vanlier2014optimal,drovandi2014sequential}, in which we are only interesting in deciding which model is correct and not interested in learning the exact model parameters, is one important example of this setting.
 	Bayesian optimisation (Sec.~\ref{sec:bo}) is also an example in which we have a probability model for an unknown function, but we are only interest in learning the location of the maximum of that function.
 	
-	For this more general case, we assume that the model is fully specified by a set of parameters $\psi$, and that our parameters of interest $\theta$ are a function of the full parameter set $\theta=f_\theta(\psi)$. In this case, the full joint distribution of the model is $p(\psi,y|\xi)$, and we obtain a joint over $\Theta \times \mathcal{Y}$ by integrating 
+	For this more general case, we assume that the model is fully specified by a set of parameters $\psi$, and that our parameters of interest $\theta$ are a stochastic function of the full parameter set $\theta\sim p(\theta|\psi)$. Note that this includes the case in which $\theta$ is a deterministic function of $\psi$. In this case, the full joint distribution of the model is $p(\psi,\theta,y|\xi)$, and we obtain a joint over $\Theta \times \mathcal{Y}$ by integrating 
 	\begin{equation}
-	p(\theta,y|\xi) = \int_{f_\theta^{-1}(\{\theta\})} p(\psi,y|\xi)\,d\psi.
+	p(\theta,y|\xi) = \int p(\psi,\theta,y|\xi)\,d\psi.
 	\end{equation}
 	
 	\paragraph{Semi-implicit likelihood}
 	The embedded model setting allows us to extend our discussion of explicit and implicit models (Sec.~\ref{sec:explicit_implicit}).
 	It could be the case that we do have an explicit prior for $\psi$ and an explicit likelihood $p(y|\psi,\xi)$ for the observation $y$ given the full set of parameters $\psi$.
-	Then the likelihood $p(y|\theta,\xi)$ is given by
+	Then the prior distribution on $\theta$ is given by
+	\begin{equation}
+		\label{eq:semi_implicit_prior}
+		p(\theta) = \int p(\psi)p(\theta|\psi)\,d\psi.
+	\end{equation}
+	The likelihood $p(y|\theta,\xi)$ can then be computed via Bayes' Rule
 	\begin{equation}
 	\label{eq:qoi}
-	p(y|\theta,\xi) = \int_{f_\theta^{-1}(\{\theta\})} p(y|\psi,\xi)\,d\psi,
+		p(y|\theta,\xi) = \frac{p(\theta,y|\xi)}{p(\theta)} = \frac{\int p(\psi)p(\theta|\psi)p(y|\psi,\xi)\,d\psi}{\int p(\psi)p(\theta|\psi)\,d\psi} = \int p(\psi|\theta)p(y|\psi,\xi)\, d\psi.
 	\end{equation}
-	and the prior is given by
-	\begin{equation}
-	\label{eq:semi_implicit_prior}
-	p(\theta) = \int_{f_\theta^{-1}(\{\theta\})} p(\psi)\,d\psi.
-	\end{equation}
-	First, note that $p(\theta,y|\xi) \ne p(\theta)p(y|\theta,\xi)$ in an embedded model.
-	Second, computing one or both of these integrals may be an intractable computation.
+	Computing one or both of the necessary integrals may be an intractable computation.
 	We use the term \emph{semi-implicit} for this case in which the likelihood or prior for $\psi$ is explicit, but the likelihood or prior for $\theta$ involves an intractable integral.
 	So a semi-implicit likelihood is one which is formed as an integral of an explicit likelihood $p(y|\psi,\xi)$ and a semi-implicit prior is one which is an integral of explicit prior $p(\psi)$.
+	
+	\paragraph{Semi-implicit likelihood with independent priors}
+	A special case of the preceding discussion arises when $\psi=(\theta,z)$ with $p(\psi) = p(\theta)p(z)$ and a deterministic $p(\theta|\psi)$. In this setting, $\psi$ is partitioned into the parameters of interest and an \emph{independent} nuisance parameter $z$. This allows us to simplify the expression for the semi-implicit likelihood by cancelling $p(\theta)$ as follows
+	\begin{equation}
+	\label{eq:indep_prior_semi_implicit}
+		p(y|\theta,\xi) = \int p(z)p(y|\theta,z,\xi)\, dz.
+	\end{equation}
 	
 	
 	\paragraph{Exchangeability}
@@ -1098,7 +1107,6 @@
 	\begin{equation}
 	I(\xi) = \E_{p(\psi)p(\theta|\psi)p(y|\psi,\xi)}\left[\log \frac{p(\theta|y,\xi)}{p(\theta)} \right].
 	\end{equation}
-	where $p(\theta|\psi)$ is a delta function on $f_\theta(\psi)$.
 	This is different to the definition in \eqref{eq:posterior_prior_ratio} because the expectation is taken over $p(\theta,y|\xi) \ne p(\theta)p(y|\theta,\xi)$ for an embedded model.
 	The EIG in an embedded model can also be expressed in BALD form (Proposition~\ref{prop:bald}) as
 	\begin{align}
