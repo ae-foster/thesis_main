@@ -1107,11 +1107,10 @@
 	\begin{equation}
 	I(\xi) = \E_{p(\psi)p(\theta|\psi)p(y|\psi,\xi)}\left[\log \frac{p(\theta|y,\xi)}{p(\theta)} \right].
 	\end{equation}
-	This is different to the definition in \eqref{eq:posterior_prior_ratio} because the expectation is taken over $p(\theta,y|\xi) \ne p(\theta)p(y|\theta,\xi)$ for an embedded model.
 	The EIG in an embedded model can also be expressed in BALD form (Proposition~\ref{prop:bald}) as
 	\begin{align}
 	I(\xi) &= H[p(y|\xi)] - \E_{p(\theta)}[H[p(y|\theta,\xi)]] \\
-	&=H\left[\E_{p(\psi)}[p(y|\psi,\xi)]\right] - \E_{p(\psi)p(\theta|\psi)}[H[p(y|\theta,\xi)]],
+	&=H\left[\E_{p(\psi)}[p(y|\psi,\xi)]\right] - \E_{p(\psi)p(\theta|\psi)}[H[\E_{p(\psi'|\theta)}[p(y|\psi',\xi)]]],
 	\end{align}
 	where the second line emphasises the difference with the standard case.
 	
